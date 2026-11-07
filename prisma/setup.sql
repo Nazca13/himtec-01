@@ -1,5 +1,5 @@
 -- ==========================================
--- FILE: supabase_setup.sql
+-- FILE: prisma/setup.sql
 -- PROJECT: SAPA (Sistem Asisten Pantau Aktif)
 -- DBMS: PostgreSQL (Supabase)
 -- Cocok dengan model DailyRecord di prisma/schema.prisma (@@map("daily_records")).

@@ -1,4 +1,4 @@
-// Data demo untuk pitching. Jalankan: node prisma/seed.js
+// Data demo untuk pitching. Jalankan: npm run db:seed
 // Menghapus semua DailyRecord lalu mengisi ulang 3 hari terakhir.
 const { PrismaClient } = require('@prisma/client');
 

@@ -3,7 +3,7 @@
 import Skeleton from './Skeleton';
 import Timeline from './Timeline';
 import { useRecords } from './RecordsProvider';
-import styles from './views.module.css';
+import styles from './pengawas.module.css';
 
 export default function RiwayatView() {
   const { records } = useRecords();

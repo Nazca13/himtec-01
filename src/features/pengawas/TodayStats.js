@@ -1,7 +1,7 @@
 import { PiMicrophoneFill, PiShieldCheckFill, PiSirenFill } from 'react-icons/pi';
 import { TIPE_INPUT } from '@/lib/constants';
 import { isHariIni } from '@/lib/format';
-import styles from './views.module.css';
+import styles from './pengawas.module.css';
 
 const TILES = [
   { tipe: TIPE_INPUT.AMAN, label: 'Kabar aman', Icon: PiShieldCheckFill, tone: 'HIJAU' },

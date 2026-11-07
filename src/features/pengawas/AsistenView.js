@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as m from 'motion/react-m';
 import { PiPaperPlaneRightFill, PiSparkleFill } from 'react-icons/pi';
-import styles from './chat.module.css';
+import styles from './AsistenView.module.css';
 
 const SARAN = [
   'Rangkum kondisi lansia 3 hari terakhir',
@@ -11,7 +11,7 @@ const SARAN = [
   'Kapan terakhir lansia memberi kabar?',
 ];
 
-export default function AsistenChat() {
+export default function AsistenView() {
   const [question, setQuestion] = useState('');
   const [thread, setThread] = useState([]); // { role: 'user' | 'ai' | 'error', text }
   const [loading, setLoading] = useState(false);

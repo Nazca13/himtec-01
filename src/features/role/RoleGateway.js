@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PiArrowRightBold, PiHandHeartFill, PiUsersThreeFill } from 'react-icons/pi';
 import { ROLES, ROLE_COOKIE } from '@/lib/roles';
-import styles from './role.module.css';
+import styles from './RoleGateway.module.css';
 
 const ICON = { lansia: PiHandHeartFill, pengawas: PiUsersThreeFill };
 const TONE = { lansia: styles.teal, pengawas: styles.sky };

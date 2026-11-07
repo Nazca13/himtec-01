@@ -11,7 +11,7 @@ import {
 } from 'react-icons/pi';
 import Wordmark from '@/components/ui/Wordmark';
 import { useRecords } from './RecordsProvider';
-import styles from './shell.module.css';
+import styles from './PengawasShell.module.css';
 
 const NAV = [
   { href: '/pengawas', label: 'Beranda', Icon: PiHouseFill },

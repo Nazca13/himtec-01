@@ -1,4 +1,4 @@
-import styles from '@/features/pengawas/enter.module.css';
+import styles from './template.module.css';
 
 // template.js dibuat ulang tiap pindah tab, jadi animasi CSS ini berjalan di setiap navigasi.
 // CSS murni (bukan JS): konten tidak tersembunyi menunggu hidrasi, jadi tidak menunda tampilan pertama.

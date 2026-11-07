@@ -28,11 +28,11 @@ Urutan kerja. Ikuti dari atas ke bawah.
    JALUR A (disarankan) - lewat Prisma
      npx prisma generate
      npx prisma db push
-     Lalu jalankan HANYA bagian "RLS" di supabase_setup.sql (SQL Editor).
+     Lalu jalankan HANYA bagian "RLS" di prisma/setup.sql (SQL Editor).
 
    JALUR B - lewat SQL Editor
      Buka dashboard -> SQL Editor -> New query.
-     Tempel seluruh isi supabase_setup.sql -> Run.
+     Tempel seluruh isi prisma/setup.sql -> Run.
      Lalu: npx prisma generate
      (Jangan jalankan prisma db push / migrate dev sesudahnya tanpa mengecek
      drift. Nama tabel dan kolom di SQL sudah dibuat sama persis dengan
@@ -53,5 +53,5 @@ Urutan kerja. Ikuti dari atas ke bawah.
      (role postgres) tidak terpengaruh.
 
 File terkait
-   - supabase_docs.md   : penjelasan model, keputusan keamanan, cara tambah tabel
-   - supabase_setup.sql : SQL siap tempel
+   - docs/supabase.md   : penjelasan model, keputusan keamanan, cara tambah tabel
+   - prisma/setup.sql   : SQL siap tempel

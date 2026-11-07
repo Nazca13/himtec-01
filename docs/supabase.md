@@ -1,6 +1,6 @@
 # Supabase di himtec-01
 
-Dokumen ini menjelaskan cara proyek memakai Supabase. Langkah pasang ada di `supabase_set up.txt`. SQL siap tempel ada di `supabase_setup.sql`.
+Dokumen ini menjelaskan cara proyek memakai Supabase. Langkah pasang ada di `docs/supabase-setup.txt`. SQL siap tempel ada di `prisma/setup.sql`.
 
 ## Arsitektur
 
@@ -37,7 +37,7 @@ Client Prisma dibuat sekali di `src/lib/db.js` (singleton). Jangan membuat `new 
 
 Nama tabel di Postgres adalah `daily_records` (snake_case, dipetakan Prisma lewat `@@map`). Kolom: `tipe_input`, `status_bahaya`, `raw_data`, `ai_analysis`, `created_at`.
 
-Data demo untuk pitching: `node prisma/seed.js` (menghapus semua baris lalu mengisi 6 baris).
+Data demo untuk pitching: `npm run db:seed` (menghapus semua baris lalu mengisi 6 baris).
 
 ## Keamanan
 

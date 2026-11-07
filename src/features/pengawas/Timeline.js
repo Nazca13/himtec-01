@@ -4,7 +4,7 @@ import { PiMicrophoneFill, PiShieldCheckFill, PiSirenFill } from 'react-icons/pi
 import StatusBadge from '@/components/ui/StatusBadge';
 import { TIPE_LABEL } from '@/lib/constants';
 import { formatWaktu } from '@/lib/format';
-import styles from './views.module.css';
+import styles from './pengawas.module.css';
 
 const ICON = { TOMBOL_AMAN: PiShieldCheckFill, VOICE_NOTE: PiMicrophoneFill, TOMBOL_DARURAT: PiSirenFill };
 

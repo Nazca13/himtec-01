@@ -1,7 +1,7 @@
-import AsistenChat from '@/features/pengawas/AsistenChat';
+import AsistenView from '@/features/pengawas/AsistenView';
 
 export const metadata = { title: 'Asisten AI' };
 
 export default function AsistenPage() {
-  return <AsistenChat />;
+  return <AsistenView />;
 }

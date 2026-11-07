@@ -2,7 +2,7 @@ import * as m from 'motion/react-m';
 import { PiMicrophoneFill, PiShieldCheckFill, PiSirenFill, PiWarningFill } from 'react-icons/pi';
 import { STATUS_LABEL, TIPE_LABEL } from '@/lib/constants';
 import { formatLalu, formatWaktu } from '@/lib/format';
-import styles from './views.module.css';
+import styles from './pengawas.module.css';
 
 const ICON = { HIJAU: PiShieldCheckFill, KUNING: PiMicrophoneFill, MERAH: PiSirenFill };
 const SEPI_MS = 12 * 60 * 60 * 1000; // tanpa kabar selama ini dianggap patut dicek

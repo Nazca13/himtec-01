@@ -1,4 +1,4 @@
-import styles from './views.module.css';
+import styles from './pengawas.module.css';
 
 export default function Skeleton() {
   return (

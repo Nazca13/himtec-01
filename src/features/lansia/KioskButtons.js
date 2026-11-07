@@ -15,7 +15,7 @@ import Wordmark from '@/components/ui/Wordmark';
 import { TIPE_INPUT } from '@/lib/constants';
 import { useRecorder } from '@/hooks/useRecorder';
 import { kirimSuara, kirimTombol } from './api';
-import styles from './kiosk.module.css';
+import styles from './KioskButtons.module.css';
 
 const MAX_REKAM_S = 30;
 const TAMPIL_TERKIRIM_MS = 3_000;

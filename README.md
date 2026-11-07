@@ -1,37 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SAPA - Sistem Asisten Pantau Aktif
 
-## Getting Started
+PWA dua tampilan untuk memantau lansia jarak jauh. Lansia menekan satu dari tiga tombol (atau merekam suara); keluarga melihat status, riwayat, dan bertanya ke asisten AI. Spesifikasi lengkap: `docs/PRD.txt`.
 
-First, run the development server:
+- `/lansia`: kiosk tiga tombol (Saya Aman, Bicara, Darurat)
+- `/pengawas`: Beranda, Riwayat, Asisten AI
+- `/`: pemilih peran (diingat per perangkat; buka `/?ganti` untuk memilih ulang)
+
+## Menjalankan
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install                  # wajib setelah clone atau pull: paket baru (mis. motion) harus terpasang
+cp .env.example .env         # isi DATABASE_URL, DIRECT_URL, ORCA_API_KEY
+npm run db:push             # buat tabel di Supabase (prisma generate jalan otomatis saat npm install)
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Setelah `db push`, aktifkan RLS: jalankan bagian RLS di `prisma/setup.sql` lewat Supabase SQL Editor. Data demo: `npm run db:seed` (menghapus semua baris dulu).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Jika muncul `Module not found`, hentikan server, jalankan `npm install`, lalu `rm -rf .next && npm run dev`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Perintah
 
-## Learn More
+| Perintah | Fungsi |
+| --- | --- |
+| `npm run dev` | server pengembangan |
+| `npm run build` / `npm start` | build dan jalankan produksi (PWA dan service worker aktif hanya di sini) |
+| `npm run lint` | ESLint |
+| `npm run db:push` | sinkronkan skema Prisma ke database |
+| `npm run db:seed` | isi data demo (MENGHAPUS semua baris dulu) |
+| `npm run db:studio` | lihat data di browser |
 
-To learn more about Next.js, take a look at the following resources:
+## Variabel lingkungan
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Nama | Isi |
+| --- | --- |
+| `DATABASE_URL` | Supabase Transaction pooler (port 6543, `?pgbouncer=true`) |
+| `DIRECT_URL` | Supabase Session pooler (port 5432), untuk migrasi |
+| `ORCA_API_KEY` | OrcaRouter: triase suara dan asisten AI |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Key anon/service_role Supabase tidak dipakai: akses database lewat Prisma dari server. Jangan commit `.env`.
 
-## Deploy on Vercel
+## Struktur
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+docs/               PRD dan dokumentasi Supabase
+design/             logo dan palet warna (sumber aset, tidak dipakai kode)
+prisma/             schema.prisma, setup.sql (DDL + RLS), seed.js
+src/app/            rute dan route handler tipis (/api/record, /api/ai, /api/assistant)
+src/features/       UI per fitur (lansia, pengawas, role)
+src/components/     komponen bersama
+src/services/       logika bisnis (record, triase, asisten)
+src/hooks/          useRecorder (rekam dan ubah ke WAV)
+src/lib/            db, orca, konstanta, format
+public/sw.js        service worker (cache aplikasi, offline)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# himtec-01
+Dokumentasi: `docs/` (PRD, Supabase). Aset desain (logo, palet): `design/`. Catatan untuk asisten kode: `CLAUDE.md`.

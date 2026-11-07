@@ -7,7 +7,7 @@ import StatusCard from './StatusCard';
 import Timeline from './Timeline';
 import TodayStats from './TodayStats';
 import { useRecords } from './RecordsProvider';
-import styles from './views.module.css';
+import styles from './pengawas.module.css';
 
 export default function BerandaView() {
   const { records, now } = useRecords();
