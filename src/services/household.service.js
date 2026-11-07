@@ -14,10 +14,11 @@ async function denganKodeUnik(buat) {
 }
 
 // Pendaftaran pengurus: keluarga + admin + orang tua pertama, dalam satu transaksi.
-export const daftarKeluarga = ({ namaAdmin, namaLansia }) =>
+export const daftarKeluarga = ({ namaAdmin, namaLansia, namaKeluarga }) =>
   denganKodeUnik(() =>
     db.$transaction(async (tx) => {
-      const household = await tx.household.create({ data: { nama: `Keluarga ${namaAdmin}`, kodeUndangan: generateCode(KODE_KELUARGA_LEN) } });
+      const namaRumah = namaKeluarga?.trim() || `Keluarga ${namaAdmin}`;
+      const household = await tx.household.create({ data: { nama: namaRumah, kodeUndangan: generateCode(KODE_KELUARGA_LEN) } });
       const member = await tx.member.create({ data: { householdId: household.id, nama: namaAdmin, role: 'ADMIN' } });
       const lansia = await tx.lansia.create({ data: { householdId: household.id, nama: namaLansia, kodePairing: generateCode(KODE_LANSIA_LEN) } });
       return { household, member, lansia };

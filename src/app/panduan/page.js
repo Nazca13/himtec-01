@@ -17,7 +17,7 @@ const PERAN = [
     siapa: 'Orang tua yang dipantau (nenek atau kakek).',
     perangkat: 'Aplikasi di HP-nya sendiri (bisa di-install ke layar utama).',
     bisa: 'Menekan Saya Aman, Keluhan (bicara, atau ketuk gambar keluhan bagi yang sulit bicara), atau Darurat. Maskot menyapa dan menghitung hari berturut-turut.',
-    masuk: 'Membuka link kode HP dari admin, lalu "Hubungkan HP ini". Cukup sekali.',
+    masuk: 'Membuka link kode HP dari admin, lalu tekan "Peduli hari ini, untuk mereka nanti". Cukup sekali.',
   },
   {
     nama: 'Pemantau',
@@ -30,7 +30,7 @@ const PERAN = [
 
 const ALUR = [
   ['Admin mendaftar', 'Buka halaman depan, pilih "Daftarkan keluarga", isi nama Anda dan nama orang tua. Anda langsung menjadi admin dan mendapat dua kode: kode HP (untuk orang tua) dan kode undangan (untuk keluarga lain).'],
-  ['Hubungkan HP orang tua', 'Tekan "Kirim lewat WhatsApp" pada kode HP. Di HP orang tua, buka link itu lalu tekan "Hubungkan HP ini". Setelah itu HP menampilkan tiga tombol setiap kali dibuka. Agar seperti aplikasi, pilih "Tambahkan ke layar utama" di menu browser.'],
+  ['Hubungkan HP orang tua ("Peduli hari ini, untuk mereka nanti")', 'Tekan "Kirim lewat WhatsApp" pada kode HP. Di HP orang tua, buka link itu lalu tekan "Hubungkan HP ini". Setelah itu HP menampilkan tombol pantauan setiap kali dibuka. Agar seperti aplikasi, pilih "Tambahkan ke layar utama" di menu browser.'],
   ['Orang tua memberi kabar', 'Saya Aman (hijau), Keluhan (oranye: bicara dan AI merangkum, atau ketuk gambar seperti Pusing, Sesak napas, Jatuh), atau Darurat (merah). Keluhan berbahaya otomatis berstatus merah.'],
   ['Keluarga memantau', 'Dashboard menampilkan status terbaru, Ringkasan AI yang diperbarui otomatis, grafik 7 hari, riwayat, dan Asisten AI untuk bertanya. Kabar baru muncul dalam hitungan detik.'],
   ['Admin mengundang keluarga lain', 'Di menu Keluarga, kirim kode undangan. Penerima memilih "Masuk dengan kode undangan" dan menjadi pemantau. Admin bisa menjadikannya admin kapan saja.'],

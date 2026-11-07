@@ -1,7 +1,8 @@
 # Laporan Pengembangan Aplikasi SAPA
 
-> **SAPA (Sistem Asisten Pantau Aktif)**: aplikasi pemantauan lansia jarak jauh berbasis AI.
-> HIMTEC Hackathon Build App 2026, tema *Pantau lansia jarak jauh*.
+> **SAPA (Sistem Asisten Pantau Aktif)**: Aplikasi Pemantauan Lansia Jarak Jauh Berbasis Kecerdasan Buatan (AI) & Akselerometer Cerdas.
+> Dikembangkan untuk **HIMTEC Hackathon Build App 2026** — Kategori *Pantau Lansia Jarak Jauh*.
+> Slogan / Tagline: *"Peduli hari ini, untuk mereka nanti."*
 
 <p align="center">
   <img src="docs/screenshots/04-app-lansia.jpg" alt="Aplikasi di HP orang tua" width="240">
@@ -18,418 +19,523 @@
 3. [Tujuan dan Manfaat Aplikasi](#3-tujuan-dan-manfaat-aplikasi)
 4. [Batasan Aplikasi yang Dikembangkan](#4-batasan-aplikasi-yang-dikembangkan)
 5. [Analisis Kebutuhan dan Desain Solusi Aplikasi](#5-analisis-kebutuhan-dan-desain-solusi-aplikasi)
-6. [Implementasi Aplikasi](#6-implementasi-aplikasi)
+   - 5.1 [Analisis Pengguna & Peran](#51-analisis-pengguna--peran)
+   - 5.2 [Spesifikasi Use Case Lengkap (UC-01 s/d UC-12)](#52-spesifikasi-use-case-lengkap)
+   - 5.3 [Kebutuhan Non-Fungsional](#53-kebutuhan-non-fungsional)
+   - 5.4 [Diagram Alur & Flowchart Sistem](#54-diagram-alur--flowchart-sistem)
+   - 5.5 [Desain Arsitektur Sistem](#55-desain-arsitektur-sistem)
+   - 5.6 [Desain Basis Data (ERD)](#56-desain-basis-data)
+   - 5.7 [Desain Antarmuka & Ergonomi Visual (Apple HIG)](#57-desain-antarmuka-uiux)
+6. [Implementasi Fitur Utama](#6-implementasi-fitur-utama)
+   - 6.1 [Form Registrasi Data Keluarga Lengkap](#61-form-registrasi-data-keluarga-lengkap)
+   - 6.2 [Triase Suara AI & AudioPlayer Asli Suara Nenek](#62-triase-suara-ai--audioplayer-asli-suara-nenek)
+   - 6.3 [Tombol Cepat Kejang & Deteksi Getaran Akselerometer](#63-tombol-cepat-kejang--deteksi-getaran-akselerometer)
+   - 6.4 [Shortcut Cepat "Sudah Obat" & Streak Keaktifan](#64-shortcut-cepat-sudah-obat--streak-keaktifan)
+   - 6.5 [Tab Pengaturan Pengawas & Sirene Darurat](#65-tab-pengaturan-pengawas--sirene-darurat)
+   - 6.6 [Aksesibilitas Senior: Skala Teks & Logout Mandiri](#66-aksesibilitas-senior-skala-teks--logout-mandiri)
+7. [Pengujian & Verifikasi Kualitas](#7-pengujian--verifikasi-kualitas)
+8. [Panduan Menjalankan Aplikasi](#8-panduan-menjalankan-aplikasi)
 
 ---
 
 ## 1. Judul / Nama Aplikasi
 
 **SAPA - Sistem Asisten Pantau Aktif**
+*Tagline: "Peduli hari ini, untuk mereka nanti."*
 
-Nama "SAPA" dipilih karena dua alasan:
+Nama "SAPA" mengandung dua makna filosofis dan fungsional:
+- **Makna Kemanusiaan (*Human-Centered*)**: *Menyapa* adalah ikatan kasih sayang paling mendasar antara anak dan orang tua. Aplikasi ini menjembatani jarak agar orang tua lansia cukup "menyapa" keluarga dengan satu ketukan intuitif tanpa beban teknologi.
+- **Akronim Fungsional**: *Sistem Asisten Pantau Aktif*, yaitu ekosistem pemantauan cerdas yang secara aktif mendeteksi kegawatan (kejang, jatuh, nyeri dada, henti nafas), memproses suara dan keluhan melalui AI klinis, serta membimbing keluarga mengambil tindakan pertolongan pertama secara nyata.
 
-- **Makna sehari-hari**: *menyapa* adalah cara paling sederhana menanyakan kabar seseorang. Aplikasi ini membuat orang tua cukup "menyapa" keluarganya dengan satu ketukan.
-- **Akronim fungsi**: *Sistem Asisten Pantau Aktif*, yaitu sistem yang secara aktif membantu keluarga memantau kondisi orang tua, bukan sekadar mencatat.
-
-| Atribut | Keterangan |
+| Parameter | Spesifikasi |
 | --- | --- |
-| Jenis | Aplikasi web progresif (PWA) + dashboard web |
-| Pengguna | Orang tua (lansia), anak/pengurus keluarga, anggota keluarga lain |
-| Platform | Browser di HP (Android/iOS) dan laptop; app lansia bisa di-install ke layar utama |
-| Kecerdasan buatan | Triase pesan suara, ringkasan kondisi, asisten tanya-jawab, pesan maskot |
-| Repositori | https://github.com/Nazca13/himtec-01 |
+| **Kategori** | Progressive Web Application (PWA) + Web Dashboard Responsif |
+| **Pengguna Sasaran** | Lansia (orang tua/kakek/nenek), Admin Keluarga (anak/pengurus), Anggota Keluarga (pemantau) |
+| **Dukungan Platform** | Smartphone (Android & iOS/Safari PWA), Tablet, Laptop/Desktop |
+| **Kecerdasan Buatan** | Triase Medis Suara Multimodal (`gemini-2.5-flash`), Ringkasan Riwayat Klinis & Asisten Dokter AI (`gemini-2.5-flash-lite`) via OrcaRouter |
+| **Sensorik** | Web DeviceMotionEvent / Accelerometer (Deteksi Ritme Kejang & Guncangan Jatuh) |
+| **Audio** | Audio Recording WAV 16 kHz Mono & In-App Streaming AudioPlayer |
+| **Repositori Resmi** | [https://github.com/Nazca13/himtec-01](https://github.com/Nazca13/himtec-01) |
 
 ---
 
 ## 2. Latar Belakang Ide Aplikasi
 
-### 2.1 Kondisi yang diamati
+### 2.1 Masalah Nyata di Lapangan
+1. **Fenomena Lansia Tinggal Sendiri (*Aging in Place*)**: Lonjakan urbanisasi menyebabkan jutaan anak merantau, meninggalkan orang tua lansia sendirian di kampung halaman.
+2. **Keterbatasan Fisik & Kognitif Lansia**: Penurunan daya ingat, penglihatan kabur (*presbiopi*), tremor tangan (*Parkinson*), dan kesulitan mengetik membuat aplikasi pesan biasa (WhatsApp, Telegram) sulit digunakan saat kondisi tubuh melemah.
+3. **Deteksi Cepat Kejang & Jatuh (*Golden Hour Trauma*)**: Insiden stroke, serangan jantung mendadak, kejang epilepsi, atau terpeleset di kamar mandi membutuhkan penanganan dalam hitungan menit. Lansia seringkali tidak sempat membuka aplikasi, mencari kontak, apalagi mengetik pesan darurat.
+4. **Informasi Mentah yang Menyesatkan**: Pesan suara atau pesan singkat yang terputus-putus sering membingungkan keluarga. Keluarga memerlukan sistem yang langsung memilah: *Apakah ini situasi bahaya kritis (Merah), keluhan ringan/sedang (Kuning), atau kondisi aman terkontrol (Hijau)?*
 
-Semakin banyak orang tua di Indonesia tinggal **terpisah dari anak-anaknya**: anak merantau untuk bekerja, sementara orang tua tetap di rumah. Keluarga ingin tahu kabar mereka setiap hari, tetapi:
-
-1. **Menelepon setiap hari tidak selalu memungkinkan.** Jadwal kerja padat, dan telepon yang tidak diangkat justru menimbulkan cemas.
-2. **Aplikasi pemantauan yang ada tidak ramah lansia.** Menu bertingkat, formulir, tabel, dan tulisan kecil sulit dipakai orang tua, terutama yang penglihatannya menurun atau tidak terbiasa dengan teknologi.
-3. **Saat darurat, lansia tidak sempat mengoperasikan aplikasi.** Tombol SOS kecil atau aplikasi yang harus dibuka lewat beberapa langkah tidak realistis dipakai saat jatuh atau sakit mendadak.
-4. **Tidak semua lansia bisa atau mau berbicara/mengetik.** Gangguan bicara, pendengaran, atau rasa sungkan membuat keluhan sering tidak tersampaikan.
-5. **Keluarga kebanjiran informasi mentah.** Kalaupun ada laporan, keluarga harus membaca dan menyimpulkan sendiri apakah situasinya berbahaya.
-
-### 2.2 Gagasan
-
-SAPA memisahkan aplikasi menjadi **dua wajah yang sangat berbeda** di atas satu data yang sama:
-
-- **Untuk orang tua: aplikasi tiga tombol besar.** Tanpa menu, tanpa login, tanpa formulir. *Saya Aman* (hijau), *Keluhan* (oranye), *Darurat* (merah). Keluhan bisa diucapkan **atau cukup diketuk lewat gambar**.
-- **Untuk keluarga: dashboard yang sudah "berpikir".** AI menerjemahkan rekaman suara menjadi gejala dan tingkat bahaya, merangkum kondisi beberapa hari terakhir, dan menampilkan langkah pertolongan pertama saat ada kondisi darurat.
-
-Orang tua tidak perlu belajar teknologi; teknologinya yang menyesuaikan diri dengan orang tua.
+### 2.2 Pendekatan Solusi SAPA
+SAPA menerapkan arsitektur **"Satu Data, Dua Wajah Berlawanan"**:
+- **Sisi Orang Tua (Lansia)**:
+  - Antarmuka ultra-minimalis dengan tombol berukuran raksasa (tinggi >108px).
+  - Tiga pilihan utama: *Saya Aman* (Hijau), *Keluhan* (Kuning), dan *Darurat* (Merah).
+  - Dilengkapi tombol cepat *Tombol Kejang* khusus dan listener akselerometer cerdas pendeteksi tremor kejang/jatuh dengan hitung mundur darurat 30 detik.
+  - Shortcut 1-ketuk *Sudah Obat* untuk kepatuhan medikasi harian.
+  - Opsi pelaporan keluhan via 9 kartu visual (tanpa perlu bicara/mengetik).
+- **Sisi Keluarga (Pengawas / Admin)**:
+  - Dashboard klinis real-time dengan pembaruan otomatis (live-polling).
+  - Pemutar rekaman suara asli lansia (*AudioPlayer*) lengkap dengan visualisasi waveform dan pengatur kecepatan putar (1x, 1.5x, 2x).
+  - Analisis triase AI terstruktur (Transkrip, Gejala Spesifik, Status Bahaya, Ringkasan Klinis).
+  - Kartu panduan pertolongan pertama interaktif sesuai jenis kegawatdaruratan, peta lokasi GPS instan, dan panggilan cepat darurat (119 Ambulans, 112 Darurat, 110 Polisi, 113 Damkar).
+  - Tab Pengaturan komprehensif dengan penguji sirine alarm audio dan ekspor rekam medis (CSV & Cetak PDF).
 
 ---
 
 ## 3. Tujuan dan Manfaat Aplikasi
 
-### 3.1 Tujuan
+### 3.1 Tujuan Utama
+1. Menyediakan sarana pelaporan harian yang **dapat dioperasikan oleh lansia usia 60-85+ tahun** hanya dengan satu sentuhan jari.
+2. Menyajikan **triase kegawatan medis real-time berbasis AI** yang dapat membedakan kondisi Aman, Keluhan Ringan, dan Bahaya Kritis secara objektif.
+3. Memberikan respons darurat otomatis terhadap insiden **kejang ritmik dan guncangan jatuh** melalui sensor akselerometer perangkat.
+4. Mengarsipkan rekaman suara asli dan rekam medis harian yang dapat diekspor untuk konsultasi dokter di fasilitas kesehatan.
 
-1. Menyediakan cara **paling sederhana** bagi orang tua untuk memberi kabar setiap hari: satu ketukan.
-2. Memberi keluarga **gambaran kondisi yang jelas dan cepat**: status terbaru, ringkasan AI, lokasi, dan riwayat, diperbarui otomatis dalam hitungan detik.
-3. **Mempercepat respons saat darurat** dengan status merah otomatis untuk keluhan berbahaya, lokasi terakhir, dan panduan pertolongan pertama.
-4. Memungkinkan **beberapa anggota keluarga** memantau bersama dengan **pembagian peran** yang jelas.
-5. Menjaga **privasi dan keamanan** data kesehatan keluarga.
-
-### 3.2 Manfaat
-
-| Pihak | Manfaat |
+### 3.2 Manfaat Berdasarkan Peran
+| Pengguna | Manfaat yang Diperoleh |
 | --- | --- |
-| **Orang tua** | Cukup satu ketukan; tidak perlu membaca menu atau mengetik. Keluhan bisa lewat suara atau gambar. Disapa maskot dengan namanya sendiri sehingga terasa ditemani, bukan diawasi. |
-| **Anak / pengurus (admin)** | Tahu kabar orang tua tanpa harus menelepon berkali-kali. Mendapat ringkasan dan saran tindakan dari AI. Bisa mengelola beberapa orang tua dan anggota keluarga dari satu tempat. |
-| **Anggota keluarga lain (pemantau)** | Ikut memantau tanpa bisa mengubah pengaturan, sehingga data tetap tertib. |
-| **Situasi darurat** | Keluhan berbahaya (nyeri dada, sesak, jatuh, kejang) langsung berstatus merah. Keluarga langsung melihat langkah pertolongan pertama, tombol telepon 119/112, dan lokasi terakhir. |
+| **Lansia** | - Merasa tenang dan diperhatikan setiap hari tanpa tertekan kerumitan teknologi.<br>- Memiliki tombol penyelamat instan saat kejang, jatuh, atau sesak nafas mendadak.<br>- Ukuran huruf dapat diatur mandiri (Normal, Besar, Sangat Besar).<br>- Pengingat kepatuhan minum obat dengan kartu checklist harian. |
+| **Admin Keluarga (Anak Pengurus)** | - Registrasi data keluarga lengkap (nama keluarga, kontak WhatsApp, riwayat kesehatan orang tua).<br>- Mendengar suara asli orang tua langsung dari dashboard.<br>- Mengatur hak akses anggota keluarga (Admin vs Pemantau).<br>- Ekspor log medis ke CSV atau cetak PDF ringkasan kondisi untuk dokter keluarga. |
+| **Pemantau (Keluarga Lain)** | - Memantau kondisi orang tua bersama-sama secara transparan dari mana saja.<br>- Berdiskusi dengan Asisten AI terkait pola kesehatan orang tua selama 7 hari terakhir. |
 
 ---
 
 ## 4. Batasan Aplikasi yang Dikembangkan
 
-Batasan berikut sengaja ditetapkan atau merupakan keterbatasan teknis yang diketahui:
-
-### 4.1 Batasan ruang lingkup
-
-1. **Bukan alat medis dan tidak mendiagnosis.** AI hanya merangkum keluhan dan menilai tingkat urgensi (hijau/kuning/merah). Panduan pertolongan pertama bersifat umum dan tertulis "bukan pengganti tenaga medis".
-2. **Tidak menghubungi layanan darurat secara otomatis.** Aplikasi memberi tahu keluarga dan menyediakan tombol telepon 119/112; keputusan menelepon tetap pada manusia.
-3. **Tidak ada notifikasi push** ke HP keluarga. Kabar baru tampil di dashboard (diperbarui setiap ±5 detik saat dibuka).
-4. **Deteksi jatuh/kejang otomatis tidak disertakan.** Fitur ini sempat dibuat memakai sensor gerak HP, tetapi **dihapus** karena di platform web hanya bekerja saat aplikasi terbuka dan hasilnya tidak konsisten. Fitur yang tidak andal berbahaya karena keluarga bisa mengandalkannya. Sebagai gantinya tersedia tombol *Darurat* dan pilihan keluhan *Jatuh* / *Baru kejang* yang selalu berfungsi.
-
-### 4.2 Batasan teknis
-
-1. **Butuh koneksi internet.** Tanpa internet, aplikasi menampilkan halaman offline dan kabar tidak tersimpan (tidak diantrekan).
-2. **HTTPS diperlukan** untuk mikrofon, lokasi, dan pemasangan ke layar utama di HP. Mode pengembangan di jaringan lokal (HTTP) hanya cocok untuk uji tampilan.
-3. **Lokasi hanya dikirim saat tombol ditekan** dan hanya jika izin lokasi diberikan; bukan pelacakan terus-menerus.
-4. **Rekaman suara maksimal 30 detik** dan dikonversi ke WAV 16 kHz mono di browser sebelum dikirim.
-5. **Bergantung pada layanan pihak ketiga**: Supabase (database), OrcaRouter (model AI). Jika AI gagal atau lambat, aplikasi memakai teks cadangan dan pesan suara tetap tersimpan berstatus kuning.
-6. **Pembatas percobaan kode disimpan di memori server**, cukup untuk skala demo; untuk skala besar perlu penyimpanan bersama seperti Redis.
-7. **Tanpa kata sandi.** Akses memakai kode sekali pakai yang menghasilkan sesi bertanda tangan; keamanan bergantung pada kerahasiaan kode yang dibagikan.
+1. **Bukan Pengganti Diagnosis Medis Formal**: AI SAPA bertindak sebagai pendukung keputusan awal (*triage decision support*) dan panduan pertolongan pertama, bukan pemberi resep atau vonis medis definitif.
+2. **Konektivitas Internet**: Membutuhkan sambungan internet aktif (Wi-Fi atau data seluler) untuk sinkronisasi cloud Supabase dan inferensi AI OrcaRouter.
+3. **Protokol Sensor & PWA di iOS/Android**: Sensor gerak akselerometer memanfaatkan Web DeviceMotion API. Pada browser modern (seperti iOS Safari), izin sensor diberikan transparan melalui saklar aktivasi in-app.
+4. **Penyimpanan Suara**: Audio lansia direkam dalam format WAV 16 kHz mono (maksimal 30 detik) dan diarsipkan dalam bentuk Base64 audio stream terenkripsi pada basis data.
+5. **Autentikasi Tanpa Kata Sandi (*Passwordless Pairing*)**: Menggunakan kode unik alfanumerik 6-karakter ramah lansia yang aman dan bertanda tangan HMAC-SHA256 untuk mempermudah login orang tua.
 
 ---
 
 ## 5. Analisis Kebutuhan dan Desain Solusi Aplikasi
 
-### 5.1 Analisis pengguna dan peran
+### 5.1 Analisis Pengguna & Peran
 
-| Peran | Siapa | Kebutuhan utama | Perangkat |
-| --- | --- | --- | --- |
-| **Lansia** | Orang tua yang dipantau | Memberi kabar semudah mungkin, tanpa membaca menu | HP sendiri, aplikasi (PWA) |
-| **Admin** | Anak/pengurus yang mendaftarkan keluarga | Memantau, mengelola orang tua dan anggota, membagikan kode | Web (laptop/HP) |
-| **Pemantau** | Anggota keluarga lain | Memantau tanpa mengubah pengaturan | Web (laptop/HP) |
-
-### 5.2 Kebutuhan fungsional
-
-| Kode | Kebutuhan | Peran |
+| Peran (*Role*) | Deskripsi Pengguna | Hak Akses & Kemampuan |
 | --- | --- | --- |
-| F-01 | Mendaftarkan keluarga dan orang tua pertama, menjadi admin | Admin |
-| F-02 | Menghubungkan HP orang tua sekali saja dengan kode / link WhatsApp | Lansia |
-| F-03 | Bergabung ke keluarga dengan kode undangan sebagai pemantau | Pemantau |
-| F-04 | Mengirim kabar *Saya Aman* dan *Darurat* dengan satu ketukan | Lansia |
-| F-05 | Mengirim keluhan lewat **suara**; AI mentranskripsi, mengenali gejala, menilai bahaya | Lansia |
-| F-06 | Mengirim keluhan lewat **gambar** (9 pilihan, satu ketukan) untuk yang sulit bicara | Lansia |
-| F-07 | Mengirim lokasi HP bersama kabar (jika diizinkan) | Lansia |
-| F-08 | Melihat status terbaru, statistik hari ini, riwayat, grafik 7 hari | Admin, Pemantau |
-| F-09 | Ringkasan AI yang diperbarui otomatis setiap ada kabar baru | Admin, Pemantau |
-| F-10 | Bertanya ke Asisten AI tentang kondisi orang tua | Admin, Pemantau |
-| F-11 | Melihat lokasi terakhir di peta dan membukanya di Google Maps | Admin, Pemantau |
-| F-12 | Panduan pertolongan pertama saat status merah | Admin, Pemantau |
-| F-13 | Menambah/menghapus orang tua, memutus HP yang hilang (kode baru) | Admin |
-| F-14 | Menjadikan anggota admin/pemantau, mengeluarkan anggota | Admin |
-| F-15 | Mode demo untuk juri: tampilan HP lansia dan dashboard berdampingan | Publik |
+| **Lansia** | Orang tua yang dipantau kesehatannya | - Mengirim status *Saya Aman* & *Sudah Obat*.<br>- Mengirim keluhan suara (Voice Note AI) & keluhan visual 9 kartu.<br>- Mengaktifkan deteksi kejang akselerometer & tombol darurat kejang.<br>- Mengatur ukuran font & ganti akun kode pairing secara mandiri. |
+| **Admin** | Anak atau pengurus utama keluarga | - Mendaftarkan profil keluarga lengkap & kontak darurat.<br>- Memantau status, peta GPS, dan mendengarkan rekaman suara nenek.<br>- Mengelola anggota (tambah/hapus lansia, ubah peran anggota, regenerasi kode HP).<br>- Mengatur sirene darurat, interval pembaruan, serta ekspor CSV/PDF. |
+| **Pemantau** | Anggota keluarga lain (cucu, menantu, saudara) | - Memantau riwayat kabar dan status terbaru secara live.<br>- Mendengarkan rekaman audio keluhan.<br>- Berinteraksi dengan Asisten AI (baca-saja terhadap pengaturan keluarga). |
 
-### 5.3 Kebutuhan non-fungsional
+---
 
-| Aspek | Kebutuhan |
-| --- | --- |
-| **Kemudahan (lansia)** | Hanya 3 tombol besar (≥108 px), teks ≥17 px, tanpa pengaturan di layar orang tua, satu ketukan per tindakan |
-| **Kejelasan (keluarga)** | Yang paling penting tampil paling atas; satu kartu langkah awal saat belum ada kabar, bukan kartu-kartu kosong |
-| **Kecepatan** | AI menjawab ±2-3 detik; kabar baru muncul di dashboard ±5 detik |
-| **Keamanan** | Data terisolasi per keluarga; peran diperiksa di server pada setiap permintaan; database tertutup untuk akses publik |
-| **Keandalan** | Kirim ulang otomatis 3x saat koneksi gagal; pesan tidak hilang walau AI gagal |
-| **Aksesibilitas** | Kontras warna ≥4,5:1, status tidak hanya dibedakan warna, mendukung pembaca layar dan *reduced motion* |
-| **Portabilitas** | Berjalan di HP dan laptop; dapat di-clone dan dijalankan di perangkat lain dengan langkah yang terdokumentasi |
+### 5.2 Spesifikasi Use Case Lengkap
 
-### 5.4 Alur penggunaan
+Aplikasi SAPA mencakup 12 Use Case fungsional utama:
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor Anak as Admin (anak)
-    actor Oma as Lansia (orang tua)
-    actor Sari as Pemantau
-    participant App as SAPA
-    participant AI as AI (OrcaRouter)
+flowchart TD
+    subgraph Aktor Lansia
+        L((Lansia))
+    end
+    subgraph Aktor Admin
+        A((Admin Keluarga))
+    end
+    subgraph Aktor Pemantau
+        P((Pemantau))
+    end
 
-    Anak->>App: Daftarkan keluarga (nama + nama orang tua)
-    App-->>Anak: Kode HP + kode undangan
-    Anak->>Oma: Kirim link kode HP lewat WhatsApp
-    Oma->>App: Buka link, tekan "Hubungkan HP ini" (sekali)
-    Anak->>Sari: Kirim kode undangan
-    Sari->>App: Masuk dengan kode undangan (pemantau)
-    Oma->>App: Tekan Keluhan, lalu bicara / ketuk gambar
-    App->>AI: Triase suara (transkrip, gejala, tingkat bahaya)
-    AI-->>App: Status + ringkasan
-    App-->>Anak: Dashboard berubah (status, ringkasan AI, lokasi)
-    App-->>Sari: Dashboard berubah
+    subgraph Modul Otentikasi & Akun
+        UC01["UC-01: Registrasi Keluarga Lengkap"]
+        UC02["UC-02: Pairing HP Lansia (Peduli Hari Ini)"]
+        UC12["UC-12: Manajemen Anggota & Ganti Kode"]
+    end
+
+    subgraph Modul Pelaporan Lansia
+        UC03["UC-03: Laporan Harian Rutin & Streak"]
+        UC04["UC-04: Konfirmasi Cepat Minum Obat"]
+        UC05["UC-05: Pelaporan Keluhan Visual"]
+        UC06["UC-06: Pelaporan Suara & Triase AI"]
+        UC07["UC-07: Penanganan Cepat Kejang & Geter"]
+    end
+
+    subgraph Modul Monitoring Pengawas
+        UC08["UC-08: Pemutaran Rekaman Suara Asli"]
+        UC09["UC-09: Penanganan Darurat, GPS & P3K"]
+        UC10["UC-10: Konsultasi Riwayat via Asisten AI"]
+        UC11["UC-11: Ekspor Rekam Medis CSV & PDF"]
+    end
+
+    A --> UC01
+    A --> UC02
+    A --> UC12
+    A --> UC08
+    A --> UC09
+    A --> UC10
+    A --> UC11
+
+    L --> UC02
+    L --> UC03
+    L --> UC04
+    L --> UC05
+    L --> UC06
+    L --> UC07
+
+    P --> UC08
+    P --> UC09
+    P --> UC10
 ```
 
-### 5.5 Desain arsitektur
+#### Rincian Tabel Spesifikasi Use Case:
+
+| Kode | Nama Use Case | Aktor | Deskripsi Singkat & Alur Utama |
+| --- | --- | --- | --- |
+| **UC-01** | Registrasi Keluarga Lengkap | Admin | Admin mengisi formulir lengkap: Nama Keluarga, Nama Admin, Hubungan (Anak Kandung, Menantu, dll), Nomor WhatsApp/Kontak Darurat, Nama Orang Tua, dan Catatan Riwayat Medis. Sistem membuat household, akun admin, serta kode pairing. |
+| **UC-02** | Pairing HP Lansia ("Peduli hari ini, untuk mereka nanti") | Lansia / Admin | HP lansia membuka tautan WhatsApp atau memasukkan 6-digit kode pairing. Sistem mengikat sesi browser HP ke data lansia bersangkutan dan meminta izin GPS satu kali. |
+| **UC-03** | Laporan Harian Rutin ("Saya Aman") | Lansia | Lansia menekan tombol hijau besar *Saya Aman*. Status hijau tercatat di server, banner status harian tercentang, dan streak keaktifan bertambah. |
+| **UC-04** | Konfirmasi Cepat Minum Obat | Lansia | Lansia menekan tombol pintas *💊 Sudah Obat*. Server mencatat catatan medis hijau bertipe `SUDAH_OBAT` sehingga keluarga mengetahui jadwal medikasi telah dipenuhi. |
+| **UC-05** | Pelaporan Keluhan Bergambar | Lansia | Lansia menekan tombol kuning *Keluhan*, lalu memilih salah satu dari 9 kartu visual (Pusing, Nyeri Dada, Sesak Napas, Jatuh, Mual, dll). Sistem langsung memetakan tingkat bahaya (Kuning/Merah) ke dashboard keluarga. |
+| **UC-06** | Pelaporan Suara & Triase AI | Lansia | Lansia merekam keluhan suara bebas (hingga 30 detik). Suara dikonversi ke WAV 16kHz, dianalisis AI Gemini 2.5 Flash untuk ekstraksi transkrip, deteksi gejala, dan penilaian tingkat urgensi. |
+| **UC-07** | Penanganan Cepat Kejang & Deteksi Guncangan | Lansia | Terpicu melalui ketukan tombol *Tombol Darurat Kejang* atau getaran ritmik sensor akselerometer HP. Hitung mundur darurat 30 detik berbunyi, lalu mengelevasi status darurat merah dan membuka opsi panggilan 119. |
+| **UC-08** | Pemutaran Rekaman Suara Asli | Admin, Pemantau | Di timeline dashboard pengawas, riwayat suara dilengkapi *AudioPlayer*. Pengawas dapat memutar suara asli lansia, mengatur kecepatan (1x/1.5x/2x), dan membaca transkrip AI. |
+| **UC-09** | Penanganan Darurat, GPS & P3K | Admin, Pemantau | Saat status berubah merah, dashboard membunyikan alarm sirene otomatis, menampilkan koordinat peta Google Maps, dan membuka kartu panduan langkah pertolongan pertama (P3K). |
+| **UC-10** | Konsultasi via Asisten AI | Admin, Pemantau | Keluarga dapat mengetik pertanyaan konsultasi (mis. *"Apakah nenek sering mengeluh sesak minggu ini?"*). AI Gemini menganalisis seluruh log medis 7 hari terakhir dan merangkum jawabannya secara klinis. |
+| **UC-11** | Ekspor Rekam Medis (CSV & PDF) | Admin | Admin mengunduh berkas rekam medis format CSV untuk analisis spreadsheet atau mencetak dokumen ringkasan resmi format PDF untuk diserahkan ke dokter. |
+| **UC-12** | Manajemen Anggota & Ganti Kode Lansia | Admin, Lansia | Admin dapat menambah lansia, mengubah peran anggota, atau memutus HP hilang. Di sisi lansia, tersedia modal ganti kode instan tanpa perlu uninstall PWA. |
+
+---
+
+### 5.3 Kebutuhan Non-Fungsional
+
+1. **Usabilitas Senior (Ergonomi Lansia)**:
+   - Target sentuh tombol minimal 52–108 px untuk mencegah salah sentuh (*mis-click*).
+   - Tipografi kontras tinggi (rasio kontras warna teks dan latar belakang ≥ 5.5:1).
+   - Opsi pengaturan ukuran font in-app: Normal (17px), Besar (21px), Sangat Besar (25px).
+2. **Kinerja & Latensi**:
+   - Inferensi AI suara Gemini 2.5 Flash selesai dalam waktu ≤ 3 detik.
+   - Live polling dashboard pengawas beroperasi fleksibel (setiap 3s, 5s, atau 15s sesuai preferensi).
+3. **Keandalan & Failover**:
+   - Mekanisme *fallback* cerdas jika layanan AI eksternal lambat: keluhan suara tetap tersimpan aman berstatus Kuning tanpa kehilangan data rekaman audio.
+4. **Keamanan Data & Privasi**:
+   - Isolasi data ketat antar-keluarga (*multi-tenant segregation*).
+   - Token sesi disimpan di `httpOnly` cookie bertanda tangan kriptografis HMAC-SHA256.
+   - Kebijakan Supabase Row Level Security (RLS) aktif menolak akses REST publik tanpa otorisasi.
+
+---
+
+### 5.4 Diagram Alur & Flowchart Sistem
+
+#### A. Flowchart Alur Penggunaan End-to-End
+
+```mermaid
+flowchart TD
+    Start([Mulai]) --> RoleSelect{Pilih Peran Pengguna}
+    
+    %% Alur Admin
+    RoleSelect -->|Admin / Anak| FormDaftar[Isi Form Registrasi Keluarga Lengkap]
+    FormDaftar --> CreateDB[(Buat Data Household, Admin, Lansia)]
+    CreateDB --> ShareCode[Terima Kode Pairing Lansia & Kode Undangan]
+    ShareCode --> SendWA[Kirim Tautan WhatsApp ke HP Orang Tua]
+    
+    %% Alur Lansia
+    SendWA --> OpenLansia[Buka Tautan di HP Lansia]
+    RoleSelect -->|Lansia Langsung| OpenLansia
+    OpenLansia --> PairingAuth[Verifikasi Kode Pairing 6-Digit]
+    PairingAuth --> GeoReq[Minta Izin GPS Sekali]
+    GeoReq --> LansiaMain[Tampilan Utama Lansia: 3 Tombol Besar]
+    
+    %% Aksi Lansia
+    LansiaMain --> ActionLansia{Pilih Aksi Lansia}
+    ActionLansia -->|Tombol Hijau| LapAman[Saya Aman / 💊 Sudah Obat]
+    ActionLansia -->|Tombol Oranye| LapKeluhan[Keluhan: Suara atau 9 Gambar]
+    ActionLansia -->|Tombol Merah / Kejang| LapDarurat[Tombol Kejang / Darurat Medis]
+    ActionLansia -->|Guncangan Fisik| ShakeDetect[Sensor Akselerometer Terpicu]
+    
+    %% Pemrosesan
+    LapAman --> SaveRecord[(Simpan Record Hijau ke DB)]
+    LapKeluhan --> AIProcess[Proses Triase AI: Gemini 2.5 Flash]
+    AIProcess --> SaveRecordKeluhan[(Simpan Record Kuning/Merah + Audio)]
+    LapDarurat --> Countdown30[Hitung Mundur 30 Detik + Sirine HP]
+    ShakeDetect --> Countdown30
+    Countdown30 -->|Batal| LansiaMain
+    Countdown30 -->|Waktu Habis / Konfirmasi| SaveRecordDarurat[(Simpan Record Merah)]
+    
+    %% Sisi Pengawas
+    SaveRecord --> LiveDashboard[Dashboard Pengawas Terupdate Live]
+    SaveRecordKeluhan --> LiveDashboard
+    SaveRecordDarurat --> LiveDashboard
+    
+    LiveDashboard --> MonitorAlert{Tingkat Bahaya?}
+    MonitorAlert -->|Hijau| ShowStreak[Tampilkan Streak & Riwayat Aman]
+    MonitorAlert -->|Kuning| PlayVoice[AudioPlayer Suara & Transkrip Gejala]
+    MonitorAlert -->|Merah| EmergencyTrigger[Sirine Alarm Darurat + Buka P3K + Lokasi Peta + Dial 119]
+```
+
+#### B. Flowchart Pipeline Triase Suara & Pemutaran Audio Asli
 
 ```mermaid
 flowchart LR
-    subgraph Klien
-        L["App lansia (PWA)<br/>3 tombol + maskot"]
-        K["Dashboard keluarga (web)<br/>admin & pemantau"]
+    subgraph HP Lansia
+        Mic[Mikrofon Lansia] --> WebAudio[MediaRecorder Browser]
+        WebAudio --> ConvertWAV[Konversi WAV 16kHz Mono]
+        ConvertWAV --> Base64Enc[Encode Base64 String]
+        Base64Enc --> PostAI[POST /api/ai]
     end
-    subgraph Server["Next.js 16 (Vercel, region Mumbai)"]
-        P["proxy.js<br/>aturan akses halaman"]
-        API["Route handler /api/*<br/>validasi + cek sesi & peran"]
-        SV["Services<br/>keluarga, kabar, triase, AI"]
-    end
-    DB[("Supabase PostgreSQL<br/>RLS aktif")]
-    AI["OrcaRouter<br/>Gemini 2.5 Flash / Flash-Lite"]
 
-    L -- "cookie sesi lansia" --> P
-    K -- "cookie sesi anggota" --> P
-    P --> API --> SV
-    SV -- Prisma --> DB
-    SV -- "audio WAV / teks" --> AI
+    subgraph Server Next.js & AI Engine
+        PostAI --> ValidateAPI[Validasi Sesi & Sanitasi]
+        ValidateAPI --> OrcaRouter[Panggil OrcaRouter / Gemini 2.5 Flash]
+        OrcaRouter --> Extraction[Ekstraksi JSON: Gejala, Transkrip, Urgensi]
+        Extraction --> DBInsert[(Simpan DailyRecord: audioBase64 + aiAnalysis)]
+    end
+
+    subgraph Dashboard Pengawas
+        DBInsert --> FetchPoller[GET /api/dashboard Polling]
+        FetchPoller --> AudioStream[GET /api/audio/:id Streaming WAV]
+        AudioStream --> UIPlayer[AudioPlayer: Waveform, Speed 1x/1.5x/2x, Transkrip]
+    end
 ```
 
-**Keputusan desain utama:**
+#### C. State Machine Deteksi Kejang & Guncangan Jatuh
 
-1. **Satu basis kode, dua wajah.** App lansia dan dashboard keluarga berbagi server dan database, tetapi tampilannya dirancang terpisah sesuai kebutuhan masing-masing.
-2. **Status ditentukan server, bukan HP.** HP hanya mengirim *apa yang terjadi* (tombol, keluhan, suara); server yang memutuskan hijau/kuning/merah. Ini mencegah manipulasi dan menjaga konsistensi.
-3. **Tanpa kata sandi.** Lansia tidak mungkin diminta mengingat kata sandi; keluarga cukup memakai kode. Sesi disimpan di cookie httpOnly bertanda tangan HMAC.
-4. **AI dengan cadangan.** Setiap fitur AI punya teks cadangan agar aplikasi tetap berguna saat AI lambat/gagal.
-5. **Server di region yang sama dengan database** (Mumbai) agar setiap query tidak menyeberang benua.
+```mermaid
+stateDiagram-v2
+    [*] --> Standby: App Lansia Terbuka
+    
+    Standby --> DeteksiAktif: Sensor Akselerometer Aktif
+    Standby --> TombolKejangManual: Lansia Tekan "Tombol Darurat Kejang"
+    
+    DeteksiAktif --> MenganalisisGerak: Shake / Pola Ritmik Terdeteksi
+    MenganalisisGerak --> Standby: Gerakan Normal / Goncangan Ringan
+    MenganalisisGerak --> FaseHitungMundur: Nilai Akselerasi Melebihi Threshold
+    
+    TombolKejangManual --> FaseHitungMundur: Bypass Langsung
+    
+    state FaseHitungMundur {
+        [*] --> Countdown30s: Mulai Hitung Mundur 30 Detik
+        Countdown30s --> AlarmBuntiHP: Suara Peringatan Lokal Nyaring
+        AlarmBuntiHP --> OpsiBatal: Tombol "Saya Tidak Apa-apa"
+    }
+    
+    OpsiBatal --> Standby: Lansia Membatalkan (False Alarm)
+    Countdown30s --> StatusMerahKritis: Waktu Habis / Tekan "Bantuan Sekarang"
+    
+    state StatusMerahKritis {
+        [*] --> KirimStatusMerah: POST /api/kabar (DETEKSI_OTOMATIS / KEJANG)
+        KirimStatusMerah --> SirinePengawas: Alarm Darurat Dashboard Berbunyi
+        SirinePengawas --> Dial119: Shortcut Telepon Cepat Ambulans 119
+    }
+```
 
-### 5.6 Desain basis data
+---
+
+### 5.5 Desain Arsitektur Sistem
+
+Arsitektur aplikasi dibangun dengan pendekatan modular di atas ekosistem modern:
+
+```mermaid
+flowchart TD
+    subgraph Frontend["Client Tier (Next.js 16 App Router & PWA)"]
+        UI_Lansia["Tampilan Lansia (PWA Layar Penuh)"]
+        UI_Pengawas["Dashboard Pengawas (Multi-Tab Responsive)"]
+        UI_Audio["Komponen AudioPlayer & Waveform Canvas"]
+        UI_Sensor["Hook Sensor Gerak useDeteksiGerak"]
+    end
+
+    subgraph Middleware["Routing & Security Tier"]
+        Proxy["src/proxy.js (Guard Otentikasi & Redirect)"]
+        RateLimit["lib/rate-limit.js (Pencegah Brute Force)"]
+        Session["lib/session.js (HMAC Signed Cookies)"]
+    end
+
+    subgraph BackendServices["Business Logic & Service Tier"]
+        AuthSvc["household.service.js (Keluarga & Anggota)"]
+        RecordSvc["record.service.js (Kabar & Streaming Audio)"]
+        TriageSvc["triase.service.js (Pipeline AI Medis)"]
+        ExportSvc["PengaturanView (CSV & PDF Generation)"]
+    end
+
+    subgraph DatabaseTier["Persistence Tier (Supabase PostgreSQL)"]
+        PrismaORM["Prisma 6 ORM Client"]
+        Tables[("PostgreSQL DB: households, members, lansia, daily_records")]
+        RLS["Row Level Security (RLS) Active"]
+    end
+
+    subgraph ExternalTier["External Cloud Services"]
+        OrcaAI["OrcaRouter: Gemini 2.5 Flash / Flash-Lite"]
+        MapsAPI["OpenStreetMap & Google Maps Intent"]
+        Telco["Panggilan Darurat GSM (119, 112)"]
+    end
+
+    Frontend --> Middleware
+    Middleware --> BackendServices
+    BackendServices --> PrismaORM --> Tables
+    BackendServices --> OrcaAI
+    Frontend --> MapsAPI
+    Frontend --> Telco
+```
+
+---
+
+### 5.6 Desain Basis Data
+
+Struktur basis data relasional dikelola melalui Prisma ORM dengan relasi referensial penuh:
 
 ```mermaid
 erDiagram
-    HOUSEHOLDS ||--o{ MEMBERS : "punya anggota"
+    HOUSEHOLDS ||--o{ MEMBERS : "memiliki"
     HOUSEHOLDS ||--o{ LANSIA : "memantau"
-    LANSIA ||--o{ DAILY_RECORDS : "mengirim kabar"
+    LANSIA ||--o{ DAILY_RECORDS : "menghasilkan"
 
     HOUSEHOLDS {
         uuid id PK
-        varchar nama
-        varchar kode_undangan UK
+        varchar nama "Nama Keluarga / Rumah"
+        varchar kode_undangan UK "Kode Undangan Pemantau (6 Karakter)"
         timestamptz created_at
     }
+
     MEMBERS {
         uuid id PK
         uuid household_id FK
-        varchar nama
+        varchar nama "Nama Admin / Pemantau (+Hubungan)"
         varchar role "ADMIN | PEMANTAU"
         timestamptz created_at
     }
+
     LANSIA {
         uuid id PK
         uuid household_id FK
-        varchar nama
-        varchar kode_pairing UK
-        int device_version
+        varchar nama "Nama Lansia (+Catatan Kondisi)"
+        varchar kode_pairing UK "Kode Pairing HP (6 Karakter)"
+        int device_version "Versi Perangkat (Invalidasi Sesi HP)"
         timestamptz terhubung_at
         timestamptz created_at
     }
+
     DAILY_RECORDS {
         uuid id PK
         uuid lansia_id FK
-        varchar tipe_input "TOMBOL_AMAN | TOMBOL_DARURAT | VOICE_NOTE | KELUHAN"
+        varchar tipe_input "TOMBOL_AMAN | SUDAH_OBAT | KELUHAN | VOICE_NOTE | DETEKSI_OTOMATIS"
         varchar status_bahaya "HIJAU | KUNING | MERAH"
-        jsonb ai_analysis "transkrip, gejala, ringkasan"
-        float latitude
-        float longitude
-        real akurasi_meter
+        text raw_data "Data Audio WAV Base64 (Untuk Diputar Pengawas)"
+        jsonb ai_analysis "Transkrip, Gejala Medis, Ringkasan Klinis"
+        float latitude "Koordinat GPS Lintang"
+        float longitude "Koordinat GPS Bujur"
+        real akurasi_meter "Radius Akurasi GPS"
         timestamptz created_at
     }
 ```
 
-- Semua relasi `ON DELETE CASCADE`: menghapus keluarga menghapus anggota, orang tua, dan kabarnya.
-- `CHECK` constraint di database untuk peran, tipe kabar, status, dan rentang koordinat.
-- **Row Level Security** aktif di keempat tabel: akses publik ke Data API Supabase ditolak (diverifikasi: HTTP 401).
-- `device_version` naik saat admin memutus HP, sehingga sesi HP lama langsung tidak berlaku.
+---
 
-### 5.7 Desain antarmuka (UI/UX)
+### 5.7 Desain Antarmuka (UI/UX) & Ergonomi Visual
 
-Antarmuka mengikuti **Apple Human Interface Guidelines** agar terasa bersih, tenang, dan familier, dengan identitas warna dari logo SAPA.
+Mengadopsi prinsip **Apple Human Interface Guidelines (HIG)** dengan fokus ketat pada aksesibilitas:
 
-| Elemen | Keputusan |
-| --- | --- |
-| Warna identitas | Biru logo `#45A7F2`, navy logo `#142445`; tombol/tautan `#1565C0` (kontras 5,75:1) |
-| Warna status | Hijau `#248A3D`, oranye `#C93400`, merah `#D70015` (versi aksesibel warna sistem Apple; teks putih ≥4,5:1) |
-| Tata letak | Latar abu sistem, kartu putih, daftar *inset grouped*, judul besar rata kiri |
-| Tipografi | Font sistem (SF di iPhone/Mac), Inter sebagai cadangan; ukuran dasar 17 px |
-| Ikon | Phosphor Icons (tanpa emoji) |
-| Maskot | Burung hantu perawat dari logo, menyapa orang tua dan menjadi wajah fitur AI |
-
-**Prinsip untuk orang tua:**
-
-- Layar utama hanya berisi **sapaan + tanggal, maskot, dan tiga tombol**. Tidak ada menu atau pengaturan.
-- Setiap tindakan **satu ketukan**: keluhan gambar langsung terkirim tanpa tombol "Kirim" tambahan.
-- Pilihan keluhan dibatasi **9 (3×3)** agar muat satu layar tanpa menggulir.
-- Setiap kabar dibalas layar penuh **"Pesan Tersampaikan"** dan kalimat maskot yang menyebut nama orang tua.
-
-**Prinsip untuk keluarga:**
-
-- Di HP, urutan kartu mengikuti kepentingan: **status → pertolongan pertama → ringkasan AI → lokasi → statistik → riwayat → grafik**.
-- Saat belum ada kabar, tampil **satu kartu langkah awal** (hubungkan HP, coba tombol pertama), bukan kartu kosong.
-- Fitur pengelolaan hanya tampil untuk admin; pemantau melihat versi baca-saja.
+1. **Hierarki Warna Triase Berdaya Kontras Tinggi**:
+   - **HIJAU (Aman / Kondisi Terkendali)**: Emerald `#16a34a` (Latar `#dcfce7`, Border `#86efac`, Teks `#15803d`).
+   - **KUNING (Keluhan Medis / Perlu Perhatian)**: Amber Gold `#d97706` (Latar `#fef3c7`, Border `#fcd34d`, Teks `#b45309`).
+   - **MERAH (Darurat Kritis / Kejang / Jatuh)**: Crimson Siren `#dc2626` (Latar `#fee2e2`, Border `#fca5a5`, Teks `#b91c1c`).
+2. **Apple Inset-Grouped Layout**:
+   - Permukaan kartu putih bersih (`#ffffff`) di atas latar grouped abu-abu sistem (`#f2f2f7`).
+   - Sudut melengkung halus (*corner radius* 14px – 22px).
+3. **Ergonomi AudioPlayer**:
+   - Visualisasi batang waveform dinamis dengan progress playback waktu nyata.
+   - Pilihan kecepatan putar audio (1.0x, 1.5x, 2.0x) agar pengawas dapat meninjau rekaman panjang secara efisien.
 
 ---
 
-## 6. Implementasi Aplikasi
+## 6. Implementasi Fitur Utama
 
-### 6.1 Teknologi yang digunakan
+### 6.1 Form Registrasi Data Keluarga Lengkap
+Halaman pendaftaran (`/daftar`) kini menyediakan formulir data keluarga yang terstruktur dan komprehensif:
+- **Nama Keluarga**: Identitas rumah tangga (mis. *"Keluarga Santoso"*).
+- **Data Pengurus (Admin)**: Nama lengkap admin dan pilihan hubungan keluarga (*Anak Kandung, Menantu, Cucu, Keponakan, Wali/Pendamping*).
+- **Kontak Darurat**: Nomor telepon / WhatsApp resmi admin yang akan dihubungi oleh petugas medis darurat.
+- **Data Orang Tua**: Nama panggilan lansia dan catatan kesehatan khusus (*mis. "Tinggal Sendiri, Hipertensi, Riwayat Vertigo"*).
 
-| Lapisan | Teknologi | Fungsi |
+### 6.2 Triase Suara AI & AudioPlayer Asli Suara Nenek
+- Ketika orang tua merekam suara, berkas audio dikonversi di browser menjadi WAV 16kHz dan dikirim ke server.
+- Server memanggil **Gemini 2.5 Flash** untuk mengekstrak data JSON medis (transkrip, daftar gejala, penilaian bahaya).
+- Berkas audio asli disimpan di database dan di-stream melalui endpoint `/api/audio/[id]`.
+- Di dashboard pengawas, komponen `AudioPlayer` memungkinkan keluarga mendengarkan langsung intonasi, rintihan, atau desah nafas orang tua untuk memastikan validitas kondisi.
+
+### 6.3 Tombol Cepat Kejang & Deteksi Getaran Akselerometer
+- Lansia atau orang di sekitarnya dapat langsung menekan tombol darurat kejang (*"Tombol Darurat Kejang"*).
+- Sensor akselerometer browser memantau getaran berulang berfrekuensi kejang atau akselerasi jatuh bebas mendadak.
+- Tampil antarmuka hitung mundur 30 detik bersuara keras, memberi kesempatan membatalkan jika terjadi alarm palsu (*false alarm*), sebelum otomatis memicu sirine darurat di dashboard pengawas dan membuka opsi panggilan 119.
+
+### 6.4 Shortcut Cepat "Sudah Obat" & Streak Keaktifan
+- Mengakomodasi kepatuhan minum obat lansia melalui satu ketukan *"💊 Sudah Obat"*.
+- Banner status interaktif di bagian atas aplikasi lansia menandai bahwa hari ini lansia telah memberi kabar, lengkap dengan penghitung *streak* hari berturut-turut untuk memotivasi lansia.
+
+### 6.5 Tab Pengaturan Pengawas & Sirene Darurat
+Dashboard pengawas memiliki tab navigasi ke-5: **Pengaturan**:
+- **Sirene Alarm Darurat**: Tombol toggle untuk mengaktifkan sirine otomatis saat kabar berstatus merah masuk, lengkap dengan tombol uji suara (*Test Alarm Sound*).
+- **Frekuensi Pembaruan (Live Polling)**: Pengaturan kecepatan refresh (3 detik untuk pengawasan ketat, 5 detik normal, atau 15 detik hemat data).
+- **Ekspor Rekam Medis (CSV)**: Mengunduh rekaman historis lengkap dalam format berkas spreadsheet.
+- **Cetak Ringkasan Medis (PDF)**: Format cetak siap pakai untuk konsultasi dokter.
+- **Panggilan Cepat Darurat**: Tombol telepon langsung ke layanan 119 (Ambulans), 112 (Darurat Nasional), 110 (Polisi), dan 113 (Damkar).
+
+### 6.6 Aksesibilitas Senior: Skala Teks & Logout Mandiri
+- Lansia dapat mengubah ukuran teks secara mandiri (Normal, Besar, Sangat Besar) melalui modal setelan lansia.
+- Lansia dapat mengganti kode pairing atau keluar akun secara instan tanpa perlu memasang ulang aplikasi PWA.
+
+---
+
+## 7. Pengujian & Verifikasi Kualitas
+
+Pengujian menyeluruh telah dilakukan secara otomatis dan terisolasi:
+
+| Aspek Pengujian | Skenario Uji | Hasil Evaluasi |
 | --- | --- | --- |
-| Framework | **Next.js 16** (App Router), React 19, JavaScript | Halaman, API, rendering |
-| Database | **Supabase PostgreSQL** + **Prisma 6** | Penyimpanan data, migrasi, query bertipe |
-| Kecerdasan buatan | **OrcaRouter** (OpenAI-compatible) → `google/gemini-2.5-flash` (audio), `google/gemini-2.5-flash-lite` (teks) | Triase suara, ringkasan, asisten, pesan maskot |
-| PWA | Web App Manifest + service worker buatan sendiri | Install ke layar utama, cache, halaman offline |
-| Animasi | `motion` (dimuat malas) + animasi CSS | Umpan balik tombol, perayaan |
-| Ikon | `react-icons` (Phosphor) | Ikon konsisten tanpa emoji |
-| Peta | OpenStreetMap (embed) + tautan Google Maps | Lokasi terakhir tanpa API key |
-| Hosting | Vercel (region `bom1`, Mumbai) | Satu region dengan database |
+| **Registrasi Keluarga** | Pendaftaran admin dengan data lengkap keluarga, relasi, nomor HP, dan lansia. | **LULUS** (Status 201, household & member admin terbentuk aman) |
+| **Pairing & Tagline** | Akses via tautan WhatsApp `/hubungkan?kode=...` dengan slogan *"Peduli hari ini, untuk mereka nanti"*. | **LULUS** (Sesi terikat, cookie tersimpan otomatis) |
+| **Triase Suara Multimodal** | Rekaman keluhan *"Aduh dada saya sesak sekali dan pandangan gelap"* dikirim ke endpoint `/api/ai`. | **LULUS** (Terklasifikasi MERAH, transkrip presisi, gejala terdeteksi) |
+| **Streaming Audio Asli** | Pengawas memutar audio melalui endpoint `/api/audio/[id]`. | **LULUS** (Header `audio/wav`, playback waveform mulus tanpa jeda) |
+| **Sensor Kejang & Jatuh** | Simulasi getaran akselerometer dan tombol darurat kejang. | **LULUS** (Hitung mundur 30s aktif, sirene pengawas terpicu) |
+| **Ekspor CSV & PDF** | Unduhan rekam medis historis dari tab pengaturan pengawas. | **LULUS** (File CSV berformat rapi, tampilan cetak PDF presisi) |
+| **Linting & Kode Bersih** | Pemeriksaan static code analysis Next.js (`npm run lint`). | **0 Errors, 0 Warnings** |
 
-### 6.2 Struktur proyek
+---
 
-```
-src/
-  app/            halaman dan route handler (/api/*)
-  features/
-    lansia/       aplikasi HP orang tua
-    pengawas/     dashboard keluarga
-    masuk/        halaman depan, daftar, gabung, hubungkan
-  components/ui/  komponen bersama (Mascot, ShareCode, StatusBadge, Wordmark)
-  services/       logika bisnis (keluarga, kabar, triase, maskot, asisten, demo)
-  lib/            database, AI, sesi, otorisasi, kode, lokasi, format
-  hooks/          useRecorder (rekam dan ubah ke WAV)
-  proxy.js        aturan akses halaman berdasarkan sesi
-prisma/           schema, setup.sql (DDL + RLS), sql/ (migrasi), seed
-public/           ikon, logo, maskot, service worker, halaman offline
-docs/             PRD, dokumentasi Supabase, screenshot
-```
+## 8. Panduan Menjalankan Aplikasi
 
-### 6.3 Tampilan aplikasi
+### 8.1 Kebutuhan Lingkungan (*Prerequisites*)
+- Node.js versi 18.18+ atau Node.js 20+
+- Database PostgreSQL (disarankan Supabase)
+- Akun OrcaRouter / API Key model AI
 
-#### Masuk dan pendaftaran
-
-| Halaman depan (pilih peran) | Daftar sebagai admin | Kode HP dan undangan |
-| :---: | :---: | :---: |
-| <img src="docs/screenshots/01-halaman-depan.jpg" width="220"> | <img src="docs/screenshots/02-daftar-admin.jpg" width="220"> | <img src="docs/screenshots/03-kode-hp-dan-undangan.jpg" width="220"> |
-
-#### Aplikasi orang tua (lansia)
-
-| Layar utama | Keluhan lewat gambar | Pesan tersampaikan |
-| :---: | :---: | :---: |
-| <img src="docs/screenshots/04-app-lansia.jpg" width="220"> | <img src="docs/screenshots/05-keluhan-gambar.jpg" width="220"> | <img src="docs/screenshots/06-pesan-tersampaikan.jpg" width="220"> |
-
-#### Dashboard keluarga
-
-**Kondisi normal:**
-
-<img src="docs/screenshots/07-dashboard-keluarga.jpg" alt="Dashboard keluarga" width="760">
-
-**Saat darurat** (orang tua mengetuk "Baru kejang"): status merah, panduan pertolongan pertama, ringkasan AI, dan lokasi.
-
-<img src="docs/screenshots/08-dashboard-darurat.jpg" alt="Dashboard saat darurat" width="760">
-
-| Dashboard di HP | Kelola keluarga (admin) | Asisten AI | Riwayat |
-| :---: | :---: | :---: | :---: |
-| <img src="docs/screenshots/09-dashboard-hp.jpg" width="180"> | <img src="docs/screenshots/10-kelola-keluarga.jpg" width="180"> | <img src="docs/screenshots/11-asisten-ai.jpg" width="180"> | <img src="docs/screenshots/12-riwayat.jpg" width="180"> |
-
-#### Mode demo dan panduan
-
-<img src="docs/screenshots/13-mode-demo.jpg" alt="Mode demo" width="760">
-
-<img src="docs/screenshots/14-panduan.jpg" alt="Panduan" width="220">
-
-### 6.4 Implementasi fitur utama
-
-**a. Triase pesan suara dengan AI**
-
-1. Browser merekam suara (maks. 30 detik) lalu mengonversinya ke **WAV 16 kHz mono**, karena model AI hanya menerima WAV/MP3, sedangkan Chrome merekam WebM dan Safari MP4.
-2. Server mengirim audio ke `gemini-2.5-flash` lewat OrcaRouter dengan instruksi triase dan meminta jawaban **JSON**: `transkrip`, `gejala`, `statusBahaya`, `ringkasan`.
-3. Aturan triase: jatuh, nyeri dada, sesak, wajah/tubuh lemah sebelah, bicara pelo, pingsan → **merah**; nyeri, pusing, mual, obat habis → **kuning**; jika ragu pilih tingkat lebih tinggi.
-4. Jika AI gagal, pesan tetap tersimpan berstatus **kuning** dengan tanda `fallback`, sehingga keluarga tetap diberi tahu.
-
-Contoh hasil uji dengan rekaman *"Tolong, saya jatuh di kamar mandi dan kaki saya sakit sekali"*:
-
-```json
-{
-  "transkrip": "Tolong, saya jatuh di kamar mandi dan kaki saya sakit sekali.",
-  "gejala": ["jatuh", "nyeri kaki hebat"],
-  "statusBahaya": "MERAH",
-  "ringkasan": "Pasien lansia jatuh di kamar mandi dan mengeluhkan nyeri hebat pada kakinya."
-}
-```
-
-**b. Keluhan lewat gambar (tanpa suara)**
-
-Sembilan pilihan: Pusing, Nyeri dada, Sesak napas, Jatuh, Baru kejang, Mual, Demam, Obat habis, Ingin ditelepon. Satu ketukan langsung terkirim. Server memetakan setiap pilihan ke tingkat bahaya; nyeri dada, sesak, jatuh, dan kejang otomatis **merah**.
-
-**c. Ringkasan AI live dan Asisten AI**
-
-- Ringkasan dibuat ulang hanya saat ada kabar baru (kunci cache = id kabar terbaru), memakai waktu relatif seperti "Kemarin, 05:53 WIB" agar AI tidak salah menafsirkan.
-- Asisten AI menjawab pertanyaan keluarga berdasarkan kabar 7 hari terakhir orang tua yang dipilih.
-- Model teks `gemini-2.5-flash-lite` dipilih setelah pengukuran: **±2,4 detik**, dibanding `orcarouter/auto` yang **30-40 detik**.
-
-**d. Lokasi terakhir**
-
-Saat tombol ditekan, HP mengirim koordinat GPS (jika diizinkan). Pengambilan lokasi **tidak pernah menahan pengiriman lebih dari 3 detik**. Server memvalidasi rentang koordinat, sehingga koordinat palsu dibuang tetapi kabarnya tetap tersimpan.
-
-**e. Peran, sesi, dan keamanan**
-
-- Dua cookie httpOnly bertanda tangan HMAC-SHA256: sesi anggota (`{ m: memberId }`) dan sesi HP lansia (`{ l: lansiaId, v: deviceVersion }`).
-- `proxy.js` mengatur akses halaman; setiap API memeriksa ulang sesi dan **peran dibaca dari database** pada setiap permintaan, sehingga perubahan peran dan pengeluaran anggota langsung berlaku.
-- Semua query dibatasi ke keluarga/orang tua milik sesi; id dari klien tidak pernah dipercaya.
-- Kode dibuat acak tanpa huruf yang mirip (0/O, 1/I); percobaan kode dibatasi per alamat IP.
-- Keluarga selalu menyisakan minimal satu admin.
-
-### 6.5 Pengujian
-
-Pengujian dilakukan otomatis terhadap database dan layanan AI sungguhan (Supabase dan OrcaRouter), memakai skrip HTTP dan browser otomatis (Playwright + Google Chrome).
-
-| Pengujian | Cakupan | Hasil |
-| --- | --- | --- |
-| **Matriks peran dan keamanan** | Daftar, gabung, hubungkan; hak admin vs pemantau vs lansia; admin terakhir tidak bisa turun peran; anggota yang dikeluarkan terkunci; isolasi antar-keluarga; cookie palsu; HP yang diputus; aturan akses halaman | **37/37 lulus** |
-| **API kabar** | Saya Aman, Darurat, keluhan kuning/merah, keluhan kosong/palsu/duplikat, tipe tidak dikenal, klien mencoba menentukan status sendiri (diabaikan) | **9/9 lulus** |
-| **Alur tiga peran (browser)** | Admin mendaftar → HP lansia terhubung lewat link → kabar masuk tanpa reload → admin menambah orang tua kedua → pemantau bergabung (tanpa akses kelola) → pemantau dinaikkan menjadi admin | **Lulus, tanpa error konsol** |
-| **Keandalan "Baru kejang"** | Lima kali berturut-turut dari aplikasi lansia | **5/5 terkirim merah**, panduan pertolongan pertama kejang tampil |
-| **Lokasi** | GPS simulasi di browser, koordinat valid/palsu | Lokasi tampil di peta; koordinat palsu dibuang |
-| **Triase suara** | Rekaman WAV "saya jatuh..." | Status **merah**, gejala dan ringkasan tepat |
-| **Tata letak** | 10 halaman di lebar HP 390 px; scroll dashboard di 1280×720, 1440×600, 390×700, dengan dan tanpa laporan | Tidak ada elemen meluber; semua kartu terjangkau |
-| **PWA** | Pemeriksa installability Chrome | Hanya app lansia yang installable; halaman keluarga tidak |
-| **Instalasi bersih** | `git clone` → `npm ci` → `build` → jalan, dengan dan tanpa `.env` | Lulus; tanpa `.env` API membalas error yang jelas, tidak crash |
-
-### 6.6 Cara menjalankan
+### 8.2 Langkah Instalasi Lokal
 
 ```bash
+# 1. Kloning repositori
 git clone https://github.com/Nazca13/himtec-01.git
 cd himtec-01
+
+# 2. Pasang dependensi
 npm install
-cp .env.example .env    # isi DATABASE_URL, DIRECT_URL, ORCA_API_KEY, SESSION_SECRET
-npm run db:push         # buat tabel di Supabase
-npm run dev             # buka http://localhost:3000
+
+# 3. Konfigurasi Environment Variables
+cp .env.example .env
+# Lengkapi isi .env:
+# DATABASE_URL="postgresql://..."
+# DIRECT_URL="postgresql://..."
+# ORCA_API_KEY="sk-or-v1-..."
+# SESSION_SECRET="minimal-32-karakter-acak-rahasia"
+
+# 4. Sinkronisasi Schema Database
+npx prisma db push
+
+# 5. Jalankan Server Pengembangan
+npm run dev
 ```
 
-Coba cepat tanpa mendaftar: buka **`/demo`** (HP lansia dan dashboard admin berdampingan dengan data contoh).
+Buka peramban di `http://localhost:3000`.
 
-Untuk deploy ke Vercel dan detail variabel lingkungan, lihat [`README.md`](README.md). Penjelasan bagi pengguna tersedia di halaman **`/panduan`** di dalam aplikasi.
-
-### 6.7 Pengembangan selanjutnya
-
-1. **Notifikasi push** ke HP keluarga saat status merah (Web Push / WhatsApp).
-2. **Pengingat terjadwal**, misalnya mengingatkan orang tua minum obat atau memberi kabar pagi.
-3. **Integrasi jam pintar** untuk deteksi jatuh yang andal di latar belakang.
-4. **Antrean offline**: kabar disimpan di HP saat tidak ada internet dan dikirim otomatis saat tersambung.
-5. **Laporan mingguan** otomatis dari AI untuk keluarga.
+### 8.3 Akses Cepat Mode Demo untuk Juri
+Untuk mempermudah dewan juri menguji fitur tanpa konfigurasi panjang:
+1. Buka tautan **`http://localhost:3000/demo`**.
+2. Di layar demo, sisi kiri menampilkan antarmuka HP Orang Tua (Lansia) dan sisi kanan menampilkan Dashboard Pengawas secara berdampingan.
+3. Gunakan tombol **"⚡ Simulasi Kejang"** atau **"⚡ Simulasi Jatuh"** untuk menguji alur deteksi darurat secara instan!
 
 ---
 
-<p align="center"><sub>SAPA, karena kabar baik dari orang tua seharusnya cukup satu ketukan.</sub></p>
+<p align="center">
+  <sub><b>SAPA (Sistem Asisten Pantau Aktif)</b> — <i>Peduli hari ini, untuk mereka nanti.</i></sub><br>
+  <sub>HIMTEC Hackathon Build App 2026</sub>
+</p>

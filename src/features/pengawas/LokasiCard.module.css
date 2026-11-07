@@ -1,9 +1,17 @@
 .card {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   padding: 18px;
   border-radius: var(--r-lg);
   background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .card h2 {
@@ -12,10 +20,24 @@
   gap: 6px;
   font-size: 1.0625rem;
   font-weight: 600;
+  color: var(--ink);
 }
 
 .card h2 svg {
   color: var(--merah);
+  font-size: 1.25rem;
+}
+
+.liveTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--hijau);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .meta,
@@ -24,12 +46,161 @@
   font-size: 0.875rem;
 }
 
+.mapWrap {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--sep);
+}
+
 .map {
   width: 100%;
-  height: 190px;
+  height: 100%;
+  border: 0;
+  background: var(--bg);
+}
+
+.pinBadge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pulseDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hijau);
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  animation: pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  }
+}
+
+/* Kotak Koordinat Lengkap */
+.coordBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--fill);
+}
+
+.coordInfo {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.875rem;
+}
+
+.coordLabel {
+  color: var(--mute);
+  font-weight: 500;
+}
+
+.coordValue {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.accuracy {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--mute);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--tint);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: transform 120ms, opacity 120ms;
+}
+
+.copyBtn:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Tombol Aksi di Bawah Map */
+.actionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.refreshActionBtn,
+.refreshBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
   border: 0;
   border-radius: 12px;
-  background: var(--bg);
+  background: var(--tint);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 120ms, transform 120ms;
+}
+
+.refreshActionBtn:active:not(:disabled),
+.refreshBtn:active:not(:disabled) {
+  opacity: 0.85;
+  transform: scale(0.98);
+}
+
+.refreshActionBtn:disabled,
+.refreshBtn:disabled {
+  opacity: 0.65;
+  cursor: wait;
 }
 
 .open {
@@ -38,12 +209,35 @@
   justify-content: center;
   gap: 6px;
   min-height: 44px;
+  padding: 0 14px;
   border-radius: 12px;
   background: var(--fill);
   color: var(--tint);
+  font-size: 0.9375rem;
   font-weight: 600;
+  text-decoration: none;
+  transition: opacity 120ms;
 }
 
 .open:active {
   opacity: 0.7;
+}
+
+.spin {
+  animation: rotate 700ms linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .actionGrid {
+    grid-template-columns: 1fr;
+  }
 }

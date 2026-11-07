@@ -48,7 +48,7 @@ export default function HubungkanLansia({ kodeAwal = '' }) {
   }
 
   return (
-    <AuthLayout title="Hubungkan HP ini" lead="Masukkan kode HP dari admin keluarga. Cukup sekali; setelah itu HP ini langsung menampilkan tiga tombol.">
+    <AuthLayout title="Peduli hari ini, untuk mereka nanti" lead="Masukkan kode HP dari admin keluarga. Cukup sekali; setelah itu HP ini langsung siap digunakan orang tua setiap hari.">
       <form className={styles.form} onSubmit={submit}>
         <div className={styles.field}>
           <label htmlFor="kode">Kode HP dari keluarga</label>

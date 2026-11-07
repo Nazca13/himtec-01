@@ -6,7 +6,7 @@ import styles from './Gateway.module.css';
 // Tiga peran. Urutan = urutan alur: admin mendaftar dulu, lalu HP orang tua, lalu keluarga lain.
 const PERAN = [
   { href: '/daftar', Icon: PiCrownFill, warna: styles.blue, peran: 'Admin', judul: 'Daftarkan keluarga', desc: 'Untuk anak atau pengurus. Tambah orang tua, bagikan kode, atur anggota.' },
-  { href: '/hubungkan', Icon: PiHandHeartFill, warna: styles.green, peran: 'Lansia', judul: 'Hubungkan HP orang tua', desc: 'Buka di HP nenek atau kakek, masukkan kode dari admin. Cukup sekali.' },
+  { href: '/hubungkan', Icon: PiHandHeartFill, warna: styles.green, peran: 'Lansia', judul: 'Peduli hari ini, untuk mereka nanti', desc: 'Buka di HP orang tua atau kakek/nenek, masukkan kode pairing dari admin. Cukup sekali.' },
   { href: '/gabung', Icon: PiEyeFill, warna: styles.indigo, peran: 'Pemantau', judul: 'Masuk dengan kode undangan', desc: 'Untuk anggota keluarga lain. Ikut melihat kabar dan bertanya ke AI.' },
 ];
 

@@ -21,7 +21,7 @@ export async function proxy(request) {
     return pengawas ? NextResponse.next() : go('/');
   }
 
-  // 3. Halaman hubungkan HP lansia
+  // 3. Halaman hubungkan HP lansia ("Peduli hari ini, untuk mereka nanti")
   if (pathname === '/hubungkan') {
     // Jika HP lansia sudah terhubung dan tidak membawa kode baru di URL, langsung buka app lansia
     if (lansia && !searchParams.has('kode')) return go('/lansia');

@@ -12,11 +12,16 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Terlalu banyak percobaan. Coba lagi nanti.' }, { status: 429 });
     }
     const body = await request.json();
-    const nama = cleanName(body.nama);
-    const namaLansia = cleanName(body.namaLansia, 60);
-    if (!nama || !namaLansia) return NextResponse.json({ error: 'Nama Anda dan nama orang tua wajib diisi.' }, { status: 400 });
+    const rawNama = cleanName(body.nama, 35);
+    const hubungan = body.hubungan ? cleanName(body.hubungan, 15) : null;
+    const namaAdmin = hubungan && hubungan !== 'Lainnya' ? `${rawNama} (${hubungan})`.slice(0, 40) : rawNama;
+    const rawLansia = cleanName(body.namaLansia, 45);
+    const kondisi = body.kondisiLansia ? cleanName(body.kondisiLansia, 30) : null;
+    const namaLansia = kondisi ? `${rawLansia} (${kondisi})`.slice(0, 60) : rawLansia;
+    const namaKeluarga = body.namaKeluarga ? cleanName(body.namaKeluarga, 60) : `Keluarga ${rawNama}`;
+    if (!rawNama || !rawLansia) return NextResponse.json({ error: 'Nama Anda dan nama orang tua wajib diisi.' }, { status: 400 });
 
-    const { household, member, lansia } = await daftarKeluarga({ namaAdmin: nama, namaLansia });
+    const { household, member, lansia } = await daftarKeluarga({ namaAdmin, namaLansia, namaKeluarga });
     const res = NextResponse.json(
       { household: { nama: household.nama, kodeUndangan: household.kodeUndangan }, lansia: { nama: lansia.nama, kodePairing: lansia.kodePairing } },
       { status: 201 }
