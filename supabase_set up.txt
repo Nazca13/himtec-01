@@ -40,7 +40,7 @@ Urutan kerja. Ikuti dari atas ke bawah.
      prisma/schema.prisma.)
 
 5. Cek hasil
-   - Dashboard -> Table Editor: tabel "DailyRecord" muncul, ikon RLS aktif.
+   - Dashboard -> Table Editor: tabel "daily_records" muncul, ikon RLS aktif.
    - Lokal: npx prisma studio -> buka model DailyRecord, tambah satu baris.
    - npm run dev -> http://localhost:3000
 

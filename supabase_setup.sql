@@ -1,37 +1,43 @@
--- supabase_setup.sql
--- Cocok dengan model DailyRecord di prisma/schema.prisma.
--- Aman dijalankan ulang (idempotent).
+-- ==========================================
+-- FILE: supabase_setup.sql
+-- PROJECT: SAPA (Sistem Asisten Pantau Aktif)
+-- DBMS: PostgreSQL (Supabase)
+-- Cocok dengan model DailyRecord di prisma/schema.prisma (@@map("daily_records")).
+-- ==========================================
 
--- ============================================================
--- TABEL (lewati bagian ini jika memakai `npx prisma db push`)
--- ============================================================
-CREATE TABLE IF NOT EXISTS public."DailyRecord" (
-  "id"           TEXT          NOT NULL DEFAULT gen_random_uuid()::text,
-  "tipeInput"    TEXT          NOT NULL,
-  "statusBahaya" TEXT          NOT NULL DEFAULT 'HIJAU',
-  "aiAnalysis"   JSONB,
-  "createdAt"    TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT "DailyRecord_pkey" PRIMARY KEY ("id")
+-- 1. Reset tabel (HAPUS SEMUA DATA). Aktifkan hanya saat mereset data simulasi.
+-- DROP TABLE IF EXISTS daily_records;
+
+-- 2. Tabel utama pencatatan log harian
+CREATE TABLE IF NOT EXISTS daily_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    -- Jenis interaksi dari halaman Kiosk Lansia
+    -- Contoh isi: 'TOMBOL_AMAN', 'VOICE_NOTE', 'TOMBOL_DARURAT'
+    tipe_input VARCHAR(50) NOT NULL,
+
+    -- Status warna untuk merender UI Dashboard secara instan
+    -- Contoh isi: 'HIJAU', 'KUNING', 'MERAH'
+    status_bahaya VARCHAR(20) DEFAULT 'HIJAU',
+
+    -- Teks mentah (jika diketik) atau URL/Base64 audio dari peramban
+    raw_data TEXT,
+
+    -- [CORE AI] Hasil ekstraksi dari Gemini (JSONB agar query di dalam JSON cepat)
+    ai_analysis JSONB,
+
+    -- Waktu kejadian dengan zona waktu
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS "DailyRecord_createdAt_idx"
-  ON public."DailyRecord" ("createdAt" DESC);
+-- 3. Indeks: mempercepat Dashboard Pengawas menarik data terbaru
+CREATE INDEX IF NOT EXISTS idx_daily_records_created_at ON daily_records(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_records_status ON daily_records(status_bahaya);
 
--- ============================================================
--- RLS (jalankan SELALU, apa pun jalur yang dipilih)
--- ============================================================
--- Tabel di schema public terbuka lewat Data API (REST). RLS aktif tanpa policy
--- = anon dan authenticated tidak bisa baca/tulis apa pun.
--- Prisma memakai role postgres (bypass RLS), jadi app tetap jalan.
-ALTER TABLE public."DailyRecord" ENABLE ROW LEVEL SECURITY;
+-- 4. RLS (jalankan SELALU). Tanpa policy, anon/authenticated tidak bisa akses lewat
+-- Data API Supabase. Prisma memakai role postgres (bypass RLS), jadi app tetap jalan.
+ALTER TABLE daily_records ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE daily_records FROM anon, authenticated;
 
--- Lapisan kedua: cabut hak akses langsung.
-REVOKE ALL ON TABLE public."DailyRecord" FROM anon, authenticated;
-
--- ============================================================
--- CEK
--- ============================================================
--- Harus mengembalikan rowsecurity = true:
-SELECT tablename, rowsecurity
-FROM pg_tables
-WHERE schemaname = 'public' AND tablename = 'DailyRecord';
+-- 5. Cek: rowsecurity harus true
+SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public' AND tablename = 'daily_records';

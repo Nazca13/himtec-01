@@ -35,13 +35,13 @@ Client Prisma dibuat sekali di `src/lib/db.js` (singleton). Jangan membuat `new 
 | `aiAnalysis`   | `jsonb`        | Hasil triase Gemini: transkrip, gejala, ringkasan  |
 | `createdAt`    | `timestamp(3)` | Default waktu sekarang. Ada indeks menurun         |
 
-Nama tabel di Postgres adalah `"DailyRecord"` (huruf besar, wajib dikutip di SQL).
+Nama tabel di Postgres adalah `daily_records` (snake_case, dipetakan Prisma lewat `@@map`). Kolom: `tipe_input`, `status_bahaya`, `raw_data`, `ai_analysis`, `created_at`.
 
 Data demo untuk pitching: `node prisma/seed.js` (menghapus semua baris lalu mengisi 6 baris).
 
 ## Keamanan
 
-- RLS aktif di `public."DailyRecord"` tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
+- RLS aktif di `public.daily_records` tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
 - Prisma memakai role `postgres`, yang melewati RLS. App tetap bekerja.
 - `service_role` key dan `anon` key tidak dipakai. Jangan menaruh key apa pun dengan awalan `NEXT_PUBLIC_`.
 - `.env` tidak boleh masuk git.
@@ -49,7 +49,7 @@ Data demo untuk pitching: `node prisma/seed.js` (menghapus semua baris lalu meng
 Kalau nanti butuh akses langsung dari browser (supabase-js), tambahkan policy dengan pola kepemilikan, bukan hanya `TO authenticated`:
 
 ```sql
-create policy "owner can read" on public."DailyRecord" for select
+create policy "owner can read" on public.daily_records for select
 to authenticated
 using ((select auth.uid()) = user_id);
 ```
