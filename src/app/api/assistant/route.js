@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { authResponse, requireMember } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
 import { askAssistant } from '@/services/assistant.service';
 import { lansiaMilik, ringkasKeluarga } from '@/services/household.service';
 
@@ -8,7 +9,8 @@ const MAX_QUESTION = 500;
 // Asisten AI untuk keluarga (admin dan pemantau), menjawab tentang satu lansia milik keluarga ini.
 export async function POST(request) {
   try {
-    const { household } = await requireMember(request);
+    const { member, household } = await requireMember(request);
+    if (!rateLimit(`asisten:${member.id}`, 60, 60 * 60 * 1000)) return NextResponse.json({ error: 'Terlalu banyak pertanyaan. Coba lagi nanti.' }, { status: 429 });
     const { question, lansiaId } = await request.json();
     const q = typeof question === 'string' ? question.trim() : '';
     if (!q || q.length > MAX_QUESTION) {

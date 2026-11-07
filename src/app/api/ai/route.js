@@ -2,12 +2,15 @@ import { NextResponse } from 'next/server';
 import { MAX_AUDIO_BASE64_LENGTH, TIPE_INPUT } from '@/lib/constants';
 import { authResponse, requireLansia } from '@/lib/auth';
 import { bersihkanLokasi } from '@/lib/lokasi';
+import { rateLimit } from '@/lib/rate-limit';
 import { createRecord } from '@/services/record.service';
 import { triageAudio } from '@/services/triage.service';
 
 export async function POST(request) {
   try {
     const { lansia } = await requireLansia(request);
+    // Melindungi biaya AI jika cookie bocor atau HP macet mengirim berulang: 40 pesan suara per jam per orang tua.
+    if (!rateLimit(`ai:${lansia.id}`, 40, 60 * 60 * 1000)) return NextResponse.json({ error: 'Terlalu banyak pesan suara. Coba lagi nanti.' }, { status: 429 });
     const { audioBase64, mimeType, lokasi } = await request.json();
 
     if (typeof audioBase64 !== 'string' || !audioBase64 || mimeType !== 'audio/wav') {

@@ -1,11 +1,11 @@
 import { db } from '@/lib/db';
+import { ValidationError } from '@/lib/errors';
 import { hariKey } from '@/lib/format';
 import { STATUS, TIPE_INPUT } from '@/lib/constants';
 
 const TIPE_VALID = new Set(Object.values(TIPE_INPUT));
 const STATUS_VALID = new Set(Object.values(STATUS));
 
-export class ValidationError extends Error {}
 
 export async function createRecord({ lansiaId, tipeInput, statusBahaya, aiAnalysis, rawData, lokasi = {} }) {
   if (!lansiaId) throw new ValidationError('lansiaId wajib');

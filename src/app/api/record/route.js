@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { authResponse, requireLansia } from '@/lib/auth';
 import { bersihkanLokasi } from '@/lib/lokasi';
 import { tafsirkanKabar } from '@/services/kabar.service';
-import { createRecord, ValidationError } from '@/services/record.service';
+import { ValidationError } from '@/lib/errors';
+import { createRecord } from '@/services/record.service';
 
 // HP lansia mengirim kabar tanpa suara: Saya Aman, Darurat, atau keluhan pilihan gambar.
 // Lansia diambil dari sesi; status ditentukan server (tafsirkanKabar), bukan klien.

@@ -1,6 +1,6 @@
 import { STATUS, TIPE_INPUT } from '@/lib/constants';
 import { KELUHAN_BY_ID, SEBAB_OTOMATIS } from '@/lib/keluhan';
-import { ValidationError } from './record.service';
+import { ValidationError } from '@/lib/errors';
 
 // Menafsirkan kabar non-suara dari HP lansia (tombol atau keluhan pilihan gambar) menjadi status + ringkasan.
 // Status selalu ditentukan server.

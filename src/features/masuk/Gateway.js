@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PiCaretRightBold, PiCrownFill, PiEyeFill, PiHandHeartFill } from 'react-icons/pi';
 import RolePill from '@/components/ui/RolePill';
+import { demoAktif } from '@/lib/flags';
 import styles from './Gateway.module.css';
 
 // Dua pintu masuk yang berbeda, bukan satu daftar peran:
@@ -88,7 +89,7 @@ export default function Gateway() {
       <p className={styles.foot}>
         <Link href="/panduan">Panduan lengkap</Link>
         {/* <a>, bukan <Link>: /demo memasang cookie, tidak boleh di-prefetch */}
-        <a href="/demo">Coba mode demo</a>
+        {demoAktif() && <a href="/demo">Coba mode demo</a>}
       </p>
     </main>
   );

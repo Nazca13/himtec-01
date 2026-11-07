@@ -7,3 +7,6 @@ export function pesanServer(error, fallback) {
   }
   return fallback;
 }
+
+// Input dari klien tidak valid (HTTP 400). Dilempar oleh service, ditangkap route handler.
+export class ValidationError extends Error {}
