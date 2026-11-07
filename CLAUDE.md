@@ -11,18 +11,28 @@ npm run start   # serve production build
 npm run lint    # eslint (flat config, eslint.config.mjs)
 ```
 
-No test framework is configured.
+No test framework is configured. Prisma has no npm script; run `npx prisma generate`, `npx prisma migrate dev` or `npx prisma studio` directly.
 
-## Stack and conventions
+## Stack
 
-- Next.js 16.4.5 + React 19.3, App Router, plain JavaScript (no TypeScript). Source lives in `src/app/`; the `@/*` alias maps to `src/*` (`jsconfig.json`).
-- Styling is global CSS (`src/app/globals.css`) plus CSS Modules (`page.module.css`).
-- Project is still the unmodified `create-next-app` scaffold.
+- Next.js 16.4.5 + React 19.3, App Router, plain JavaScript (no TypeScript). Source lives in `src/`; the `@/*` alias maps to `src/*` (`jsconfig.json`).
+- Styling: global CSS (`src/app/globals.css`) plus CSS Modules.
+- Data: Prisma 6 on PostgreSQL (Supabase). Schema in `prisma/schema.prisma`; use the shared client from `src/lib/db.js` (singleton, don't instantiate `PrismaClient` elsewhere).
+- AI: Gemini via `@google/genai`. Server-side only; the API key must never reach client code.
 
-## Next.js version caveat
+## Layout
 
-`AGENTS.md` warns that this Next.js version has breaking changes from what you may know. Before writing Next.js code, read the relevant guide in `node_modules/next/dist/docs/` (`01-app/` for App Router, `03-architecture/`, etc.) and heed deprecation notices. `AGENTS.md` is managed by `next dev`, which re-adds it if removed.
+- `src/app/` pages, layouts and route handlers (`src/app/api/*/route.js`).
+- `src/lib/` shared server utilities (e.g. `db.js`).
+- `prisma/` database schema.
 
-## Non-default Next config
+The project is early-stage and its direction is still open; treat the current pages and the example `Record` model as starting points, not fixed design.
 
-`next.config.mjs` enables `cacheComponents: true`, `partialPrefetching: true`, and `experimental.agentFeedback`. `cacheComponents` changes caching and rendering semantics (e.g. dynamic/uncached data access must be handled via Suspense or `use cache`), so consult the docs for these flags before writing data-fetching or caching code.
+## Environment
+
+Copy `.env.example` to `.env`: `DATABASE_URL` (Supabase pooler, port 6543, runtime), `DIRECT_URL` (direct, port 5432, migrations) and `GEMINI_API_KEY`.
+
+## Next.js caveats
+
+- `AGENTS.md` warns that this Next.js version has breaking changes from what you may know. Before writing Next.js code, read the relevant guide in `node_modules/next/dist/docs/` (`01-app/`, `03-architecture/`, etc.) and heed deprecation notices. `AGENTS.md` is managed by `next dev`, which re-adds it if removed.
+- `next.config.mjs` enables `cacheComponents`, `partialPrefetching` and `experimental.agentFeedback`. `cacheComponents` changes caching and rendering semantics (dynamic/uncached data access must go through Suspense or `use cache`), so check the docs before writing data-fetching or caching code.

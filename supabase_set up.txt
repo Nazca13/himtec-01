@@ -1,0 +1,58 @@
+SETUP SUPABASE - himtec-01
+==========================
+
+Urutan kerja. Ikuti dari atas ke bawah.
+
+1. Buat project Supabase
+   - Buka https://supabase.com/dashboard, klik "New project".
+   - Isi nama, region terdekat (mis. Singapore), dan database password.
+   - SIMPAN password itu. Dipakai di DATABASE_URL dan DIRECT_URL.
+
+2. Ambil connection string
+   - Di dashboard, klik tombol "Connect" di atas.
+   - Salin dua string:
+     a. Transaction pooler (port 6543)  -> DATABASE_URL (runtime app)
+     b. Direct connection / session pooler (port 5432) -> DIRECT_URL (migrasi)
+   - Ganti [YOUR-PASSWORD] dengan password dari langkah 1.
+   - Kalau password punya karakter spesial (@ : / # ?), encode dulu (URL-encode).
+
+3. Isi file .env (salin dari .env.example)
+   DATABASE_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres?pgbouncer=true"
+   DIRECT_URL="postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"
+   GEMINI_API_KEY="<api key dari https://aistudio.google.com/apikey>"
+
+   - JANGAN commit .env. Jangan pakai awalan NEXT_PUBLIC_ untuk key apa pun di atas.
+   - Proyek ini hanya memakai Prisma dari server. Tidak perlu anon key / service_role key.
+
+4. Buat tabel. Pilih SALAH SATU jalur:
+
+   JALUR A (disarankan) - lewat Prisma
+     npx prisma generate
+     npx prisma db push
+     Lalu jalankan HANYA bagian "RLS" di supabase_setup.sql (SQL Editor).
+
+   JALUR B - lewat SQL Editor
+     Buka dashboard -> SQL Editor -> New query.
+     Tempel seluruh isi supabase_setup.sql -> Run.
+     Lalu: npx prisma generate
+     (Jangan jalankan prisma db push / migrate dev sesudahnya tanpa mengecek
+     drift. Nama tabel dan kolom di SQL sudah dibuat sama persis dengan
+     prisma/schema.prisma.)
+
+5. Cek hasil
+   - Dashboard -> Table Editor: tabel "Record" muncul, ikon RLS aktif.
+   - Lokal: npx prisma studio -> buka model Record, tambah satu baris.
+   - npm run dev -> http://localhost:3000
+
+6. Masalah umum
+   - "Can't reach database server": cek port dan password di .env.
+   - "prepared statement ... already exists": DATABASE_URL belum memakai
+     ?pgbouncer=true atau salah port (harus 6543).
+   - Migrasi macet / timeout: pastikan DIRECT_URL (5432) yang dipakai, bukan pooler 6543.
+   - Tabel tidak terbaca lewat REST API Supabase: memang disengaja. RLS aktif
+     tanpa policy, jadi anon/authenticated tidak bisa akses. App lewat Prisma
+     (role postgres) tidak terpengaruh.
+
+File terkait
+   - supabase_docs.md   : penjelasan model, keputusan keamanan, cara tambah tabel
+   - supabase_setup.sql : SQL siap tempel
