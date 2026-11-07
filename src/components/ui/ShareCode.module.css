@@ -6,7 +6,8 @@
   background: var(--ice);
 }
 
-.code {
+.box .code {
+  color: var(--ink);
   font-size: clamp(2.25rem, 11vw, 3rem);
   font-weight: 800;
   letter-spacing: 0.14em;

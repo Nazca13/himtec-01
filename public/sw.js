@@ -1,5 +1,5 @@
 // Service worker SAPA. Naikkan VERSION setiap mengubah strategi cache.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = `sapa-shell-${VERSION}`;
 const RUNTIME = `sapa-runtime-${VERSION}`;
 const PRECACHE = ['/offline.html', '/icon-192.png', '/icon-512.png', '/logo.png'];

@@ -72,6 +72,10 @@ export default function Gateway() {
           ))}
         </ol>
       </section>
+
+      <p className={`${styles.rise} ${styles.demo}`} style={step(6)}>
+        Juri atau ingin mencoba cepat? <Link href="/demo">Buka mode demo</Link>
+      </p>
     </main>
   );
 }

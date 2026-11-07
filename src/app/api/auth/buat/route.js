@@ -22,7 +22,7 @@ export async function POST(request) {
       { household: { namaLansia: household.namaLansia, kodeLansia: household.kodeLansia, kodeKeluarga: household.kodeKeluarga } },
       { status: 201 }
     );
-    res.cookies.set(sessionCookie(await signSession({ h: household.id, r: 'pengawas', n: nama }), request));
+    res.cookies.set(sessionCookie('pengawas', await signSession({ h: household.id, r: 'pengawas', n: nama }), request));
     return res;
   } catch (error) {
     console.error('POST /api/auth/buat:', error);

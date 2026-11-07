@@ -12,7 +12,8 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' }, // iframe hanya dari situs sendiri (mode demo)
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           // Mikrofon hanya untuk halaman sendiri; kamera dan lokasi tidak dipakai.
           { key: 'Permissions-Policy', value: 'microphone=(self), camera=(), geolocation=()' },

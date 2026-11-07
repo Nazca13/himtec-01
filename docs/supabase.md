@@ -25,23 +25,17 @@ Client Prisma dibuat sekali di `src/lib/db.js` (singleton). Jangan membuat `new 
 
 ## Model saat ini
 
-`prisma/schema.prisma` memiliki satu model, `DailyRecord`: satu baris per pesan dari lansia.
+Dua tabel (`prisma/schema.prisma`, DDL + RLS di `prisma/setup.sql`):
 
-| Kolom          | Tipe SQL       | Catatan                                            |
-| -------------- | -------------- | -------------------------------------------------- |
-| `id`           | `text`         | Primary key. UUID dibuat oleh Prisma               |
-| `tipeInput`    | `text`         | `TOMBOL_AMAN`, `TOMBOL_DARURAT`, atau `VOICE_NOTE` |
-| `statusBahaya` | `text`         | `HIJAU` (default), `KUNING`, atau `MERAH`          |
-| `aiAnalysis`   | `jsonb`        | Hasil triase AI: transkrip, gejala, ringkasan  |
-| `createdAt`    | `timestamp(3)` | Default waktu sekarang. Ada indeks menurun         |
+**`households`** (grup keluarga, satu lansia): `id`, `nama_lansia`, `kode_lansia` (unik, dipakai di HP lansia), `kode_keluarga` (unik, untuk mengundang keluarga), `lansia_version` (naik saat HP lansia diputus), `lansia_terhubung_at`, `created_at`.
 
-Nama tabel di Postgres adalah `daily_records` (snake_case, dipetakan Prisma lewat `@@map`). Kolom: `tipe_input`, `status_bahaya`, `raw_data`, `ai_analysis`, `created_at`.
+**`daily_records`** (log): `id`, `household_id` (FK ke `households`, cascade; nullable hanya untuk baris lama), `tipe_input` (`TOMBOL_AMAN` / `TOMBOL_DARURAT` / `VOICE_NOTE`), `status_bahaya` (`HIJAU` / `KUNING` / `MERAH`), `raw_data`, `ai_analysis` (jsonb), `created_at`. Indeks `(household_id, created_at desc)`.
 
-Data demo untuk pitching: `npm run db:seed` (menghapus semua baris lalu mengisi 6 baris).
+Semua query log wajib memfilter `household_id` dari sesi. Data demo: `npm run db:seed` (hanya menghapus log grup demo).
 
 ## Keamanan
 
-- RLS aktif di `public.daily_records` tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
+- RLS aktif di `public.households` dan `public.daily_records` tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
 - Prisma memakai role `postgres`, yang melewati RLS. App tetap bekerja.
 - `service_role` key dan `anon` key tidak dipakai. Jangan menaruh key apa pun dengan awalan `NEXT_PUBLIC_`.
 - `.env` tidak boleh masuk git.

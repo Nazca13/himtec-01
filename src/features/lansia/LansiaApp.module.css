@@ -1,0 +1,332 @@
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ice);
+  max-width: 560px;
+  margin-inline: auto;
+  /* Cegah zoom dan seleksi teks yang tidak sengaja pada layar sentuh lansia */
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* Panel langit: tempat maskot berbicara */
+.sky {
+  background: var(--sky);
+  border-radius: 0 0 36px 36px;
+  padding: calc(env(safe-area-inset-top) + 14px) var(--gutter) 22px;
+  box-shadow: 0 8px 0 #2f8fe0; /* tepi bawah 3D, selaras tombol */
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.hello {
+  font-weight: 800;
+  font-size: 1.125rem;
+}
+
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--mute);
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+.streak svg {
+  font-size: 1.25rem;
+}
+
+.hot {
+  color: var(--ink);
+}
+
+.hot svg {
+  color: var(--orange);
+}
+
+.talk {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.bubble {
+  position: relative;
+  flex: 1;
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 0 4px 0 rgba(17, 42, 70, 0.14);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/* Ekor gelembung menunjuk ke maskot */
+.bubble::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  bottom: 26px;
+  width: 20px;
+  height: 20px;
+  background: var(--paper);
+  border-radius: 4px;
+  transform: rotate(45deg);
+}
+
+.bubble p {
+  position: relative;
+  animation: say 380ms ease-out;
+}
+
+@keyframes say {
+  from {
+    opacity: 0.2;
+    transform: translateY(6px);
+  }
+}
+
+.buttons {
+  flex: 1;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(112px, 1fr));
+  gap: 16px;
+  padding: 24px var(--gutter) 8px;
+}
+
+/* Tombol 3D: sisi bawah tebal, turun saat ditekan */
+.big {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 26px;
+  background: var(--tone);
+  color: var(--on-tone);
+  text-align: left;
+  box-shadow: 0 7px 0 var(--tone-deep);
+  transition: box-shadow 90ms;
+}
+
+.big:active {
+  box-shadow: 0 2px 0 var(--tone-deep);
+}
+
+.disc {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(64px, 19vw, 84px);
+  height: clamp(64px, 19vw, 84px);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: clamp(2.125rem, 10vw, 2.875rem);
+}
+
+.danger .disc {
+  color: var(--merah);
+}
+
+.label {
+  display: grid;
+  gap: 2px;
+}
+
+.label strong {
+  font-size: clamp(1.75rem, 8vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.label span {
+  font-size: 0.9375rem;
+  line-height: 1.3;
+  opacity: 0.92;
+}
+
+.today {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px var(--gutter) calc(env(safe-area-inset-bottom) + 18px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--mute);
+  font-weight: 700;
+}
+
+.done {
+  color: var(--ink);
+}
+
+.done svg {
+  font-size: 1.375rem;
+  color: var(--teal);
+}
+
+/* Layar penuh untuk umpan balik: satu pesan, satu tindakan */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: var(--gutter);
+  background: var(--ice);
+  text-align: center;
+  overflow: hidden;
+}
+
+.recording {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sent {
+  background: var(--sky);
+}
+
+.msg {
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  max-width: 14ch;
+}
+
+.reply {
+  max-width: 24ch;
+  padding: 14px 18px;
+  border-radius: 22px;
+  background: var(--paper);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.errText {
+  max-width: 22ch;
+  font-size: clamp(1.5rem, 6vw, 2.25rem);
+}
+
+.warn {
+  font-size: 3rem;
+  color: var(--merah);
+}
+
+.timer {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #c9dcf0;
+}
+
+/* Cincin denyut hanya saat merekam: menandakan mikrofon aktif */
+.listen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: rgba(255, 152, 0, 0.18);
+}
+
+.listen::before,
+.listen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--orange);
+  animation: ring 1.8s ease-out infinite;
+}
+
+.listen::after {
+  animation-delay: 0.9s;
+}
+
+@keyframes ring {
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: min(100%, 360px);
+  min-height: 72px;
+  margin-top: 8px;
+  border-radius: 26px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 1.5rem;
+  font-weight: 800;
+  box-shadow: 0 6px 0 #000c1d;
+}
+
+.recording .action {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 6px 0 #9fb4c9;
+}
+
+/* Konfeti CSS murni saat "Pesan Tersampaikan" */
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.confetti i {
+  position: absolute;
+  top: -20px;
+  left: calc(var(--i) * 7.2%);
+  width: 10px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--c, var(--orange));
+  animation: fall 2.4s ease-in calc(var(--i) * 90ms) both;
+}
+
+.confetti i:nth-child(3n) {
+  --c: var(--paper);
+}
+
+.confetti i:nth-child(3n + 1) {
+  --c: var(--teal);
+}
+
+.confetti i:nth-child(5n) {
+  --c: var(--ink);
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(110dvh) rotate(540deg);
+  }
+}

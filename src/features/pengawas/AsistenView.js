@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as m from 'motion/react-m';
-import { PiPaperPlaneRightFill, PiSparkleFill } from 'react-icons/pi';
+import { PiPaperPlaneRightFill } from 'react-icons/pi';
+import Mascot from '@/components/ui/Mascot';
 import styles from './AsistenView.module.css';
 
 const SARAN = [
@@ -52,9 +53,7 @@ export default function AsistenView() {
       <div className={styles.thread} aria-live="polite">
         {!thread.length && (
           <div className={styles.intro}>
-            <span className={styles.spark}>
-              <PiSparkleFill aria-hidden="true" />
-            </span>
+            <Mascot size={84} />
             <p>Tanya apa saja soal kondisi lansia. Jawaban dibuat dari log aktivitas 7 hari terakhir.</p>
             <ul className={styles.chips}>
               {SARAN.map((s) => (

@@ -353,3 +353,37 @@ section > .h2 {
   font-size: 1.1875rem;
   font-weight: 800;
 }
+
+/* Dashboard dua kolom di layar lebar; ponsel tetap satu kolom (AI live tepat di bawah status) */
+.dash {
+  display: grid;
+  gap: 24px;
+}
+
+.main,
+.side {
+  display: grid;
+  gap: 24px;
+  align-content: start;
+}
+
+.side {
+  order: -1; /* ponsel: AI live naik ke atas */
+}
+
+@media (min-width: 1000px) {
+  .dash {
+    grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+    align-items: start;
+  }
+
+  .side {
+    order: 0;
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.narrow {
+  max-width: 760px;
+}

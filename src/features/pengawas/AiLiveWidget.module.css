@@ -1,0 +1,81 @@
+.card {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--r-md);
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--shadow-md);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.head h2 {
+  font-size: 1.1875rem;
+  font-weight: 800;
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c9dcf0;
+  font-size: 0.875rem;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.text {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  transition: opacity 200ms;
+}
+
+.stale {
+  opacity: 0.55;
+}
+
+.skel {
+  display: grid;
+  gap: 10px;
+}
+
+.skel i {
+  height: 14px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.18);
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+.skel i:nth-child(2) {
+  width: 88%;
+}
+
+.skel i:nth-child(3) {
+  width: 62%;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--sky);
+  font-weight: 800;
+}

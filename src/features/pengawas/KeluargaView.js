@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { PiPhoneDisconnectBold, PiSignOutBold } from 'react-icons/pi';
 import ShareCode from '@/components/ui/ShareCode';
 import { formatWaktu } from '@/lib/format';
@@ -10,6 +11,7 @@ import { useRecords } from './RecordsProvider';
 import styles from './pengawas.module.css';
 
 export default function KeluargaView() {
+  const router = useRouter();
   const { household, me, refresh } = useRecords();
   const [busy, setBusy] = useState(false);
   if (!household) return <Skeleton />;
@@ -26,11 +28,12 @@ export default function KeluargaView() {
 
   const keluar = async () => {
     await postJson('/api/auth/keluar');
-    (window.location.href = '/');
+    router.replace('/');
+    router.refresh();
   };
 
   return (
-    <div className={styles.stack}>
+    <div className={`${styles.stack} ${styles.narrow}`}>
       <h1 className={styles.h1}>Keluarga</h1>
 
       <section className={styles.panel} aria-labelledby="hp-lansia">

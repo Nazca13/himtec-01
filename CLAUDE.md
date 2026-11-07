@@ -26,15 +26,19 @@ No test framework is configured. Prisma has no npm script; run `npx prisma gener
 - `src/lib/` shared server utilities (e.g. `db.js`).
 - `prisma/` database schema.
 
-The project is SAPA (see `docs/PRD.txt`): a dual-view PWA. `/lansia` is a 3-button kiosk with voice notes; `/pengawas` is the family app (tabs: Beranda, Riwayat, Asisten AI; bottom nav on mobile, sidebar >=900px). `/` is a role gateway that remembers the role in localStorage (`?ganti` to re-pick); roles are defined in `src/lib/roles.js`. Icons: `react-icons/pi` (Phosphor), no emoji. Palette tokens live in `src/app/globals.css` (status colors via `.tone-HIJAU/KUNING/MERAH`).
+The project is SAPA (see `docs/PRD.txt`). Flow: a family member creates a household (group) on the web and gets two codes (elder phone, invite family); the elder phone pairs once via `/hubungkan?kode=...` and becomes the installable PWA (`/lansia`, only that page and `/hubungkan` link `/app.webmanifest`); other family join with the family code and use the web dashboard (`/pengawas/*`: Beranda, Riwayat, Asisten AI, Keluarga). `/demo` logs one browser into the seeded demo household as both roles and shows them side by side.
 
-Structure: `src/app` (routes + thin route handlers), `src/features/{lansia,pengawas}` (feature UI), `src/components/ui` (shared UI), `src/services` (business logic: record, triage, assistant), `src/hooks`, `src/lib` (db, orca, constants, format). Route handlers validate input and call services; they hold no logic.
+Structure: `src/app` (routes + thin route handlers), `src/features/{lansia,pengawas,masuk}` (feature UI), `src/components/ui` (shared UI incl. `Mascot`), `src/services` (business logic: household, record, triage, mascot, assistant, demo), `src/hooks`, `src/lib` (db, orca, session, auth, codes, rate-limit, format...). Route handlers validate input and call services; they hold no logic.
 
-AI: audio triage (model `google/gemini-2.5-flash` via OrcaRouter, `input_audio` WAV only) and the assistant (`orcarouter/auto`) both use `ORCA_API_KEY`. The browser converts recordings to 16 kHz mono WAV (`useRecorder`). If the key is missing or the call fails, triage saves the voice note as KUNING with `aiAnalysis.fallback = true`. PWA: native `src/app/manifest.js` + hand-written `public/sw.js` (no `next-pwa`; registered only in production by `RegisterSW`). SW caches the app shell and `/_next/static`, never `/api/*`; offline fallback is `public/offline.html`. Bump `VERSION` in `sw.js` when changing cache strategy. `src/proxy.js` redirects `/` to the role in the `sapa-role` cookie (`?ganti` skips it). Entrance animations must be CSS (not JS `initial` states) so content paints without waiting for hydration; use `m.*` from `motion/react-m` (LazyMotion strict), never `motion.*`. Demo data: `npm run db:seed`.
+Auth: no passwords. Two signed httpOnly cookies (`sapa-lansia`, `sapa-pengawas`, HMAC-SHA256 via Web Crypto, `SESSION_SECRET`). `src/proxy.js` gates pages; every API re-checks via `requireSession(request, role)` and scopes queries by `household.id` from the session, never from the body. Revoking the elder phone bumps `Household.lansiaVersion`, which invalidates the old cookie. Join/pair endpoints are rate limited (in-memory shortcut).
+
+AI: audio triage (`google/gemini-2.5-flash`, `input_audio` WAV only) and text features (`google/gemini-2.5-flash-lite`; `orcarouter/auto` was measured at 30-40 s, do not use) all use `ORCA_API_KEY` via `src/lib/orca.js`. The browser converts recordings to 16 kHz mono WAV (`useRecorder`). Mascot message and the family "Ringkasan AI" are cached in memory; if AI fails or is slow (>6 s) a local rule-based text is used, and triage saves the voice note as KUNING with `aiAnalysis.fallback = true`.
+
+PWA: hand-written `public/sw.js` (no `next-pwa`; registered only in production by `RegisterSW`) caches the app shell and `/_next/static`, never `/api/*`; offline fallback `public/offline.html`; bump `VERSION` when changing cache strategy. Entrance animations must be CSS (not JS `initial` states) so content paints without waiting for hydration; use `m.*` from `motion/react-m` (LazyMotion strict), never `motion.*`. Cookie-reading GET handlers call `await connection()`. Demo data: `npm run db:seed` or `/demo?reset=1`.
 
 ## Environment
 
-Copy `.env.example` to `.env`: `DATABASE_URL` (Supabase pooler, port 6543, runtime), `DIRECT_URL` (direct, port 5432, migrations) and `ORCA_API_KEY`. No Supabase anon/service keys are used (Prisma connects directly).
+Copy `.env.example` to `.env`: `DATABASE_URL` (Supabase pooler, port 6543, runtime), `DIRECT_URL` (direct, port 5432, migrations) `ORCA_API_KEY` and `SESSION_SECRET`. No Supabase anon/service keys are used (Prisma connects directly).
 
 ## Next.js caveats
 

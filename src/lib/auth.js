@@ -6,7 +6,7 @@ export class AuthError extends Error {}
 // Dipakai semua route handler yang butuh sesi. Mengembalikan { session, household }
 // atau melempar AuthError (handler membalas 401).
 export async function requireSession(request, role) {
-  const session = await verifySession(request.cookies.get(SESSION_COOKIE)?.value).catch(() => null);
+  const session = await verifySession(request.cookies.get(SESSION_COOKIE[role])?.value).catch(() => null);
   if (!session || session.r !== role) throw new AuthError('Sesi tidak valid');
 
   const household = await getHousehold(session.h);

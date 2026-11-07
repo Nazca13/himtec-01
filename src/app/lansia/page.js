@@ -1,7 +1,7 @@
-import KioskButtons from '@/features/lansia/KioskButtons';
+import LansiaApp from '@/features/lansia/LansiaApp';
 
 export const metadata = { title: 'SAPA - Lansia' };
 
 export default function LansiaPage() {
-  return <KioskButtons />;
+  return <LansiaApp />;
 }

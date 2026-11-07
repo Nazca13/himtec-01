@@ -9,7 +9,7 @@ export default function RiwayatView() {
   const { records } = useRecords();
 
   return (
-    <div className={styles.stack}>
+    <div className={`${styles.stack} ${styles.narrow}`}>
       <h1 className={styles.h1}>Riwayat</h1>
       {records ? <Timeline records={records} /> : <Skeleton />}
     </div>

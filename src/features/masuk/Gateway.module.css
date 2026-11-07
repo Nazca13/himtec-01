@@ -141,3 +141,14 @@
 .cara li::marker {
   font-weight: 800;
 }
+
+.demo {
+  margin-top: 20px;
+  color: var(--mute);
+  text-align: center;
+}
+
+.demo a {
+  color: var(--sky-deep);
+  font-weight: 800;
+}

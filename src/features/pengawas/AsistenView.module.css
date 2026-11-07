@@ -1,4 +1,5 @@
 .chat {
+  max-width: 760px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -29,17 +30,6 @@
   border-radius: var(--r-md);
   background: var(--paper);
   box-shadow: var(--shadow-sm);
-}
-
-.spark {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: var(--sky);
-  color: var(--ink);
-  font-size: 1.5rem;
 }
 
 .chips {

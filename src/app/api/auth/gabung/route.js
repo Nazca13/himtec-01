@@ -20,7 +20,7 @@ export async function POST(request) {
     if (!household) return NextResponse.json({ error: 'Kode keluarga tidak ditemukan. Periksa lagi.' }, { status: 404 });
 
     const res = NextResponse.json({ namaLansia: household.namaLansia });
-    res.cookies.set(sessionCookie(await signSession({ h: household.id, r: 'pengawas', n: nama }), request));
+    res.cookies.set(sessionCookie('pengawas', await signSession({ h: household.id, r: 'pengawas', n: nama }), request));
     return res;
   } catch (error) {
     console.error('POST /api/auth/gabung:', error);

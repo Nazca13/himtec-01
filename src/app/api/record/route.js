@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { connection, NextResponse } from 'next/server';
 import { STATUS, TIPE_INPUT } from '@/lib/constants';
 import { AuthError, requireSession, unauthorized } from '@/lib/auth';
 import { createRecord, listRecords, ValidationError } from '@/services/record.service';
@@ -11,6 +11,7 @@ const STATUS_TOMBOL = {
 
 // Keluarga: log grupnya + info grup (nama, kode, status HP lansia).
 export async function GET(request) {
+  await connection(); // tandai dinamis: handler ini membaca cookie sesi
   try {
     const { session, household } = await requireSession(request, 'pengawas');
     const limit = Number(new URL(request.url).searchParams.get('limit')) || 50;

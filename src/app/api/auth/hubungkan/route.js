@@ -18,7 +18,7 @@ export async function POST(request) {
 
     await markLansiaTerhubung(household.id);
     const res = NextResponse.json({ namaLansia: household.namaLansia });
-    res.cookies.set(sessionCookie(await signSession({ h: household.id, r: 'lansia', n: household.namaLansia, v: household.lansiaVersion }), request));
+    res.cookies.set(sessionCookie('lansia', await signSession({ h: household.id, r: 'lansia', n: household.namaLansia, v: household.lansiaVersion }), request));
     return res;
   } catch (error) {
     console.error('POST /api/auth/hubungkan:', error);

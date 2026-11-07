@@ -1,6 +1,7 @@
 // Sesi tanpa kata sandi: cookie httpOnly berisi { h: grup, r: peran, n: nama, v: versi } yang
 // ditandatangani HMAC-SHA256. Web Crypto dipakai agar sama di proxy.js maupun route handler.
-export const SESSION_COOKIE = 'sapa-session';
+// Dua cookie terpisah: satu browser boleh memegang sesi lansia sekaligus keluarga (mode demo/uji).
+export const SESSION_COOKIE = { lansia: 'sapa-lansia', pengawas: 'sapa-pengawas' };
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 365; // HP lansia harus tetap terhubung
 
 const enc = new TextEncoder();
@@ -37,7 +38,7 @@ export async function verifySession(token) {
 }
 
 // Secure hanya jika koneksi HTTPS: tes lewat http://192.168.x.x di LAN tidak boleh menolak cookie.
-export function sessionCookie(token, request) {
+export function sessionCookie(role, token, request) {
   const https = request.headers.get('x-forwarded-proto') === 'https' || new URL(request.url).protocol === 'https:';
-  return { name: SESSION_COOKIE, value: token, httpOnly: true, sameSite: 'lax', secure: https, path: '/', maxAge: SESSION_MAX_AGE };
+  return { name: SESSION_COOKIE[role], value: token, httpOnly: true, sameSite: 'lax', secure: https, path: '/', maxAge: SESSION_MAX_AGE };
 }

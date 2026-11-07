@@ -1,5 +1,6 @@
 import { getOrca, ORCA_TEXT_MODEL } from '@/lib/orca';
 import { STATUS_LABEL, TIPE_LABEL } from '@/lib/constants';
+import { wib } from '@/lib/format';
 import { listRecords } from './record.service';
 
 const INSTRUCTION = `Kamu asisten keluarga untuk memantau lansia. Jawab dalam Bahasa Indonesia, ringkas dan hangat.
@@ -7,13 +8,6 @@ Gunakan HANYA data log di bawah. Jika data tidak cukup, katakan terus terang. Ja
 Tandai hal yang butuh tindakan keluarga.`;
 
 const DAYS_BACK = 7;
-
-const wib = (d) =>
-  new Intl.DateTimeFormat('id-ID', {
-    timeZone: 'Asia/Jakarta',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(d);
 
 function buildContext(records) {
   if (!records.length) return 'Belum ada log aktivitas.';

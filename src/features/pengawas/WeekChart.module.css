@@ -1,0 +1,73 @@
+.card {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.card h2 {
+  font-size: 1.1875rem;
+  font-weight: 800;
+}
+
+.bars {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  align-items: end;
+  height: 150px;
+}
+
+.bars li {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 6px;
+  height: 100%;
+  text-align: center;
+}
+
+.col {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 2px;
+  border-radius: 8px;
+  background: var(--ice);
+  overflow: hidden;
+}
+
+.seg {
+  display: block;
+  min-height: 8px;
+  background: var(--tone);
+}
+
+.day {
+  color: var(--mute);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  color: var(--mute);
+  font-size: 0.875rem;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--tone);
+}

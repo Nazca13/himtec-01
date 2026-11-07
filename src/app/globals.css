@@ -10,6 +10,11 @@
   --paper: #ffffff;
   --merah: #d32f2f;
 
+  /* Sisi bawah tombol 3D (gaya Duolingo): satu tingkat lebih gelap dari warna tombol */
+  --teal-deep: #0b8d80;
+  --orange-deep: #c97700;
+  --merah-deep: #9f2121;
+
   --mute: #4a5f78;
   --line: rgba(17, 42, 70, 0.12);
 
@@ -86,16 +91,19 @@ svg {
 /* Nada status: satu kelas menyetel warna kuat, warna lembut, dan warna teks di atasnya */
 .tone-HIJAU {
   --tone: var(--teal);
+  --tone-deep: var(--teal-deep);
   --tone-soft: #d6f4ef;
   --on-tone: var(--ink);
 }
 .tone-KUNING {
   --tone: var(--orange);
+  --tone-deep: var(--orange-deep);
   --tone-soft: #ffecc9;
   --on-tone: var(--ink);
 }
 .tone-MERAH {
   --tone: var(--merah);
+  --tone-deep: var(--merah-deep);
   --tone-soft: #fde1df;
   --on-tone: var(--paper);
 }

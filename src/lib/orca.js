@@ -1,7 +1,8 @@
 import OpenAI from 'openai';
 
 // Server-side only: ORCA_API_KEY must never reach client code.
-export const ORCA_TEXT_MODEL = 'orcarouter/auto';
+// Diukur: orcarouter/auto 30-40 dtk per jawaban (memilih model sendiri); gemini-2.5-flash-lite ±1,2 dtk.
+export const ORCA_TEXT_MODEL = 'google/gemini-2.5-flash-lite';
 // Model yang menerima input audio (WAV) lewat OrcaRouter. "auto" bisa memilih model tanpa audio.
 export const ORCA_AUDIO_MODEL = 'google/gemini-2.5-flash';
 
