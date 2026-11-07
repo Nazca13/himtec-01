@@ -15,4 +15,5 @@ export const ROLES = {
   },
 };
 
-export const ROLE_STORAGE_KEY = 'sapa.role';
+// Cookie (bukan localStorage) agar proxy.js bisa mengalihkan di server sebelum halaman dirender.
+export const ROLE_COOKIE = 'sapa-role';

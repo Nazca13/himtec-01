@@ -32,7 +32,7 @@ Client Prisma dibuat sekali di `src/lib/db.js` (singleton). Jangan membuat `new 
 | `id`           | `text`         | Primary key. UUID dibuat oleh Prisma               |
 | `tipeInput`    | `text`         | `TOMBOL_AMAN`, `TOMBOL_DARURAT`, atau `VOICE_NOTE` |
 | `statusBahaya` | `text`         | `HIJAU` (default), `KUNING`, atau `MERAH`          |
-| `aiAnalysis`   | `jsonb`        | Hasil triase Gemini: transkrip, gejala, ringkasan  |
+| `aiAnalysis`   | `jsonb`        | Hasil triase AI: transkrip, gejala, ringkasan  |
 | `createdAt`    | `timestamp(3)` | Default waktu sekarang. Ada indeks menurun         |
 
 Nama tabel di Postgres adalah `daily_records` (snake_case, dipetakan Prisma lewat `@@map`). Kolom: `tipe_input`, `status_bahaya`, `raw_data`, `ai_analysis`, `created_at`.

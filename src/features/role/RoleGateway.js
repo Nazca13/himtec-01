@@ -1,51 +1,45 @@
 'use client';
 
-import { useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { PiArrowRightBold, PiHandHeartFill, PiUsersThreeFill } from 'react-icons/pi';
-import Wordmark from '@/components/ui/Wordmark';
-import { ROLES, ROLE_STORAGE_KEY } from '@/lib/roles';
+import { ROLES, ROLE_COOKIE } from '@/lib/roles';
 import styles from './role.module.css';
 
 const ICON = { lansia: PiHandHeartFill, pengawas: PiUsersThreeFill };
 const TONE = { lansia: styles.teal, pengawas: styles.sky };
 
 const remember = (id) => {
-  try {
-    localStorage.setItem(ROLE_STORAGE_KEY, id);
-  } catch {}
+  document.cookie = `${ROLE_COOKIE}=${id}; path=/; max-age=31536000; samesite=lax`;
 };
 
-// Perangkat yang sudah memilih peran langsung masuk. Tambahkan ?ganti untuk memilih ulang.
+// Urutan masuk (logo, teks, kartu) memakai animasi CSS dengan jeda --i: berjalan tanpa menunggu JS.
+const step = (i) => ({ '--i': i });
+
+// Perangkat yang sudah memilih peran dialihkan oleh src/proxy.js. Tambahkan ?ganti untuk memilih ulang.
 export default function RoleGateway() {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).has('ganti')) return;
-    try {
-      const saved = ROLES[localStorage.getItem(ROLE_STORAGE_KEY)];
-      if (saved) router.replace(saved.href);
-    } catch {}
-  }, [router]);
-
   return (
     <main className={styles.page}>
-      <header className={styles.top}>
-        <Wordmark tone="light" />
-        <h1 className={styles.headline}>Pantau orang tua dari jauh, tanpa membuat mereka repot.</h1>
-        <p className={styles.sub}>Lansia cukup menekan satu tombol. Keluarga langsung tahu kondisinya.</p>
-      </header>
+      <div className={`${styles.rise} ${styles.logoWrap}`} style={step(0)}>
+        <Image src="/logo.png" width={720} height={720} alt="SAPA, Sistem Asisten Pantau Aktif" className={styles.logo} priority />
+      </div>
 
-      <section className={styles.sheet} aria-labelledby="pilih">
-        <h2 id="pilih" className={styles.pick}>
-          Siapa yang memakai perangkat ini?
-        </h2>
-        <ul className={styles.list}>
-          {Object.values(ROLES).map((role) => {
-            const Icon = ICON[role.id];
-            return (
-              <li key={role.id}>
+      <h1 className={`${styles.rise} ${styles.headline}`} style={step(1)}>
+        Pantau orang tua dari jauh, tanpa membuat mereka repot.
+      </h1>
+      <p className={`${styles.rise} ${styles.sub}`} style={step(2)}>
+        Lansia cukup menekan satu tombol. Keluarga langsung tahu kondisinya.
+      </p>
+
+      <h2 className={`${styles.rise} ${styles.pick}`} style={step(3)}>
+        Siapa yang memakai perangkat ini?
+      </h2>
+      <ul className={styles.list}>
+        {Object.values(ROLES).map((role, i) => {
+          const Icon = ICON[role.id];
+          return (
+            <li key={role.id} className={styles.rise} style={step(4 + i)}>
+              <div>
                 <Link href={role.href} className={`${styles.card} ${TONE[role.id]}`} onClick={() => remember(role.id)}>
                   <span className={styles.icon}>
                     <Icon aria-hidden="true" />
@@ -56,12 +50,14 @@ export default function RoleGateway() {
                   </span>
                   <PiArrowRightBold className={styles.go} aria-hidden="true" />
                 </Link>
-              </li>
-            );
-          })}
-        </ul>
-        <p className={styles.note}>Pilihan diingat di perangkat ini. Untuk mengganti, buka alamat /?ganti.</p>
-      </section>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      <p className={`${styles.rise} ${styles.note}`} style={step(6)}>
+        Pilihan diingat di perangkat ini. Untuk mengganti, buka alamat /?ganti.
+      </p>
     </main>
   );
 }

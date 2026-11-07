@@ -22,7 +22,5 @@ export const TIPE_LABEL = {
   VOICE_NOTE: 'Pesan Suara',
 };
 
-export const GEMINI_MODEL = 'gemini-2.5-flash';
-
 // Batas payload audio (base64 chars). ~30 detik rekaman opus masih jauh di bawah ini.
 export const MAX_AUDIO_BASE64_LENGTH = 6_000_000;

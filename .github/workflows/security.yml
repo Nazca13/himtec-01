@@ -1,0 +1,49 @@
+name: Security Scan
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  strix-scan:
+    runs-on: ubuntu-latest
+    env:
+      STRIX_LLM: ${{ secrets.STRIX_LLM }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+    steps:
+      # Tanpa secret, scan dilewati (bukan gagal) agar PR tidak merah sebelum Strix disiapkan.
+      - name: Cek secret Strix
+        id: gate
+        run: |
+          if [ -z "$LLM_API_KEY" ] || [ -z "$STRIX_LLM" ]; then
+            echo "STRIX_LLM / LLM_API_KEY belum diisi di Settings > Secrets. Scan dilewati."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          fetch-depth: 0 # wajib agar scope diff PR bisa dihitung
+
+      - name: Install Strix
+        if: steps.gate.outputs.run == 'true'
+        run: curl -sSL https://strix.ai/install | bash
+
+      - name: Run security scan (hanya file yang berubah)
+        if: steps.gate.outputs.run == 'true'
+        run: strix -n -t ./ --scan-mode quick --diff-base "origin/${{ github.base_ref }}" --max-budget 10
+
+      # Jangan gagal diam-diam: run yang kena batas anggaran keluar 0 tetapi berstatus "stopped".
+      - name: Gagal jika scan tidak selesai
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          run_json=$(ls -t strix_runs/*/run.json | head -1)
+          status=$(jq -r .status "$run_json")
+          if [ "$status" != "completed" ]; then
+            echo "Status run Strix '$status': scan tidak selesai (kemungkinan anggaran habis). Naikkan --max-budget." >&2
+            exit 1
+          fi

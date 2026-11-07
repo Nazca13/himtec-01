@@ -7,14 +7,14 @@ export async function POST(request) {
   try {
     const { audioBase64, mimeType } = await request.json();
 
-    if (typeof audioBase64 !== 'string' || !audioBase64 || !String(mimeType).startsWith('audio/')) {
-      return NextResponse.json({ error: 'audioBase64 dan mimeType audio/* wajib diisi.' }, { status: 400 });
+    if (typeof audioBase64 !== 'string' || !audioBase64 || mimeType !== 'audio/wav') {
+      return NextResponse.json({ error: 'audioBase64 dan mimeType audio/wav wajib diisi.' }, { status: 400 });
     }
     if (audioBase64.length > MAX_AUDIO_BASE64_LENGTH) {
       return NextResponse.json({ error: 'Rekaman terlalu panjang.' }, { status: 413 });
     }
 
-    const { statusBahaya, aiAnalysis } = await triageAudio({ audioBase64, mimeType });
+    const { statusBahaya, aiAnalysis } = await triageAudio({ audioBase64 });
     const record = await createRecord({ tipeInput: TIPE_INPUT.VOICE, statusBahaya, aiAnalysis });
 
     return NextResponse.json({ record }, { status: 201 });

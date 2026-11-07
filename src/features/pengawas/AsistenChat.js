@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import * as m from 'motion/react-m';
 import { PiPaperPlaneRightFill, PiSparkleFill } from 'react-icons/pi';
 import styles from './chat.module.css';
 
@@ -64,10 +65,16 @@ export default function AsistenChat() {
             </ul>
           </div>
         )}
-        {thread.map((m, i) => (
-          <p key={i} className={`${styles.msg} ${styles[m.role]}`}>
-            {m.text}
-          </p>
+        {thread.map((msg, i) => (
+          <m.p
+            key={i}
+            initial={{ opacity: 0, y: 12, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+            className={`${styles.msg} ${styles[msg.role]}`}
+          >
+            {msg.text}
+          </m.p>
         ))}
         {loading && <p className={`${styles.msg} ${styles.ai} ${styles.typing}`}>Membaca log</p>}
         <div ref={endRef} />

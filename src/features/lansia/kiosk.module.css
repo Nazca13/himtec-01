@@ -40,12 +40,6 @@
   color: var(--on-tone);
   text-align: left;
   box-shadow: var(--shadow-md);
-  transition: transform 120ms, box-shadow 120ms;
-}
-
-.big:active {
-  transform: scale(0.97);
-  box-shadow: var(--shadow-sm);
 }
 
 .disc {
@@ -92,7 +86,7 @@
   justify-content: center;
   gap: 20px;
   padding: var(--gutter);
-  background: var(--ice);
+  background: var(--paper);
   text-align: center;
 }
 
@@ -118,6 +112,7 @@
 }
 
 .bigIcon {
+  display: grid;
   font-size: clamp(6rem, 30vw, 9rem);
 }
 
@@ -186,6 +181,3 @@
   color: var(--ink);
 }
 
-.action:active {
-  transform: scale(0.97);
-}

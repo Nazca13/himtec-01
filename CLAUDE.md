@@ -18,7 +18,7 @@ No test framework is configured. Prisma has no npm script; run `npx prisma gener
 - Next.js 16.4.5 + React 19.3, App Router, plain JavaScript (no TypeScript). Source lives in `src/`; the `@/*` alias maps to `src/*` (`jsconfig.json`).
 - Styling: global CSS (`src/app/globals.css`) plus CSS Modules.
 - Data: Prisma 6 on PostgreSQL (Supabase). Schema in `prisma/schema.prisma`; use the shared client from `src/lib/db.js` (singleton, don't instantiate `PrismaClient` elsewhere).
-- AI: Gemini via `@google/genai`. Server-side only; the API key must never reach client code.
+- AI: OrcaRouter (OpenAI-compatible, `openai` SDK, `src/lib/orca.js`). Server-side only; the API key must never reach client code.
 
 ## Layout
 
@@ -28,13 +28,13 @@ No test framework is configured. Prisma has no npm script; run `npx prisma gener
 
 The project is SAPA (see `PRD.txt`): a dual-view PWA. `/lansia` is a 3-button kiosk with voice notes; `/pengawas` is the family app (tabs: Beranda, Riwayat, Asisten AI; bottom nav on mobile, sidebar >=900px). `/` is a role gateway that remembers the role in localStorage (`?ganti` to re-pick); roles are defined in `src/lib/roles.js`. Icons: `react-icons/pi` (Phosphor), no emoji. Palette tokens live in `src/app/globals.css` (status colors via `.tone-HIJAU/KUNING/MERAH`).
 
-Structure: `src/app` (routes + thin route handlers), `src/features/{lansia,pengawas}` (feature UI), `src/components/ui` (shared UI), `src/services` (business logic: record, triage, assistant), `src/hooks`, `src/lib` (db, gemini, orca, constants, format). Route handlers validate input and call services; they hold no logic.
+Structure: `src/app` (routes + thin route handlers), `src/features/{lansia,pengawas}` (feature UI), `src/components/ui` (shared UI), `src/services` (business logic: record, triage, assistant), `src/hooks`, `src/lib` (db, orca, constants, format). Route handlers validate input and call services; they hold no logic.
 
-AI: audio triage and the assistant use Gemini; the assistant falls back to OrcaRouter (`ORCA_API_KEY`). If no key is set, triage saves the voice note as KUNING with `aiAnalysis.fallback = true`. PWA uses the native `src/app/manifest.js` (no `next-pwa`, no service worker). Demo data: `node prisma/seed.js`.
+AI: audio triage (model `google/gemini-2.5-flash` via OrcaRouter, `input_audio` WAV only) and the assistant (`orcarouter/auto`) both use `ORCA_API_KEY`. The browser converts recordings to 16 kHz mono WAV (`useRecorder`). If the key is missing or the call fails, triage saves the voice note as KUNING with `aiAnalysis.fallback = true`. PWA: native `src/app/manifest.js` + hand-written `public/sw.js` (no `next-pwa`; registered only in production by `RegisterSW`). SW caches the app shell and `/_next/static`, never `/api/*`; offline fallback is `public/offline.html`. Bump `VERSION` in `sw.js` when changing cache strategy. `src/proxy.js` redirects `/` to the role in the `sapa-role` cookie (`?ganti` skips it). Entrance animations must be CSS (not JS `initial` states) so content paints without waiting for hydration; use `m.*` from `motion/react-m` (LazyMotion strict), never `motion.*`. Demo data: `node prisma/seed.js`.
 
 ## Environment
 
-Copy `.env.example` to `.env`: `DATABASE_URL` (Supabase pooler, port 6543, runtime), `DIRECT_URL` (direct, port 5432, migrations) and `GEMINI_API_KEY`.
+Copy `.env.example` to `.env`: `DATABASE_URL` (Supabase pooler, port 6543, runtime), `DIRECT_URL` (direct, port 5432, migrations) and `ORCA_API_KEY`. No Supabase anon/service keys are used (Prisma connects directly).
 
 ## Next.js caveats
 

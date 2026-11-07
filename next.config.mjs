@@ -6,6 +6,28 @@ const nextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // Mikrofon hanya untuk halaman sendiri; kamera dan lokasi tidak dipakai.
+          { key: 'Permissions-Policy', value: 'microphone=(self), camera=(), geolocation=()' },
+        ],
+      },
+      {
+        // SW tidak boleh di-cache browser agar versi baru langsung terdeteksi.
+        source: '/sw.js',
+        headers: [
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

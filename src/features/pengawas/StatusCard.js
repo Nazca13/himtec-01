@@ -1,3 +1,4 @@
+import * as m from 'motion/react-m';
 import { PiMicrophoneFill, PiShieldCheckFill, PiSirenFill, PiWarningFill } from 'react-icons/pi';
 import { STATUS_LABEL, TIPE_LABEL } from '@/lib/constants';
 import { formatLalu, formatWaktu } from '@/lib/format';
@@ -22,7 +23,14 @@ export default function StatusCard({ latest, now }) {
   const sepi = now - new Date(latest.createdAt).getTime() > SEPI_MS;
 
   return (
-    <section className={`${styles.status} tone-${latest.statusBahaya}`} aria-label="Status terkini">
+    <m.section
+      key={latest.id}
+      initial={{ opacity: 0.4, scale: 0.97 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+      className={`${styles.status} tone-${latest.statusBahaya}`}
+      aria-label="Status terkini"
+    >
       <span className={`${styles.orb} ${latest.statusBahaya === 'MERAH' ? styles.alarm : ''}`}>
         <Icon aria-hidden="true" />
       </span>
@@ -41,6 +49,6 @@ export default function StatusCard({ latest, now }) {
           </p>
         )}
       </div>
-    </section>
+    </m.section>
   );
 }

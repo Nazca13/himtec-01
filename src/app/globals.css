@@ -17,8 +17,9 @@
   --r-md: 20px;
   --r-lg: 28px;
 
-  --shadow-sm: 0 1px 2px rgba(17, 42, 70, 0.06), 0 2px 8px rgba(17, 42, 70, 0.06);
-  --shadow-md: 0 2px 4px rgba(17, 42, 70, 0.06), 0 12px 32px rgba(17, 42, 70, 0.1);
+  /* Dasar putih: pemisah antar-kartu memakai cincin tipis + bayangan lembut */
+  --shadow-sm: 0 0 0 1px rgba(17, 42, 70, 0.08), 0 2px 8px rgba(17, 42, 70, 0.05);
+  --shadow-md: 0 0 0 1px rgba(17, 42, 70, 0.06), 0 12px 32px rgba(17, 42, 70, 0.12);
 
   --font: var(--font-jakarta), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --gutter: 20px;
@@ -39,7 +40,7 @@ html {
 
 body {
   min-height: 100dvh;
-  background: var(--ice);
+  background: var(--paper);
   color: var(--ink);
   font-family: var(--font);
   font-size: 1.0625rem; /* 17px: dasar yang nyaman untuk pembaca senior */

@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence } from 'motion/react';
+import * as m from 'motion/react-m';
 import {
   PiCheckCircleFill,
   PiMicrophoneFill,
@@ -91,7 +93,7 @@ export default function KioskButtons() {
       </header>
 
       <div className={styles.buttons}>
-        <button className={`${styles.big} tone-HIJAU`} onClick={() => pressButton(TIPE_INPUT.AMAN)}>
+        <m.button whileTap={{ scale: 0.96 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} className={`${styles.big} tone-HIJAU`} onClick={() => pressButton(TIPE_INPUT.AMAN)}>
           <span className={styles.disc}>
             <PiShieldCheckFill aria-hidden="true" />
           </span>
@@ -99,9 +101,9 @@ export default function KioskButtons() {
             <strong>Saya Aman</strong>
             <span>Kabari keluarga bahwa saya baik-baik saja</span>
           </span>
-        </button>
+        </m.button>
 
-        <button className={`${styles.big} tone-KUNING`} onClick={startRecording}>
+        <m.button whileTap={{ scale: 0.96 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} className={`${styles.big} tone-KUNING`} onClick={startRecording}>
           <span className={styles.disc}>
             <PiMicrophoneFill aria-hidden="true" />
           </span>
@@ -109,9 +111,9 @@ export default function KioskButtons() {
             <strong>Bicara</strong>
             <span>Ceritakan keluhan lewat suara</span>
           </span>
-        </button>
+        </m.button>
 
-        <button className={`${styles.big} ${styles.danger} tone-MERAH`} onClick={() => pressButton(TIPE_INPUT.DARURAT)}>
+        <m.button whileTap={{ scale: 0.96 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} className={`${styles.big} ${styles.danger} tone-MERAH`} onClick={() => pressButton(TIPE_INPUT.DARURAT)}>
           <span className={styles.disc}>
             <PiSirenFill aria-hidden="true" />
           </span>
@@ -119,11 +121,21 @@ export default function KioskButtons() {
             <strong>DARURAT</strong>
             <span>Panggil keluarga sekarang</span>
           </span>
-        </button>
+        </m.button>
       </div>
 
-      {phase !== 'idle' && (
-        <div className={`${styles.overlay} ${styles[phase]}`} role="status" aria-live="assertive">
+      <AnimatePresence>
+        {phase !== 'idle' && (
+        <m.div
+          key="overlay"
+          className={`${styles.overlay} ${styles[phase]}`}
+          role="status"
+          aria-live="assertive"
+          initial={{ opacity: 0, scale: 1.03 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
           {phase === 'recording' && (
             <>
               <span className={styles.orb}>
@@ -133,16 +145,23 @@ export default function KioskButtons() {
               <p className={styles.timer}>
                 0:{String(detik).padStart(2, '0')} / 0:{MAX_REKAM_S}
               </p>
-              <button className={styles.action} onClick={finishRecording}>
+              <m.button whileTap={{ scale: 0.96 }} className={styles.action} onClick={finishRecording}>
                 <PiStopFill aria-hidden="true" />
                 Selesai bicara
-              </button>
+              </m.button>
             </>
           )}
           {phase === 'sending' && <p className={styles.msg}>Mengirim</p>}
           {phase === 'sent' && (
             <>
-              <PiCheckCircleFill className={styles.bigIcon} aria-hidden="true" />
+              <m.span
+                initial={{ scale: 0, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 14 }}
+                className={styles.bigIcon}
+              >
+                <PiCheckCircleFill aria-hidden="true" />
+              </m.span>
               <p className={styles.msg}>Pesan Tersampaikan</p>
             </>
           )}
@@ -150,13 +169,14 @@ export default function KioskButtons() {
             <>
               <PiWarningCircleFill className={`${styles.bigIcon} ${styles.warn}`} aria-hidden="true" />
               <p className={`${styles.msg} ${styles.errText}`}>{errorText}</p>
-              <button className={styles.action} onClick={() => setPhase('idle')}>
+              <m.button whileTap={{ scale: 0.96 }} className={styles.action} onClick={() => setPhase('idle')}>
                 Kembali
-              </button>
+              </m.button>
             </>
           )}
-        </div>
+        </m.div>
       )}
+      </AnimatePresence>
     </main>
   );
 }

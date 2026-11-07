@@ -1,43 +1,53 @@
 .page {
   min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  background: var(--ink);
+  max-width: 560px;
+  margin-inline: auto;
+  padding: calc(env(safe-area-inset-top) + 32px) var(--gutter) calc(env(safe-area-inset-bottom) + 32px);
 }
 
-.top {
-  padding: calc(env(safe-area-inset-top) + 28px) var(--gutter) 40px;
-  color: var(--paper);
-  max-width: 640px;
+.rise {
+  animation: rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0.5; /* tidak 0: konten harus tetap terlihat (FCP) meski animasi tidak jalan */
+    transform: translateY(14px);
+  }
+}
+
+.logoWrap {
+  width: clamp(150px, 46vw, 200px);
+  aspect-ratio: 1;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.logo {
+  display: block;
   width: 100%;
-  margin-inline: auto;
+  height: auto;
 }
 
 .headline {
-  margin-top: 40px;
-  font-size: clamp(2rem, 8.5vw, 3rem);
+  margin-top: 32px;
+  font-size: clamp(1.875rem, 8vw, 2.5rem);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.12;
   letter-spacing: -0.02em;
-  max-width: 16ch;
 }
 
 .sub {
-  margin-top: 16px;
-  max-width: 34ch;
-  color: #c9dcf0; /* biru es redup di atas biru tua, kontras 9:1 */
-}
-
-.sheet {
-  flex: 1;
-  background: var(--ice);
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  padding: 28px var(--gutter) calc(env(safe-area-inset-bottom) + 28px);
+  margin-top: 12px;
+  max-width: 36ch;
+  color: var(--mute);
 }
 
 .pick {
-  max-width: 640px;
-  margin: 0 auto 16px;
+  margin-top: 36px;
+  margin-bottom: 14px;
   font-size: 1.125rem;
   font-weight: 700;
 }
@@ -46,8 +56,6 @@
   list-style: none;
   display: grid;
   gap: 14px;
-  max-width: 640px;
-  margin-inline: auto;
 }
 
 .card {
@@ -58,15 +66,15 @@
   background: var(--paper);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-sm);
-  transition: transform 120ms, box-shadow 120ms;
+  transition: box-shadow 150ms, transform 120ms;
+}
+
+.card:active {
+  transform: scale(0.98);
 }
 
 .card:hover {
   box-shadow: var(--shadow-md);
-}
-
-.card:active {
-  transform: scale(0.985);
 }
 
 .icon {
@@ -111,8 +119,7 @@
 }
 
 .note {
-  max-width: 640px;
-  margin: 20px auto 0;
+  margin-top: 20px;
   color: var(--mute);
   font-size: 0.875rem;
 }

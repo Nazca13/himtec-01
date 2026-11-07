@@ -23,6 +23,7 @@
 }
 
 .item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -47,6 +48,22 @@
   color: var(--sky-deep);
 }
 
+/* Penanda tab aktif: batang tipis di atas (ponsel), latar lembut di samping (desktop) */
+.pill {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 36px;
+  height: 4px;
+  margin-left: -18px;
+  border-radius: 0 0 4px 4px;
+  background: var(--sky);
+}
+
+.item > :not(.pill) {
+  position: relative;
+}
+
 .main {
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
 }
@@ -59,8 +76,24 @@
   align-items: center;
   justify-content: space-between;
   padding: calc(env(safe-area-inset-top) + 12px) var(--gutter) 12px;
-  background: rgba(235, 245, 251, 0.92);
-  backdrop-filter: blur(10px);
+  background: var(--paper); /* tanpa blur: backdrop-filter berat di HP murah */
+}
+
+.topEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.switchBtn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  font-size: 1.25rem;
 }
 
 .live {
@@ -151,7 +184,12 @@
     background: var(--ice);
   }
 
-  .active {
+  .pill {
+    inset: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    border-radius: var(--r-sm);
     background: var(--ice);
   }
 

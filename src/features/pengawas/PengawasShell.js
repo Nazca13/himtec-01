@@ -6,6 +6,7 @@ import {
   PiChatCircleDotsFill,
   PiClockCounterClockwiseFill,
   PiHouseFill,
+  PiArrowsLeftRightBold,
   PiWifiSlashBold,
 } from 'react-icons/pi';
 import Wordmark from '@/components/ui/Wordmark';
@@ -33,6 +34,7 @@ export default function PengawasShell({ children }) {
             const active = pathname === href;
             return (
               <Link key={href} href={href} className={`${styles.item} ${active ? styles.active : ''}`} aria-current={active ? 'page' : undefined}>
+                {active && <span className={styles.pill} aria-hidden="true" />}
                 <Icon aria-hidden="true" />
                 <span>{label}</span>
               </Link>
@@ -47,10 +49,15 @@ export default function PengawasShell({ children }) {
       <div className={styles.main}>
         <header className={styles.top}>
           <Wordmark />
+          <div className={styles.topEnd}>
           <span className={`${styles.live} ${error ? styles.off : ''}`} role="status">
             {error ? <PiWifiSlashBold aria-hidden="true" /> : <span className={styles.pulse} aria-hidden="true" />}
             {error ? 'Terputus' : 'Langsung'}
           </span>
+          <Link href="/?ganti" className={styles.switchBtn} aria-label="Ganti peran">
+            <PiArrowsLeftRightBold aria-hidden="true" />
+          </Link>
+          </div>
         </header>
 
         {error && (
