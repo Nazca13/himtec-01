@@ -9,8 +9,8 @@ import { createRecord, ValidationError } from '@/services/record.service';
 export async function POST(request) {
   try {
     const { lansia } = await requireLansia(request);
-    const { tipeInput, keluhan, lokasi } = await request.json();
-    const { statusBahaya, aiAnalysis } = tafsirkanKabar({ tipeInput, keluhan, nama: lansia.nama });
+    const { tipeInput, keluhan, sebab, lokasi } = await request.json();
+    const { statusBahaya, aiAnalysis } = tafsirkanKabar({ tipeInput, keluhan, sebab, nama: lansia.nama });
     const record = await createRecord({ lansiaId: lansia.id, tipeInput, statusBahaya, aiAnalysis, lokasi: bersihkanLokasi(lokasi) });
     return NextResponse.json({ record }, { status: 201 });
   } catch (error) {
