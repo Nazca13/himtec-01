@@ -1,91 +1,109 @@
+/* Design tokens SAPA. Palet resmi: biru tua, biru muda, toska, oranye, biru es, putih.
+   Merah tidak ada di palet; dipakai hanya untuk status DARURAT. */
 :root {
-  --primary-color: #2563eb;
-  --primary-color-hover: #1d4ed8;
-  --bg-color: #0f172a;
-  --text-color: #f8fafc;
-  --text-muted: #94a3b8;
-  --card-bg: #1e293b;
-  --card-border: #334155;
-  --border-radius: 10px;
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --transition: all 0.2s ease-in-out;
+  --ink: #112a46;
+  --sky: #42a5f5;
+  --sky-deep: #1976d2; /* sky untuk teks/ikon kecil di atas putih (kontras 4.6:1) */
+  --teal: #14b8a6;
+  --orange: #ff9800;
+  --ice: #ebf5fb;
+  --paper: #ffffff;
+  --merah: #d32f2f;
+
+  --mute: #4a5f78;
+  --line: rgba(17, 42, 70, 0.12);
+
+  --r-sm: 12px;
+  --r-md: 20px;
+  --r-lg: 28px;
+
+  --shadow-sm: 0 1px 2px rgba(17, 42, 70, 0.06), 0 2px 8px rgba(17, 42, 70, 0.06);
+  --shadow-md: 0 2px 4px rgba(17, 42, 70, 0.06), 0 12px 32px rgba(17, 42, 70, 0.1);
+
+  --font: var(--font-jakarta), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --gutter: 20px;
+  --nav-h: 72px;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  min-height: 100vh;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: var(--font-family);
-  line-height: 1.6;
+  min-height: 100dvh;
+  background: var(--ice);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 1.0625rem; /* 17px: dasar yang nyaman untuk pembaca senior */
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Utility Classes */
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+button,
+input {
+  font: inherit;
+  color: inherit;
 }
 
-.card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--primary-color);
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  font-weight: 600;
+button {
   cursor: pointer;
-  transition: var(--transition);
+  border: 0;
+  background: none;
+}
+
+a {
+  color: inherit;
   text-decoration: none;
 }
 
-.btn-primary:hover {
-  background-color: var(--primary-color-hover);
+svg {
+  flex: none;
 }
 
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+:focus-visible {
+  outline: 3px solid var(--sky-deep);
+  outline-offset: 3px;
 }
 
-.input-field {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--border-radius);
-  color: var(--text-color);
-  font-size: 1rem;
-  outline: none;
-  transition: var(--transition);
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-.input-field:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+/* Nada status: satu kelas menyetel warna kuat, warna lembut, dan warna teks di atasnya */
+.tone-HIJAU {
+  --tone: var(--teal);
+  --tone-soft: #d6f4ef;
+  --on-tone: var(--ink);
+}
+.tone-KUNING {
+  --tone: var(--orange);
+  --tone-soft: #ffecc9;
+  --on-tone: var(--ink);
+}
+.tone-MERAH {
+  --tone: var(--merah);
+  --tone-soft: #fde1df;
+  --on-tone: var(--paper);
 }
 
-.input-field::placeholder {
-  color: var(--text-muted);
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

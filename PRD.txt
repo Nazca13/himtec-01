@@ -1,0 +1,65 @@
+PRODUCT REQUIREMENTS DOCUMENT (PRD)
+================================================================================
+Nama Proyek  : SAPA (Sistem Asisten Pantau Aktif)
+Tema Lomba   : Pantau lansia jarak jauh[cite: 2]
+Event        : HIMTEC Hackathon Build App 2026 - Build App With AI[cite: 1]
+Waktu        : 10 - 13 Jam (MVP Ready)[cite: 1]
+Format App   : PWA (Progressive Web App) dengan Arsitektur Dual-View
+================================================================================
+
+1. LATAR BELAKANG & RUMUSAN MASALAH
+Aplikasi pemantauan lansia tradisional gagal karena memaksa lansia mempelajari antarmuka digital yang rumit (navigasi, form, tabel). Pada saat kondisi darurat fisik (jatuh/stroke), menekan tombol SOS kecil di layar adalah hal yang mustahil. Keluarga membutuhkan visibilitas real-time tanpa membebani lansia dengan friksi teknologi.
+
+2. SOLUSI & NILAI JUAL UTAMA (UNIQUE VALUE PROPOSITION)
+Membangun satu aplikasi PWA dengan dua wajah (Dual-View) yang berjalan di atas satu database terpusat:
+- View Lansia (Kiosk Mode): Antarmuka buta huruf/teknologi. Hanya 3 tombol warna raksasa dan input suara (Voice Note).
+- View Pengawas (Command Center): Dashboard analitik komprehensif bagi keluarga untuk memantau status medis harian yang telah diekstrak oleh AI dari rekaman suara lansia.
+
+3. TECH STACK & DAFTAR LIBRARY YANG DIGUNAKAN
+Proyek dibangun dengan arsitektur monolitis di dalam satu folder Next.js App Router (Vanilla JavaScript, tanpa TypeScript, tanpa Tailwind).
+
+Daftar Library & NPM Packages:
+- next (v15)             : Framework full-stack utama.
+- @ducanh2912/next-pwa   : Membungkus Next.js menjadi PWA agar aplikasi bisa di-install (Add to Homescreen) di HP lansia dan pengawas selayaknya native app.
+- prisma                 : ORM CLI (DevDependency) untuk manajemen skema database.
+- @prisma/client         : Database client untuk melakukan query (INSERT/SELECT) ke Supabase PostgreSQL.
+- @google/genai          : SDK resmi Gemini API. Digunakan untuk NLP Triage (Voice-to-JSON) dan sistem RAG pada Widget AI Pengawas.
+- lucide-react           : Kumpulan ikon SVG ringan (opsional) untuk mempertegas UI 3 tombol besar dan ikon dashboard.
+- date-fns               : Utility format waktu untuk mengubah timestamp database menjadi format manusiawi (ex: "Hari ini, 08:30 WIB") pada tabel log aktivitas.
+
+4. TARGET PENGGUNA & HAK AKSES (ROLES)
+Seperti sistem manajemen pada umumnya, aplikasi dipisah berdasarkan rute peran:
+- /lansia   : Tidak ada autentikasi rumit. Dibuka secara fullscreen di perangkat lansia.
+- /pengawas : Diakses oleh anak/keluarga untuk melihat ringkasan data.
+
+5. SPESIFIKASI FITUR (FUNCTIONAL REQUIREMENTS)
+
+A. Modul Lansia (/lansia)
+1. Kiosk Interface: Layar hanya berisi 3 tombol raksasa (Hijau: "Saya Aman", Kuning: "Bicara/Keluhan", Merah: "DARURAT").
+2. Voice Input (MediaRecorder): Jika tombol Kuning ditekan, peramban merekam suara lansia. File audio (Base64) langsung dikirim ke backend.
+3. Zero-Feedback Loop: Setelah tombol ditekan, layar hanya menampilkan pesan singkat "Pesan Tersampaikan" dan kembali ke tampilan 3 tombol.
+
+B. Modul Backend & AI Core (/api/ai & /api/record)
+1. Audio-to-JSON Triage: Menerima payload audio Base64, mengirimnya ke model `gemini-2.5-flash` dengan instruksi mengekstrak suara menjadi objek JSON terstruktur (Gejala, Status Bahaya, Ringkasan).
+2. Database Insertion: Menyimpan riwayat (waktu, tipe input, hasil JSON AI) ke dalam tabel Supabase via Prisma.
+
+C. Modul Pengawas (/pengawas)
+1. Traffic Light Indicator: Card header di dashboard yang warnanya berubah seketika (Hijau/Kuning/Merah) menyesuaikan row terakhir dari database.
+2. Activity Timeline: Tabel riwayat yang menampilkan log aktivitas lansia berurut dari yang paling baru (descending).
+3. Floating AI Assistant (Widget): Tombol melayang di pojok layar. Pengawas dapat mengetik (contoh: "Tolong rangkum kondisi Oma 3 hari terakhir"). API akan menarik log dari database, memasukkannya ke context prompt Gemini, dan menampilkan rangkuman analitik seketika.
+
+6. SKEMA DATABASE (PRISMA SCHEMA)
+model DailyRecord {
+  id             String   @id @default(uuid())
+  tipeInput      String   // Nilai: "TOMBOL_AMAN", "TOMBOL_DARURAT", "VOICE_NOTE"
+  statusBahaya   String   @default("HIJAU") // Nilai: "HIJAU", "KUNING", "MERAH"
+  aiAnalysis     Json?    // Hasil JSON dari Gemini (gejala, ringkasan)
+  createdAt      DateTime @default(now())
+}
+
+7. PANDUAN EKSEKUSI (SPRINT 10 JAM)
+- JAM 1-2 (Infrastruktur): Setup Next.js PWA, inisialisasi Prisma ke Supabase, buat tabel DailyRecord, setup CSS Variables untuk tema Black & White Neo-Brutalism.
+- JAM 3-5 (UI Development): Pembuatan layout 3 tombol raksasa di rute /lansia dan pembuatan layout dashboard grid di rute /pengawas.
+- JAM 6-8 (API & AI Integration): Penulisan backend route handlers. Integrasi MediaRecorder API (Frontend Lansia) -> Google GenAI (Backend) -> Prisma Insert.
+- JAM 9 (Widget & Refinement): Eksekusi komponen Floating AI Widget di dashboard pengawas dan implementasi RAG ringan dengan data Supabase.
+- JAM 10 (Code Freeze): Latihan flow presentasi pitching. Siapkan data fallback jika internet lambat.

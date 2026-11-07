@@ -1,0 +1,268 @@
+.stack {
+  display: grid;
+  gap: 28px;
+}
+
+.h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.h2 {
+  font-size: 1.1875rem;
+  font-weight: 800;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.row .h2 {
+  margin: 0;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--sky-deep);
+  font-weight: 700;
+}
+
+section > .h2 {
+  margin-bottom: 12px;
+}
+
+.empty {
+  padding: 20px;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  color: var(--mute);
+}
+
+/* Kartu status: elemen utama halaman; satu-satunya blok berwarna penuh */
+.status {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 22px;
+  border-radius: var(--r-lg);
+  background: var(--tone);
+  color: var(--on-tone);
+  box-shadow: var(--shadow-md);
+}
+
+.statusEmpty {
+  display: block;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 2rem;
+}
+
+/* Denyut hanya untuk DARURAT, agar mata tertarik ke satu hal ini */
+.alarm {
+  color: var(--merah);
+}
+
+.alarm::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--paper);
+  animation: alarm 1.4s ease-out infinite;
+}
+
+@keyframes alarm {
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+.statusWord {
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.statusMeta {
+  margin-top: 6px;
+  font-size: 0.9375rem;
+  opacity: 0.92;
+}
+
+.statusNote {
+  margin-top: 12px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.sepi {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.stats {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 14px;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat strong {
+  margin-top: 8px;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stat > span:last-child {
+  color: var(--mute);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.statIcon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--tone);
+  color: var(--on-tone);
+  font-size: 1.25rem;
+}
+
+.timeline {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.entry {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+.entryIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--tone);
+  color: var(--on-tone);
+  font-size: 1.5rem;
+}
+
+.entryBody {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.entryHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.entryBody time {
+  color: var(--mute);
+  font-size: 0.875rem;
+}
+
+.entryBody p {
+  margin-top: 4px;
+}
+
+.tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tags li {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--ice);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Kerangka muat: menjaga tata letak tetap stabil sebelum data tiba */
+.skel {
+  border-radius: var(--r-md);
+  background: linear-gradient(90deg, #dcebf5 25%, #eef6fb 50%, #dcebf5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.skelHero {
+  height: 160px;
+  margin-bottom: 28px;
+  border-radius: var(--r-lg);
+}
+
+.skelRow {
+  height: 88px;
+  margin-bottom: 12px;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (min-width: 900px) {
+  .stat {
+    padding: 18px;
+  }
+}

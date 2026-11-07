@@ -25,23 +25,23 @@ Client Prisma dibuat sekali di `src/lib/db.js` (singleton). Jangan membuat `new 
 
 ## Model saat ini
 
-`prisma/schema.prisma` memiliki satu model contoh, `Record`.
+`prisma/schema.prisma` memiliki satu model, `DailyRecord`: satu baris per pesan dari lansia.
 
-| Kolom       | Tipe SQL        | Catatan                            |
-| ----------- | --------------- | ---------------------------------- |
-| `id`        | `text`          | Primary key. UUID dibuat oleh Prisma |
-| `title`     | `text`          | Wajib                              |
-| `content`   | `text`          | Opsional                           |
-| `metadata`  | `jsonb`         | Opsional                           |
-| `imageUrl`  | `text`          | Opsional                           |
-| `status`    | `text`          | Default `'PENDING'`                |
-| `createdAt` | `timestamp(3)`  | Default waktu sekarang             |
+| Kolom          | Tipe SQL       | Catatan                                            |
+| -------------- | -------------- | -------------------------------------------------- |
+| `id`           | `text`         | Primary key. UUID dibuat oleh Prisma               |
+| `tipeInput`    | `text`         | `TOMBOL_AMAN`, `TOMBOL_DARURAT`, atau `VOICE_NOTE` |
+| `statusBahaya` | `text`         | `HIJAU` (default), `KUNING`, atau `MERAH`          |
+| `aiAnalysis`   | `jsonb`        | Hasil triase Gemini: transkrip, gejala, ringkasan  |
+| `createdAt`    | `timestamp(3)` | Default waktu sekarang. Ada indeks menurun         |
 
-Nama tabel di Postgres adalah `"Record"` (huruf besar, wajib dikutip di SQL).
+Nama tabel di Postgres adalah `"DailyRecord"` (huruf besar, wajib dikutip di SQL).
+
+Data demo untuk pitching: `node prisma/seed.js` (menghapus semua baris lalu mengisi 6 baris).
 
 ## Keamanan
 
-- RLS aktif di `public."Record"` tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
+- RLS aktif di `public."DailyRecord"` tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
 - Prisma memakai role `postgres`, yang melewati RLS. App tetap bekerja.
 - `service_role` key dan `anon` key tidak dipakai. Jangan menaruh key apa pun dengan awalan `NEXT_PUBLIC_`.
 - `.env` tidak boleh masuk git.
@@ -49,7 +49,7 @@ Nama tabel di Postgres adalah `"Record"` (huruf besar, wajib dikutip di SQL).
 Kalau nanti butuh akses langsung dari browser (supabase-js), tambahkan policy dengan pola kepemilikan, bukan hanya `TO authenticated`:
 
 ```sql
-create policy "owner can read" on public."Record" for select
+create policy "owner can read" on public."DailyRecord" for select
 to authenticated
 using ((select auth.uid()) = user_id);
 ```

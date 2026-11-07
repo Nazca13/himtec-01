@@ -1,0 +1,28 @@
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 1.25rem;
+}
+
+.light {
+  color: var(--paper);
+}
+
+.light .badge {
+  background: var(--paper);
+  color: var(--ink);
+}

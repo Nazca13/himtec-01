@@ -8,12 +8,12 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Record {
-  id        String   @id @default(uuid())
-  title     String
-  content   String?
-  metadata  Json?
-  imageUrl  String?
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
+model DailyRecord {
+  id           String   @id @default(uuid())
+  tipeInput    String // "TOMBOL_AMAN" | "TOMBOL_DARURAT" | "VOICE_NOTE"
+  statusBahaya String   @default("HIJAU") // "HIJAU" | "KUNING" | "MERAH"
+  aiAnalysis   Json? // hasil triage Gemini: gejala, ringkasan
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
 }
