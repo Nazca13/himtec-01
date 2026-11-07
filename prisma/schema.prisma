@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,12 +10,15 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Record {
-  id        String   @id @default(uuid())
-  title     String
-  content   String?
-  metadata  Json?
-  imageUrl  String?
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
+model DailyRecord {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tipeInput    String   @map("tipe_input") @db.VarChar(50)
+  statusBahaya String   @default("HIJAU") @map("status_bahaya") @db.VarChar(20)
+  rawData      String?  @map("raw_data") @db.Text
+  aiAnalysis   Json?    @map("ai_analysis") @db.JsonB
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([createdAt(sort: Desc)])
+  @@index([statusBahaya])
+  @@map("daily_records")
 }
