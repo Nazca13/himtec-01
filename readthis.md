@@ -34,6 +34,7 @@
    - 6.5 [Tab Pengaturan Pengawas & Sirene Darurat](#65-tab-pengaturan-pengawas--sirene-darurat)
    - 6.6 [Aksesibilitas Senior: Skala Teks & Logout Mandiri](#66-aksesibilitas-senior-skala-teks--logout-mandiri)
    - 6.7 [Pembaruan Lokasi GPS Live & Titik Koordinat Presisi](#67-pembaruan-lokasi-gps-live--titik-koordinat-presisi)
+   - 6.8 [Sistem Sirine Ambulans Dual-Engine & Autoplay Resilience](#68-sistem-sirine-ambulans-dual-engine--autoplay-resilience)
 7. [Pengujian & Verifikasi Kualitas](#7-pengujian--verifikasi-kualitas)
 8. [Panduan Menjalankan Aplikasi](#8-panduan-menjalankan-aplikasi)
 
@@ -41,7 +42,7 @@
 
 ## 1. Judul / Nama Aplikasi
 
-**SAPA - Sistem Asisten Pantau Aktif**
+**SAPA - Sistem Asisten Pantau Aktif**  
 *Tagline: "Peduli hari ini, untuk mereka nanti."*
 
 Nama "SAPA" mengandung dua makna filosofis dan fungsional:
@@ -55,7 +56,7 @@ Nama "SAPA" mengandung dua makna filosofis dan fungsional:
 | **Dukungan Platform** | Smartphone (Android & iOS/Safari PWA), Tablet, Laptop/Desktop |
 | **Kecerdasan Buatan** | Triase Medis Suara Multimodal (`gemini-2.5-flash`), Ringkasan Riwayat Klinis & Asisten Dokter AI (`gemini-2.5-flash-lite`) via OrcaRouter |
 | **Sensorik** | Web DeviceMotionEvent / Accelerometer (Deteksi Ritme Kejang & Guncangan Jatuh) |
-| **Audio** | Audio Recording WAV 16 kHz Mono & In-App Streaming AudioPlayer |
+| **Audio** | Audio Recording WAV 16 kHz Mono, In-App Streaming AudioPlayer, & Dual-Engine Siren Alert |
 | **Repositori Resmi** | [https://github.com/Nazca13/himtec-01](https://github.com/Nazca13/himtec-01) |
 
 ---
@@ -73,14 +74,15 @@ SAPA menerapkan arsitektur **"Satu Data, Dua Wajah Berlawanan"**:
 - **Sisi Orang Tua (Lansia)**:
   - Antarmuka ultra-minimalis dengan tombol berukuran raksasa (tinggi >108px).
   - Tiga pilihan utama: *Saya Aman* (Hijau), *Keluhan* (Kuning), dan *Darurat* (Merah).
-  - Dilengkapi tombol cepat *Tombol Kejang* khusus dan listener akselerometer cerdas pendeteksi tremor kejang/jatuh dengan hitung mundur darurat 30 detik.
+  - Dilengkapi tombol cepat *Tombol Kejang* khusus dan listener akselerometer cerdas pendeteksi tremor kejang/jatuh dengan hitung mundur darurat 30 detik bersuara sirine ambulans.
   - Shortcut 1-ketuk *Sudah Obat* untuk kepatuhan medikasi harian.
   - Opsi pelaporan keluhan via 9 kartu visual (tanpa perlu bicara/mengetik).
 - **Sisi Keluarga (Pengawas / Admin)**:
-  - Dashboard klinis real-time dengan pembaruan otomatis (live-polling).
+  - Dashboard klinis real-time dengan pembaruan otomatis (live-polling fleksibel 3s, 5s, atau 15s).
+  - Sirine ambulans darurat otomatis (*Dual-Engine HTML5 Audio + Web Audio API*) yang langsung berbunyi saat status merah masuk.
   - Pemutar rekaman suara asli lansia (*AudioPlayer*) lengkap dengan visualisasi waveform dan pengatur kecepatan putar (1x, 1.5x, 2x).
   - Analisis triase AI terstruktur (Transkrip, Gejala Spesifik, Status Bahaya, Ringkasan Klinis).
-  - Kartu panduan pertolongan pertama interaktif sesuai jenis kegawatdaruratan, peta lokasi GPS instan, dan panggilan cepat darurat (119 Ambulans, 112 Darurat, 110 Polisi, 113 Damkar).
+  - Kartu panduan pertolongan pertama interaktif sesuai jenis kegawatdaruratan, peta lokasi GPS instan dengan tombol pembaruan live, dan panggilan cepat darurat (119 Ambulans, 112 Darurat, 110 Polisi, 113 Damkar).
   - Tab Pengaturan komprehensif dengan penguji sirine alarm audio dan ekspor rekam medis (CSV & Cetak PDF).
 
 ---
@@ -90,7 +92,7 @@ SAPA menerapkan arsitektur **"Satu Data, Dua Wajah Berlawanan"**:
 ### 3.1 Tujuan Utama
 1. Menyediakan sarana pelaporan harian yang **dapat dioperasikan oleh lansia usia 60-85+ tahun** hanya dengan satu sentuhan jari.
 2. Menyajikan **triase kegawatan medis real-time berbasis AI** yang dapat membedakan kondisi Aman, Keluhan Ringan, dan Bahaya Kritis secara objektif.
-3. Memberikan respons darurat otomatis terhadap insiden **kejang ritmik dan guncangan jatuh** melalui sensor akselerometer perangkat.
+3. Memberikan respons darurat otomatis terhadap insiden **kejang ritmik dan guncangan jatuh** melalui sensor akselerometer perangkat dengan alarm suara ambulans nyaring.
 4. Mengarsipkan rekaman suara asli dan rekam medis harian yang dapat diekspor untuk konsultasi dokter di fasilitas kesehatan.
 
 ### 3.2 Manfaat Berdasarkan Peran
@@ -106,7 +108,7 @@ SAPA menerapkan arsitektur **"Satu Data, Dua Wajah Berlawanan"**:
 
 1. **Bukan Pengganti Diagnosis Medis Formal**: AI SAPA bertindak sebagai pendukung keputusan awal (*triage decision support*) dan panduan pertolongan pertama, bukan pemberi resep atau vonis medis definitif.
 2. **Konektivitas Internet**: Membutuhkan sambungan internet aktif (Wi-Fi atau data seluler) untuk sinkronisasi cloud Supabase dan inferensi AI OrcaRouter.
-3. **Protokol Sensor & PWA di iOS/Android**: Sensor gerak akselerometer memanfaatkan Web DeviceMotion API. Pada browser modern (seperti iOS Safari), izin sensor diberikan transparan melalui saklar aktivasi in-app.
+3. **Protokol Sensor & PWA di iOS/Android**: Sensor gerak akselerometer memanfaatkan Web DeviceMotion API. Pada peramban modern (seperti iOS Safari), izin sensor diberikan transparan melalui saklar aktivasi in-app.
 4. **Penyimpanan Suara**: Audio lansia direkam dalam format WAV 16 kHz mono (maksimal 30 detik) dan diarsipkan dalam bentuk Base64 audio stream terenkripsi pada basis data.
 5. **Autentikasi Tanpa Kata Sandi (*Passwordless Pairing*)**: Menggunakan kode unik alfanumerik 6-karakter ramah lansia yang aman dan bertanda tangan HMAC-SHA256 untuk mempermudah login orang tua.
 
@@ -151,12 +153,12 @@ flowchart TD
         UC04["UC-04: Konfirmasi Cepat Minum Obat"]
         UC05["UC-05: Pelaporan Keluhan Visual"]
         UC06["UC-06: Pelaporan Suara & Triase AI"]
-        UC07["UC-07: Penanganan Cepat Kejang & Geter"]
+        UC07["UC-07: Penanganan Cepat Kejang & Sirine"]
     end
 
     subgraph Modul Monitoring Pengawas
         UC08["UC-08: Pemutaran Rekaman Suara Asli"]
-        UC09["UC-09: Penanganan Darurat, GPS & P3K"]
+        UC09["UC-09: Penanganan Darurat, Sirine & P3K"]
         UC10["UC-10: Konsultasi Riwayat via Asisten AI"]
         UC11["UC-11: Ekspor Rekam Medis CSV & PDF"]
     end
@@ -191,9 +193,9 @@ flowchart TD
 | **UC-04** | Konfirmasi Cepat Minum Obat | Lansia | Lansia menekan tombol pintas *💊 Sudah Obat*. Server mencatat catatan medis hijau bertipe `SUDAH_OBAT` sehingga keluarga mengetahui jadwal medikasi telah dipenuhi. |
 | **UC-05** | Pelaporan Keluhan Bergambar | Lansia | Lansia menekan tombol kuning *Keluhan*, lalu memilih salah satu dari 9 kartu visual (Pusing, Nyeri Dada, Sesak Napas, Jatuh, Mual, dll). Sistem langsung memetakan tingkat bahaya (Kuning/Merah) ke dashboard keluarga. |
 | **UC-06** | Pelaporan Suara & Triase AI | Lansia | Lansia merekam keluhan suara bebas (hingga 30 detik). Suara dikonversi ke WAV 16kHz, dianalisis AI Gemini 2.5 Flash untuk ekstraksi transkrip, deteksi gejala, dan penilaian tingkat urgensi. |
-| **UC-07** | Penanganan Cepat Kejang & Deteksi Guncangan | Lansia | Terpicu melalui ketukan tombol *Tombol Darurat Kejang* atau getaran ritmik sensor akselerometer HP. Hitung mundur darurat 30 detik berbunyi, lalu mengelevasi status darurat merah dan membuka opsi panggilan 119. |
+| **UC-07** | Penanganan Cepat Kejang & Deteksi Guncangan | Lansia | Terpicu melalui ketukan tombol *Tombol Darurat Kejang* atau getaran ritmik sensor akselerometer HP. Hitung mundur 30 detik berbunyi bersama sirine ambulans keras, lalu mengelevasi status darurat merah ke dashboard pengawas. |
 | **UC-08** | Pemutaran Rekaman Suara Asli | Admin, Pemantau | Di timeline dashboard pengawas, riwayat suara dilengkapi *AudioPlayer*. Pengawas dapat memutar suara asli lansia, mengatur kecepatan (1x/1.5x/2x), dan membaca transkrip AI. |
-| **UC-09** | Penanganan Darurat, GPS & P3K | Admin, Pemantau | Saat status berubah merah, dashboard membunyikan alarm sirene otomatis, menampilkan koordinat peta Google Maps, dan membuka kartu panduan langkah pertolongan pertama (P3K). |
+| **UC-09** | Penanganan Darurat, Sirine Otomatis & P3K | Admin, Pemantau | Saat status berubah merah, dashboard otomatis membunyikan alarm sirine ambulans (*dual-engine audio*), menampilkan koordinat peta Google Maps dengan tombol perbarui live, dan membuka kartu panduan langkah pertolongan pertama (P3K). |
 | **UC-10** | Konsultasi via Asisten AI | Admin, Pemantau | Keluarga dapat mengetik pertanyaan konsultasi (mis. *"Apakah nenek sering mengeluh sesak minggu ini?"*). AI Gemini menganalisis seluruh log medis 7 hari terakhir dan merangkum jawabannya secara klinis. |
 | **UC-11** | Ekspor Rekam Medis (CSV & PDF) | Admin | Admin mengunduh berkas rekam medis format CSV untuk analisis spreadsheet atau mencetak dokumen ringkasan resmi format PDF untuk diserahkan ke dokter. |
 | **UC-12** | Manajemen Anggota & Ganti Kode Lansia | Admin, Lansia | Admin dapat menambah lansia, mengubah peran anggota, atau memutus HP hilang. Di sisi lansia, tersedia modal ganti kode instan tanpa perlu uninstall PWA. |
@@ -211,6 +213,7 @@ flowchart TD
    - Live polling dashboard pengawas beroperasi fleksibel (setiap 3s, 5s, atau 15s sesuai preferensi).
 3. **Keandalan & Failover**:
    - Mekanisme *fallback* cerdas jika layanan AI eksternal lambat: keluhan suara tetap tersimpan aman berstatus Kuning tanpa kehilangan data rekaman audio.
+   - Dual-engine sirine darurat (file MP3 + oscillator Web Audio API) memastikan alarm tetap berbunyi walau terhalang kebijakan peramban.
 4. **Keamanan Data & Privasi**:
    - Isolasi data ketat antar-keluarga (*multi-tenant segregation*).
    - Token sesi disimpan di `httpOnly` cookie bertanda tangan kriptografis HMAC-SHA256.
@@ -250,10 +253,10 @@ flowchart TD
     LapAman --> SaveRecord[(Simpan Record Hijau ke DB)]
     LapKeluhan --> AIProcess[Proses Triase AI: Gemini 2.5 Flash]
     AIProcess --> SaveRecordKeluhan[(Simpan Record Kuning/Merah + Audio)]
-    LapDarurat --> Countdown30[Hitung Mundur 30 Detik + Sirine HP]
+    LapDarurat --> Countdown30[Hitung Mundur 30 Detik + Sirine Ambulans HP]
     ShakeDetect --> Countdown30
     Countdown30 -->|Batal| LansiaMain
-    Countdown30 -->|Waktu Habis / Konfirmasi| SaveRecordDarurat[(Simpan Record Merah)]
+    Countdown30 -->|Waktu Habis / Tombol Langsung| SaveRecordDarurat[(Simpan Record Merah)]
     
     %% Sisi Pengawas
     SaveRecord --> LiveDashboard[Dashboard Pengawas Terupdate Live]
@@ -263,7 +266,7 @@ flowchart TD
     LiveDashboard --> MonitorAlert{Tingkat Bahaya?}
     MonitorAlert -->|Hijau| ShowStreak[Tampilkan Streak & Riwayat Aman]
     MonitorAlert -->|Kuning| PlayVoice[AudioPlayer Suara & Transkrip Gejala]
-    MonitorAlert -->|Merah| EmergencyTrigger[Sirine Alarm Darurat + Buka P3K + Lokasi Peta + Dial 119]
+    MonitorAlert -->|Merah| EmergencyTrigger[Sirine Alarm Darurat Berbunyi Otomatis + Buka P3K + Peta GPS + Dial 119]
 ```
 
 #### B. Flowchart Pipeline Triase Suara & Pemutaran Audio Asli
@@ -308,16 +311,18 @@ stateDiagram-v2
     
     state FaseHitungMundur {
         [*] --> Countdown30s: Mulai Hitung Mundur 30 Detik
-        Countdown30s --> AlarmBuntiHP: Suara Peringatan Lokal Nyaring
-        AlarmBuntiHP --> OpsiBatal: Tombol "Saya Tidak Apa-apa"
+        Countdown30s --> SirineAmbulansHP: Suara Sirine Ambulans Nyaring + Vibrate
+        SirineAmbulansHP --> OpsiBatal: Tombol "Saya Baik-Baik Saja"
+        SirineAmbulansHP --> OpsiInstan: Tombol "Hubungi Keluarga Sekarang"
     }
     
     OpsiBatal --> Standby: Lansia Membatalkan (False Alarm)
-    Countdown30s --> StatusMerahKritis: Waktu Habis / Tekan "Bantuan Sekarang"
+    OpsiInstan --> StatusMerahKritis: Kirim Seketika Tanpa Tunggu
+    Countdown30s --> StatusMerahKritis: Waktu Habis 0s
     
     state StatusMerahKritis {
         [*] --> KirimStatusMerah: POST /api/kabar (DETEKSI_OTOMATIS / KEJANG)
-        KirimStatusMerah --> SirinePengawas: Alarm Darurat Dashboard Berbunyi
+        KirimStatusMerah --> SirinePengawas: Alarm Sirine Ambulans Dashboard Berbunyi Otomatis
         SirinePengawas --> Dial119: Shortcut Telepon Cepat Ambulans 119
     }
 ```
@@ -334,6 +339,7 @@ flowchart TD
         UI_Lansia["Tampilan Lansia (PWA Layar Penuh)"]
         UI_Pengawas["Dashboard Pengawas (Multi-Tab Responsive)"]
         UI_Audio["Komponen AudioPlayer & Waveform Canvas"]
+        UI_Siren["Sistem Sirine Dual-Engine siren.js"]
         UI_Sensor["Hook Sensor Gerak useDeteksiGerak"]
     end
 
@@ -458,7 +464,7 @@ Halaman pendaftaran (`/daftar`) kini menyediakan formulir data keluarga yang ter
 ### 6.3 Tombol Cepat Kejang & Deteksi Getaran Akselerometer
 - Lansia atau orang di sekitarnya dapat langsung menekan tombol darurat kejang (*"Tombol Darurat Kejang"*).
 - Sensor akselerometer browser memantau getaran berulang berfrekuensi kejang atau akselerasi jatuh bebas mendadak.
-- Tampil antarmuka hitung mundur 30 detik bersuara keras, memberi kesempatan membatalkan jika terjadi alarm palsu (*false alarm*), sebelum otomatis memicu sirine darurat di dashboard pengawas dan membuka opsi panggilan 119.
+- Tampil antarmuka hitung mundur 30 detik dengan suara sirine ambulans nyaring dan getaran HP terus-menerus, memberi kesempatan membatalkan jika terjadi alarm palsu (*false alarm*), atau menekan *"Hubungi Keluarga Sekarang"* untuk segera menghubungi pengawas.
 
 ### 6.4 Shortcut Cepat "Sudah Obat" & Streak Keaktifan
 - Mengakomodasi kepatuhan minum obat lansia melalui satu ketukan *"💊 Sudah Obat"*.
@@ -483,6 +489,12 @@ Dashboard pengawas memiliki tab navigasi ke-5: **Pengaturan**:
 - **Integrasi Google Maps**: Tersedia tombol pembuka rute langsung menuju posisi orang tua.
 - **Radar Berdenyut (*Pulse Dot*)**: Visualisasi pin radar live yang menegaskan posisi aktif orang tua di peta.
 
+### 6.8 Sistem Sirine Ambulans Dual-Engine & Autoplay Resilience
+- **Dual-Engine Audio**: Menggunakan file audio asli `/alert/ambulance-2.mp3` sebagai pemutar utama dan synthesizer **Web Audio API (LFO sweep 680-980 Hz)** sebagai cadangan jika peramban membatasi file audio.
+- **Browser Autoplay Unlocker**: Mengatasi batasan autoplay peramban modern dengan listener interaksi pertama pengguna (*click/pointerdown/keydown*).
+- **Tombol Aksi Banner Darurat**: Jika peramban sempat menahan autoplay sebelum ada klik, banner merah menyediakan tombol menyala **`🔊 Bunyikan Sirine`** dan **`Hentikan Sirine`** yang siap ditekan setiap saat.
+- **Iframe Autoplay Policy**: Mengaktifkan `allow="autoplay; geolocation; microphone"` pada iframe mode demo (`/demo`) sehingga audio sirine bebas berbunyi pada layar split-screen.
+
 ---
 
 ## 7. Pengujian & Verifikasi Kualitas
@@ -495,7 +507,8 @@ Pengujian menyeluruh telah dilakukan secara otomatis dan terisolasi:
 | **Pairing & Tagline** | Akses via tautan WhatsApp `/hubungkan?kode=...` dengan slogan *"Peduli hari ini, untuk mereka nanti"*. | **LULUS** (Sesi terikat, cookie tersimpan otomatis) |
 | **Triase Suara Multimodal** | Rekaman keluhan *"Aduh dada saya sesak sekali dan pandangan gelap"* dikirim ke endpoint `/api/ai`. | **LULUS** (Terklasifikasi MERAH, transkrip presisi, gejala terdeteksi) |
 | **Streaming Audio Asli** | Pengawas memutar audio melalui endpoint `/api/audio/[id]`. | **LULUS** (Header `audio/wav`, playback waveform mulus tanpa jeda) |
-| **Sensor Kejang & Jatuh** | Simulasi getaran akselerometer dan tombol darurat kejang. | **LULUS** (Hitung mundur 30s aktif, sirene pengawas terpicu) |
+| **Sensor Kejang & Jatuh** | Simulasi getaran akselerometer dan tombol darurat kejang. | **LULUS** (Hitung mundur 30s aktif, sirine ambulans HP berbunyi) |
+| **Autoplay Sirine Pengawas** | Menerima record berstatus MERAH saat dashboard terbuka. | **LULUS** (Sirine berbunyi otomatis + banner darurat merah aktif) |
 | **Ekspor CSV & PDF** | Unduhan rekam medis historis dari tab pengaturan pengawas. | **LULUS** (File CSV berformat rapi, tampilan cetak PDF presisi) |
 | **Linting & Kode Bersih** | Pemeriksaan static code analysis Next.js (`npm run lint`). | **0 Errors, 0 Warnings** |
 
@@ -539,7 +552,10 @@ Buka peramban di `http://localhost:3000`.
 Untuk mempermudah dewan juri menguji fitur tanpa konfigurasi panjang:
 1. Buka tautan **`http://localhost:3000/demo`**.
 2. Di layar demo, sisi kiri menampilkan antarmuka HP Orang Tua (Lansia) dan sisi kanan menampilkan Dashboard Pengawas secara berdampingan.
-3. Gunakan tombol **"⚡ Simulasi Kejang"** atau **"⚡ Simulasi Jatuh"** untuk menguji alur deteksi darurat secara instan!
+3. Gunakan 3 tombol simulasi di bilah atas:
+   - **`⚡ Simulasi Kejang (30s)`**: Menjalankan hitung mundur 30 detik + getaran dan sirine ambulans di HP lansia.
+   - **`🚨 Sirine Darurat Instan`**: Langsung memicu status MERAH dan **membunyikan sirine ambulans di dashboard pengawas seketika** tanpa menunggu.
+   - **`💥 Simulasi Jatuh`**: Menjalankan simulasi lansia terpeleset/jatuh.
 
 ---
 
