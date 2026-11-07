@@ -33,6 +33,7 @@
    - 6.4 [Shortcut Cepat "Sudah Obat" & Streak Keaktifan](#64-shortcut-cepat-sudah-obat--streak-keaktifan)
    - 6.5 [Tab Pengaturan Pengawas & Sirene Darurat](#65-tab-pengaturan-pengawas--sirene-darurat)
    - 6.6 [Aksesibilitas Senior: Skala Teks & Logout Mandiri](#66-aksesibilitas-senior-skala-teks--logout-mandiri)
+   - 6.7 [Pembaruan Lokasi GPS Live & Titik Koordinat Presisi](#67-pembaruan-lokasi-gps-live--titik-koordinat-presisi)
 7. [Pengujian & Verifikasi Kualitas](#7-pengujian--verifikasi-kualitas)
 8. [Panduan Menjalankan Aplikasi](#8-panduan-menjalankan-aplikasi)
 
@@ -474,6 +475,13 @@ Dashboard pengawas memiliki tab navigasi ke-5: **Pengaturan**:
 ### 6.6 Aksesibilitas Senior: Skala Teks & Logout Mandiri
 - Lansia dapat mengubah ukuran teks secara mandiri (Normal, Besar, Sangat Besar) melalui modal setelan lansia.
 - Lansia dapat mengganti kode pairing atau keluar akun secara instan tanpa perlu memasang ulang aplikasi PWA.
+
+### 6.7 Pembaruan Lokasi GPS Live & Titik Koordinat Presisi
+- Di kartu lokasi pengawas, peta OpenStreetMap kini dilengkapi tombol **"Perbarui Lokasi"** untuk sinkronisasi posisi terkini dari HP lansia tanpa memuat ulang seluruh peramban.
+- **Kotak Titik Koordinat Monospace**: Menampilkan koordinat desimal format `Latitude, Longitude` dengan akurasi radius GPS (`±X m`).
+- **Tombol Salin 1-Ketuk**: Mempermudah keluarga atau petugas menyalin titik koordinat ke papan klip (*clipboard*) saat menghubungi layanan darurat Ambulans 119 atau kepolisian.
+- **Integrasi Google Maps**: Tersedia tombol pembuka rute langsung menuju posisi orang tua.
+- **Radar Berdenyut (*Pulse Dot*)**: Visualisasi pin radar live yang menegaskan posisi aktif orang tua di peta.
 
 ---
 

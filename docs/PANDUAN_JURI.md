@@ -90,6 +90,18 @@ Untuk menguji seluruh ekosistem tanpa perlu mendaftar atau menghubungkan dua per
 
 ---
 
+### 7. 📍 Pembaruan Lokasi GPS Live & Titik Koordinat Presisi
+- **Tujuan**: Mengetahui posisi fisik lansia secara akurat dengan visualisasi peta dan tombol penyegaran instan.
+- **Langkah Uji**:
+  1. Pada kartu **Lokasi Lansia** di dashboard pengawas:
+     - Terpampang peta OpenStreetMap dengan radar posisi berdenyut (*pulse dot*).
+     - Terlihat kotak koordinat presisi format desimal (`Latitude, Longitude`) dan radius akurasi GPS (`±X m`).
+  2. Tekan tombol **Salin**: Titik koordinat tersalin ke clipboard dalam satu sentuhan.
+  3. Tekan tombol **Perbarui Lokasi**: Ikon berputar dan posisi peta ter-refresh tanpa perlu memuat ulang seluruh halaman web.
+  4. Tekan tombol **Buka Google Maps**: Membuka rute navigasi instan menuju lokasi orang tua.
+
+---
+
 ## 🛠️ Ringkasan Arsitektur Teknologi
 
 | Komponen | Spesifikasi |

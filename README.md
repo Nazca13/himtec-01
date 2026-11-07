@@ -1,6 +1,8 @@
 # 🦉 SAPA — Sistem Asisten Pantau Aktif
 
-> **Platform Pemantauan Lansia Terpadu Berbasis AI Multimodal, PWA, dan Desain Aksesibel Apple Human Interface Guidelines.**
+> **SAPA (Sistem Asisten Pantau Aktif)** — *"Peduli hari ini, untuk mereka nanti."*  
+> **Platform Pemantauan Lansia Terpadu Berbasis AI Multimodal, PWA, dan Desain Aksesibel Apple Human Interface Guidelines.**  
+> Dikembangkan untuk **HIMTEC Hackathon Build App 2026** — Kategori *Pantau Lansia Jarak Jauh*.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.4.5-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.3.0-blue?style=flat-square&logo=react)](https://react.dev/)
@@ -12,15 +14,15 @@
 
 ## 🌟 Mengapa SAPA Diciptakan?
 
-Banyak orang tua lanjut usia di Indonesia tinggal terpisah dari anak-anaknya. Saat terjadi keadaan darurat (seperti **jatuh, serangan jantung, atau kejang**), lansia sering kali tidak sempat atau kesulitan mengoperasikan aplikasi perpesanan yang rumit. 
+Banyak orang tua lanjut usia di Indonesia tinggal terpisah dari anak-anaknya. Saat terjadi keadaan darurat (seperti **jatuh, serangan jantung, stroke, atau kejang**), lansia sering kali tidak sempat atau kesulitan mengoperasikan aplikasi perpesanan konvensional yang rumit. 
 
 **SAPA (Sistem Asisten Pantau Aktif)** hadir memberikan solusi dengan prinsip **Zero Cognitive Load** untuk lansia:
-- **Di HP Orang Tua**: Hanya ada **tiga tombol besar** (Aman, Keluhan, Darurat), tombol cepat darurat kejang, dan pengingat minum obat 1-ketuk. Tanpa password, tanpa menu bertingkat.
-- **Di Layar Keluarga / Petugas**: Dashboard *real-time* cerdas yang menyajikan ringkasan kondisi medis dari AI, pemutar rekaman suara asli lansia, peta lokasi GPS, serta panduan pertolongan pertama terarah.
+- **Di HP Orang Tua**: Antarmuka bersih dengan **tiga tombol raksasa** (Aman, Keluhan, Darurat), tombol cepat darurat kejang, pengingat minum obat 1-ketuk (`💊 Sudah Obat`), serta deteksi guncangan akselerometer otomatis. Tanpa kata sandi, tanpa menu membingungkan.
+- **Di Layar Keluarga / Petugas**: Dashboard *real-time* klinis yang menyajikan ringkasan kondisi medis dari AI, pemutar rekaman suara asli lansia (*AudioPlayer*), peta lokasi GPS dengan tombol penyegaran instan, serta panduan pertolongan pertama terarah.
 
 ---
 
-## 🎯 6 Fitur Unggulan
+## 🎯 8 Fitur Unggulan Utama
 
 ### 1. 🔊 Pemutar Suara Nenek Asli (*Voice Memo Player*)
 Rekaman ucapan lansia dikonversi menjadi audio WAV standar mono 16 kHz dan disimpan aman di server. Petugas/keluarga dapat:
@@ -45,18 +47,31 @@ Memisahkan kategori status secara tegas agar tidak memicu ambiguitas visual:
 - Perhitungan rentetan hari (*streak*) kedisiplinan orang tua dalam memberi kabar.
 - Tombol 1-ketuk **`💊 Sudah Obat`** untuk mencatat kepatuhan minum obat secara instan.
 
-### 5. ⚙️ Pengaturan Lengkap di Kedua Sisi
+### 5. 📍 Pembaruan Lokasi GPS Live & Titik Koordinat Presisi
+- Peta OpenStreetMap interaktif yang menampilkan posisi lansia secara real-time dengan radar posisi berdenyut (*pulse dot*).
+- **Titik Koordinat Monospace**: Menyajikan koordinat desimal format `lat, lng` dan radius akurasi GPS (`±X m`).
+- **Tombol "Salin" Koordinat**: Menyalin koordinat ke clipboard dalam 1 sentuhan untuk mempermudah panggilan darurat.
+- **Tombol "Perbarui Lokasi"**: Menyegarkan posisi peta dan koordinat GPS secara in-app tanpa me-reload peramban.
+- **Tombol Rute Google Maps**: Membuka rute navigasi instan menuju lokasi orang tua.
+
+### 6. 📋 Form Registrasi Keluarga Lengkap & Kontak Darurat
+- Pendaftaran akun admin keluarga (`/daftar`) kini meminta data menyeluruh:
+  - **Nama Rumah/Keluarga** (mis. *Keluarga Santoso*).
+  - **Identitas Admin**: Nama lengkap, relasi keluarga (*Anak Kandung, Menantu, Cucu, Keponakan, Wali/Pendamping*), dan nomor kontak WhatsApp darurat.
+  - **Identitas Lansia**: Nama panggilan orang tua dan catatan kondisi khusus (*mis. Tinggal sendiri, riwayat hipertensi*).
+
+### 7. ⚙️ Pengaturan Lengkap di Kedua Sisi
 - **Di Sisi Lansia**:
   - Pilihan skala ukuran font layar: **Standar (100%)**, **Besar (115%)**, atau **Sangat Besar (130%)**.
   - **Ganti Kode Tanpa Instal Ulang**: Form input kode 6-digit langsung di tempat tanpa perlu uninstall PWA atau klik link tautan.
 - **Di Sisi Pengawas (`/pengawas/pengaturan`)**:
-  - Saklar sirine alarm otomatis saat status darurat merah masuk.
+  - Saklar sirine alarm otomatis saat status darurat merah masuk (lengkap dengan tombol uji suara).
   - Pilihan interval pembaruan data (*polling rate* 3s / 5s / 15s).
   - Panggilan cepat darurat medis (**Ambulans 119, Darurat 112, Polisi 110, Damkar 113**).
   - **Ekspor Riwayat ke CSV / Excel** untuk diserahkan ke dokter spesialis geriatri.
   - Fitur **Cetak PDF Ringkasan Medis**.
 
-### 6. 🤖 Triase Klinis & Chatbot Asisten AI
+### 8. 🤖 Triase Klinis & Chatbot Asisten AI
 Ditenagai model **Gemini 2.5 Flash** melalui OrcaRouter. AI menganalisis rekaman suara daerah/tidak jelas, mengekstraksi gejala spesifik, menentukan derajat keparahan secara obyektif, dan melayani konsultasi tanya-jawab keluarga seputar kondisi lansia.
 
 ---
@@ -85,7 +100,8 @@ Layar split-screen otomatis terbuka:
 - **Kanan**: Dashboard Keluarga Real-Time (Tamu Demo).
 - **Atas**: Tombol simulasi instan (`⚡ Simulasikan Kejang` dan `💥 Simulasikan Jatuh`).
 
-> Baca selengkapnya di [**docs/PANDUAN_JURI.md**](docs/PANDUAN_JURI.md) untuk panduan penilaian lengkap.
+> Baca panduan penilaian lengkap dewan juri di [**docs/PANDUAN_JURI.md**](docs/PANDUAN_JURI.md).  
+> Dokumen laporan lengkap beserta 12 Use Case dan Diagram Mermaid tersedia di [**readthis.md**](readthis.md).
 
 ---
 
@@ -126,26 +142,33 @@ Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 ```
 himtec-01/
 ├── docs/                     # Dokumentasi komprehensif
-│   ├── PANDUAN_JURI.md       # Panduan pengujian fitur untuk dewan juri
+│   ├── README.md             # Indeks direktori dokumentasi
+│   ├── PANDUAN_JURI.md       # Panduan pengujian 7 skenario untuk dewan juri
 │   ├── ARSITEKTUR.md         # Diagram arsitektur teknis & database ERD
-│   ├── PRD.txt               # Product Requirements Document
+│   ├── PRD.txt               # Product Requirements Document asli
 │   └── supabase.md           # Panduan konfigurasi Supabase & RLS
 ├── prisma/                   # Skema database & migrasi
 │   ├── schema.prisma         # Definisi model Prisma ORM
-│   └── setup.sql             # Skrip SQL indeks, constraints, dan RLS
+│   ├── setup.sql             # Skrip SQL indeks, constraints, dan RLS
+│   └── sql/                  # Berkas migrasi SQL historis
 ├── public/                   # Aset PWA (icons, sw.js, manifest, offline.html)
-└── src/
-    ├── app/                  # Next.js 16 App Router (halaman & API routes)
-    │   ├── api/              # 16 Endpoint RESTful API
-    │   ├── demo/layar/       # Mode demo split-screen untuk presentasi
-    │   ├── lansia/           # Tampilan aplikasi orang tua (PWA)
-    │   └── pengawas/         # Dashboard monitoring keluarga (5 tab)
-    ├── components/           # Komponen UI global (AudioPlayer, Mascot, Badge)
-    ├── features/             # Modul fungsional per peran (lansia, pengawas, masuk)
-    ├── hooks/                # Custom React hooks (useRecorder, useDeteksiGerak)
-    ├── lib/                  # Server utilities (auth, session HMAC, deteksi, geo)
-    ├── services/             # Lapisan logika bisnis (record, triage, household, demo)
-    └── proxy.js              # Middleware kontrol akses & navigasi sesi
+│   └── mascot/               # Aset ilustrasi maskot burung hantu
+├── src/
+│   ├── app/                  # Next.js 16 App Router (halaman & API routes)
+│   │   ├── api/              # 16 Endpoint RESTful API
+│   │   ├── demo/layar/       # Mode demo split-screen untuk presentasi
+│   │   ├── lansia/           # Tampilan aplikasi orang tua (PWA)
+│   │   └── pengawas/         # Dashboard monitoring keluarga (5 tab)
+│   ├── components/           # Komponen UI global (AudioPlayer, Mascot, Badge)
+│   ├── features/             # Modul fungsional per peran (lansia, pengawas, masuk)
+│   │   ├── lansia/           # Komponen LansiaApp, modal keluhan, modal setelan
+│   │   ├── pengawas/         # StatusCard, Timeline, LokasiCard, PengaturanView
+│   │   └── masuk/            # Gateway, DaftarKeluarga, HubungkanLansia, Gabung
+│   ├── hooks/                # Custom React hooks (useRecorder, useDeteksiGerak)
+│   ├── lib/                  # Server utilities (auth, session HMAC, deteksi, geo)
+│   ├── services/             # Lapisan logika bisnis (record, triage, household, demo)
+│   └── proxy.js              # Middleware kontrol akses & navigasi sesi
+└── readthis.md               # Laporan Pengembangan Lengkap (12 Use Cases & Flowchart)
 ```
 
 ---
@@ -168,5 +191,5 @@ himtec-01/
 ---
 
 ## 📄 Lisensi & Hak Cipta
-Hak Cipta © 2026 **Tim Pengembang SAPA**. Seluruh hak cipta dilindungi undang-undang.
-*Mendedikasikan teknologi untuk keselamatan dan ketenangan keluarga Indonesia.* 🇮🇩
+Hak Cipta © 2026 **Tim Pengembang SAPA**. Seluruh hak cipta dilindungi undang-undang.  
+*Mendedikasikan teknologi untuk keselamatan dan ketenangan keluarga Indonesia.* 🦉🇮🇩
