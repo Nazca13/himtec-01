@@ -1,0 +1,33 @@
+.row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 0 0 0 2px #dbe9f5;
+  font-weight: 700;
+}
+
+.on {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: none;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--tone, #b9c7d6);
+}

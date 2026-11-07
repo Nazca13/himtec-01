@@ -1,9 +1,14 @@
-/* Design tokens SAPA. Palet resmi: biru tua, biru muda, toska, oranye, biru es, putih.
-   Merah tidak ada di palet; dipakai hanya untuk status DARURAT. */
+/* Design tokens SAPA, diambil langsung dari logo: biru logo #45A7F2 dan navy #142445.
+   Teks di atas biru logo selalu navy (5,4:1), seperti subjudul logo; putih di atas biru logo hanya 2,7:1.
+   Toska/oranye/merah dipakai HANYA sebagai warna status (aman/perhatian/darurat). */
 :root {
-  --ink: #112a46;
-  --sky: #42a5f5;
-  --sky-deep: #1976d2; /* sky untuk teks/ikon kecil di atas putih (kontras 4.6:1) */
+  --ink: #142445; /* navy logo: teks, ikon */
+  --brand: #45a7f2; /* biru logo: panel, header, sidebar */
+  --brand-deep: #2c8ddb; /* sisi bawah 3D panel biru */
+  --brand-strong: #1565c0; /* tombol utama dan tautan: putih di atasnya 5,75:1 */
+  --brand-strong-deep: #0d4a96;
+  --sky: var(--brand);
+  --sky-deep: var(--brand-strong);
   --teal: #14b8a6;
   --orange: #ff9800;
   --ice: #ebf5fb;

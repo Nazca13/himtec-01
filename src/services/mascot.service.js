@@ -1,6 +1,6 @@
 import { getOrca, ORCA_TEXT_MODEL } from '@/lib/orca';
 import { STATUS_LABEL, TIPE_LABEL } from '@/lib/constants';
-import { hariKey, wib } from '@/lib/format';
+import { formatWaktu, hariKey, wib } from '@/lib/format';
 
 const INSTRUCTION_MASKOT = `Kamu SAPA, burung hantu maskot yang menjadi teman harian seorang lansia.
 Bicara sangat sederhana, hangat, kalimat pendek, maksimal 2 kalimat (30 kata). Sebut nama lansia.
@@ -40,10 +40,10 @@ export function sapaanLokal({ nama, bagian, sudahHariIni, streak, statusHariIni 
 }
 
 // Pesan maskot di HP lansia, dibuat AI. Di-cache per keadaan (bagian hari, sudah/belum, status) selama 30 menit.
-export async function pesanMaskot({ householdId, nama, sudahHariIni, streak, statusHariIni }) {
+export async function pesanMaskot({ lansiaId, nama, sudahHariIni, streak, statusHariIni }) {
   const bagian = bagianHari();
   const input = { nama, bagian, sudahHariIni, streak, statusHariIni };
-  const key = `maskot:${householdId}:${hariKey(new Date())}:${bagian}:${sudahHariIni}:${statusHariIni}:${Math.min(streak, 7)}`;
+  const key = `maskot:${lansiaId}:${hariKey(new Date())}:${bagian}:${sudahHariIni}:${statusHariIni}:${Math.min(streak, 7)}`;
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < 30 * 60 * 1000) return { pesan: hit.text, sumber: 'ai' };
   try {
@@ -56,22 +56,22 @@ export async function pesanMaskot({ householdId, nama, sudahHariIni, streak, sta
 }
 
 // Ringkasan live untuk dashboard keluarga. Kuncinya memuat id log terbaru: ringkasan dibuat ulang hanya saat ada kabar baru.
-export async function ringkasanKeluarga({ household, records }) {
-  if (!records.length) return { ringkasan: `Belum ada kabar dari ${household.namaLansia}. Ringkasan muncul setelah ada tombol yang ditekan.`, sumber: 'lokal' };
-  const key = `ringkasan:${household.id}:${records[0].id}`;
+export async function ringkasanKeluarga({ lansia, records }) {
+  if (!records.length) return { ringkasan: `Belum ada kabar dari ${lansia.nama}. Ringkasan muncul setelah ada tombol yang ditekan.`, sumber: 'lokal' };
+  const key = `ringkasan:${lansia.id}:${records[0].id}`;
   const hit = cache.get(key);
   if (hit) return { ringkasan: hit.text, sumber: 'ai' };
   const baris = records
     .slice(0, 30)
-    .map((r) => `${wib(r.createdAt)} WIB | ${TIPE_LABEL[r.tipeInput]} | ${STATUS_LABEL[r.statusBahaya]}${r.aiAnalysis?.ringkasan ? ` | ${r.aiAnalysis.ringkasan}` : ''}`)
+    .map((r) => `${formatWaktu(r.createdAt)} | ${TIPE_LABEL[r.tipeInput]} | ${STATUS_LABEL[r.statusBahaya]}${r.aiAnalysis?.ringkasan ? ` | ${r.aiAnalysis.ringkasan}` : ''}`)
     .join('\n');
   try {
-    const text = await ask(INSTRUCTION_RINGKASAN, `Lansia: ${household.namaLansia}\nWaktu sekarang: ${wib(new Date())} WIB\nLog terbaru di atas:\n${baris}`, 220);
+    const text = await ask(INSTRUCTION_RINGKASAN, `Lansia: ${lansia.nama}\nWaktu sekarang: ${wib(new Date())} WIB\nLog terbaru di atas:\n${baris}`, 220);
     cache.set(key, { text, at: Date.now() });
     if (cache.size > 500) cache.delete(cache.keys().next().value);
     return { ringkasan: text, sumber: 'ai' };
   } catch {
     const r = records[0];
-    return { ringkasan: `Kabar terakhir dari ${household.namaLansia}: ${r.aiAnalysis?.ringkasan ?? r.tipeInput}. Ringkasan AI sedang tidak tersedia.`, sumber: 'lokal' };
+    return { ringkasan: `Kabar terakhir dari ${lansia.nama}: ${r.aiAnalysis?.ringkasan ?? r.tipeInput}. Ringkasan AI sedang tidak tersedia.`, sumber: 'lokal' };
   }
 }

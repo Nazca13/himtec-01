@@ -1,5 +1,6 @@
 .stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* kolom tidak melebar mengikuti isi terlebar */
   gap: 28px;
 }
 
@@ -386,4 +387,142 @@ section > .h2 {
 
 .narrow {
   max-width: 760px;
+}
+
+.headRow {
+  display: grid;
+  gap: 12px;
+}
+
+.cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 22px;
+  border-radius: 18px;
+  background: var(--brand-strong);
+  color: var(--paper);
+  font-weight: 800;
+  box-shadow: 0 5px 0 var(--brand-strong-deep);
+}
+
+/* Tab Keluarga: daftar orang tua dan anggota */
+.list {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.item {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--r-sm);
+  background: var(--ice);
+}
+
+.itemHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.itemHead strong {
+  font-size: 1.125rem;
+}
+
+.admin {
+  background: var(--brand);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions .outline,
+.actions .danger {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 0.9375rem;
+}
+
+.details summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--brand-strong);
+  font-weight: 800;
+}
+
+.details[open] summary {
+  margin-bottom: 8px;
+}
+
+.addForm {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 2px solid var(--ice);
+}
+
+.addForm label {
+  font-weight: 800;
+}
+
+.addRow {
+  display: flex;
+  gap: 10px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 2px rgba(20, 36, 69, 0.18);
+  font-size: 1.0625rem;
+}
+
+.input:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px var(--brand-strong);
+}
+
+.cta svg {
+  margin-right: 6px;
+}
+
+.formError,
+.formOk {
+  padding: 12px 16px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+}
+
+.formError {
+  background: #fde1df;
+}
+
+.formOk {
+  background: #d6f4ef;
+}
+
+.loc {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  color: var(--brand-strong);
+  font-size: 0.9375rem;
+  font-weight: 700;
 }

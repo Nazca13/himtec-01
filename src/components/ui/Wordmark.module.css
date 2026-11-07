@@ -9,5 +9,6 @@
 
 .badge {
   border-radius: 12px;
-  box-shadow: var(--shadow-sm);
+  /* cincin putih: ubin logo yang biru tetap terlihat di atas header biru */
+  box-shadow: 0 0 0 2px var(--paper), var(--shadow-sm);
 }

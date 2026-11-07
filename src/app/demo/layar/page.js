@@ -12,12 +12,13 @@ export default function DemoLayar() {
         <h1>Demo SAPA</h1>
         <p>Ketuk tombol di HP kiri. Dashboard keluarga di kanan ikut berubah.</p>
         <nav>
-          <Link href="/demo?reset=1">Ulangi data demo</Link>
+          {/* <a>, bukan <Link>: prefetch akan mereset data diam-diam */}
+          <a href="/demo?reset=1">Ulangi data demo</a>
         </nav>
       </header>
       <div className={styles.stage}>
         <div className={styles.phone}>
-          <iframe className={styles.frame} src="/lansia" title="HP nenek (aplikasi lansia)" />
+          <iframe className={styles.frame} allow="geolocation; microphone" src="/lansia" title="HP nenek (aplikasi lansia)" />
         </div>
         <div className={styles.desk}>
           <iframe className={styles.frame} src="/pengawas" title="Dashboard keluarga" />

@@ -135,7 +135,7 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: var(--ink);
+  background: var(--brand-strong);
   color: var(--paper);
   font-size: 1.375rem;
 }
@@ -149,4 +149,9 @@
   .chat {
     height: calc(100dvh - 96px);
   }
+}
+
+.titleRow {
+  display: grid;
+  gap: 10px;
 }

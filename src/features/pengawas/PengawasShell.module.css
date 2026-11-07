@@ -45,7 +45,7 @@
 }
 
 .active svg {
-  color: var(--sky-deep);
+  color: var(--brand-strong);
 }
 
 /* Penanda tab aktif: batang tipis di atas (ponsel), latar lembut di samping (desktop) */
@@ -57,7 +57,7 @@
   height: 4px;
   margin-left: -18px;
   border-radius: 0 0 4px 4px;
-  background: var(--sky);
+  background: var(--brand-strong);
 }
 
 .item > :not(.pill) {
@@ -76,7 +76,10 @@
   align-items: center;
   justify-content: space-between;
   padding: calc(env(safe-area-inset-top) + 12px) var(--gutter) 12px;
-  background: var(--paper); /* tanpa blur: backdrop-filter berat di HP murah */
+  margin-bottom: 16px;
+  background: var(--brand); /* biru logo; tanpa blur: backdrop-filter berat di HP murah */
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 5px 0 var(--brand-deep);
 }
 
 .live {
@@ -139,7 +142,8 @@
     flex-direction: column;
     gap: 32px;
     padding: 28px 16px;
-    box-shadow: 1px 0 0 var(--line);
+    background: var(--brand); /* sidebar biru logo, teks navy */
+    box-shadow: 6px 0 0 var(--brand-deep);
   }
 
   .brand {
@@ -160,11 +164,13 @@
     min-height: 52px;
     padding: 0 14px;
     border-radius: var(--r-sm);
+    color: var(--ink);
     font-size: 1rem;
+    font-weight: 700;
   }
 
   .item:hover {
-    background: var(--ice);
+    background: rgba(255, 255, 255, 0.35);
   }
 
   .pill {
@@ -173,7 +179,8 @@
     height: auto;
     margin: 0;
     border-radius: var(--r-sm);
-    background: var(--ice);
+    background: var(--paper);
+    box-shadow: 0 4px 0 var(--brand-deep);
   }
 
   .who {
@@ -183,8 +190,9 @@
     font-size: 0.9375rem;
   }
 
-  .who span {
-    color: var(--mute);
+  .who {
+    border-radius: var(--r-sm);
+    background: rgba(255, 255, 255, 0.35);
   }
 
   .main {
@@ -197,5 +205,6 @@
 
   .content {
     padding-top: 32px;
+    padding-inline: 40px;
   }
 }

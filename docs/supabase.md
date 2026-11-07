@@ -25,17 +25,32 @@ Client Prisma dibuat sekali di `src/lib/db.js` (singleton). Jangan membuat `new 
 
 ## Model saat ini
 
-Dua tabel (`prisma/schema.prisma`, DDL + RLS di `prisma/setup.sql`):
+Empat tabel (`prisma/schema.prisma`, DDL + CHECK + RLS di `prisma/setup.sql`):
 
-**`households`** (grup keluarga, satu lansia): `id`, `nama_lansia`, `kode_lansia` (unik, dipakai di HP lansia), `kode_keluarga` (unik, untuk mengundang keluarga), `lansia_version` (naik saat HP lansia diputus), `lansia_terhubung_at`, `created_at`.
+```
+households 1 --- n members        (ADMIN mengelola, PEMANTAU hanya melihat)
+households 1 --- n lansia         (orang tua yang dipantau)
+lansia     1 --- n daily_records  (kabar dari HP lansia)
+```
 
-**`daily_records`** (log): `id`, `household_id` (FK ke `households`, cascade; nullable hanya untuk baris lama), `tipe_input` (`TOMBOL_AMAN` / `TOMBOL_DARURAT` / `VOICE_NOTE`), `status_bahaya` (`HIJAU` / `KUNING` / `MERAH`), `raw_data`, `ai_analysis` (jsonb), `created_at`. Indeks `(household_id, created_at desc)`.
+| Tabel | Kolom penting |
+| --- | --- |
+| `households` | `nama`, `kode_undangan` (unik, untuk bergabung sebagai pemantau) |
+| `members` | `household_id` (FK), `nama`, `role` (`ADMIN` / `PEMANTAU`, CHECK) |
+| `lansia` | `household_id` (FK), `nama`, `kode_pairing` (unik, untuk HP lansia), `device_version` (naik saat HP diputus), `terhubung_at` |
+| `daily_records` | `lansia_id` (FK; nullable hanya untuk baris lama), `tipe_input`, `status_bahaya` (CHECK), `ai_analysis` (jsonb), `latitude`, `longitude`, `akurasi_meter` (CHECK rentang), `created_at` |
 
-Semua query log wajib memfilter `household_id` dari sesi. Data demo: `npm run db:seed` (hanya menghapus log grup demo).
+Semua FK `ON DELETE CASCADE`. Indeks utama: `daily_records(lansia_id, created_at desc)`. Semua query wajib memfilter keluarga/lansia dari sesi, bukan dari input klien.
+
+Migrasi manual untuk database lama (dijalankan berurutan, masing-masing satu transaksi):
+1. `prisma/sql/2026-11-07-peran-dan-relasi.sql`: grup lama menjadi keluarga + lansia, log dipindah ke lansia.
+2. `prisma/sql/2026-11-07-lokasi.sql`: kolom lokasi.
+
+Data demo: `npm run db:seed` (hanya mereset Keluarga Demo).
 
 ## Keamanan
 
-- RLS aktif di `public.households` dan `public.daily_records` tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
+- RLS aktif di keempat tabel (`households`, `members`, `lansia`, `daily_records`) tanpa policy. Data API Supabase (REST) tidak bisa membaca atau menulis tabel ini.
 - Prisma memakai role `postgres`, yang melewati RLS. App tetap bekerja.
 - `service_role` key dan `anon` key tidak dipakai. Jangan menaruh key apa pun dengan awalan `NEXT_PUBLIC_`.
 - `.env` tidak boleh masuk git.

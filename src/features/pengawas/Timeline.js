@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
-import { PiMicrophoneFill, PiShieldCheckFill, PiSirenFill } from 'react-icons/pi';
+import { PiMapPinFill, PiMicrophoneFill, PiShieldCheckFill, PiSirenFill } from 'react-icons/pi';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { TIPE_LABEL } from '@/lib/constants';
 import { formatWaktu } from '@/lib/format';
@@ -38,6 +38,12 @@ export default function Timeline({ records }) {
               </div>
               <time dateTime={new Date(r.createdAt).toISOString()}>{formatWaktu(r.createdAt)}</time>
               {analysis?.ringkasan && <p>{analysis.ringkasan}</p>}
+              {r.latitude != null && (
+                <a className={styles.loc} href={`https://www.google.com/maps/search/?api=1&query=${r.latitude},${r.longitude}`} target="_blank" rel="noopener noreferrer">
+                  <PiMapPinFill aria-hidden="true" />
+                  Lihat lokasi
+                </a>
+              )}
               {analysis?.gejala?.length > 0 && (
                 <ul className={styles.tags}>
                   {analysis.gejala.map((g) => (

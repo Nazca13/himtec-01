@@ -1,61 +1,67 @@
 -- ==========================================
 -- FILE: prisma/setup.sql
 -- PROJECT: SAPA (Sistem Asisten Pantau Aktif)
--- DBMS: PostgreSQL (Supabase)
--- Cocok dengan model Household dan DailyRecord di prisma/schema.prisma.
+-- DBMS: PostgreSQL (Supabase). Cocok dengan prisma/schema.prisma.
+-- Untuk database BARU. Database lama (sebelum ada peran): jalankan prisma/sql/2026-11-07-peran-dan-relasi.sql.
+--
+-- Relasi:
+--   households 1 --- n members       (ADMIN mengelola, PEMANTAU hanya melihat)
+--   households 1 --- n lansia        (orang tua yang dipantau)
+--   lansia     1 --- n daily_records (kabar dari HP lansia)
 -- ==========================================
 
--- 1. Reset tabel (HAPUS SEMUA DATA). Aktifkan hanya saat mereset data simulasi.
--- DROP TABLE IF EXISTS daily_records;
-
--- 2a. Grup keluarga: satu lansia, banyak anggota keluarga. Dihubungkan lewat dua kode.
 CREATE TABLE IF NOT EXISTS households (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    nama_lansia VARCHAR(60) NOT NULL,
-    kode_lansia VARCHAR(12) NOT NULL UNIQUE,    -- dipakai di HP lansia
-    kode_keluarga VARCHAR(12) NOT NULL UNIQUE,  -- dipakai untuk mengundang keluarga
-    lansia_version INTEGER NOT NULL DEFAULT 1,  -- dinaikkan saat HP lansia diputus
-    lansia_terhubung_at TIMESTAMPTZ,
+    nama VARCHAR(60) NOT NULL,                    -- mis. "Keluarga Budi"
+    kode_undangan VARCHAR(12) NOT NULL,           -- untuk bergabung sebagai pemantau
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+CREATE UNIQUE INDEX IF NOT EXISTS households_kode_undangan_key ON households(kode_undangan);
 
--- 2b. Tabel utama pencatatan log harian
+CREATE TABLE IF NOT EXISTS members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    household_id UUID NOT NULL REFERENCES households(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    nama VARCHAR(40) NOT NULL,
+    role VARCHAR(10) NOT NULL DEFAULT 'PEMANTAU' CHECK (role IN ('ADMIN', 'PEMANTAU')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS members_household_id_idx ON members(household_id);
+
+CREATE TABLE IF NOT EXISTS lansia (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    household_id UUID NOT NULL REFERENCES households(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    nama VARCHAR(60) NOT NULL,
+    kode_pairing VARCHAR(12) NOT NULL,            -- dimasukkan di HP lansia
+    device_version INTEGER NOT NULL DEFAULT 1,    -- naik saat HP diputus: sesi HP lama tidak berlaku
+    terhubung_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS lansia_kode_pairing_key ON lansia(kode_pairing);
+CREATE INDEX IF NOT EXISTS lansia_household_id_idx ON lansia(household_id);
+
 CREATE TABLE IF NOT EXISTS daily_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-    -- Grup pemilik log. Nullable hanya untuk baris lama; semua query memfilternya.
-    household_id UUID REFERENCES households(id) ON DELETE CASCADE,
-
-    -- Jenis interaksi dari halaman Kiosk Lansia
-    -- Contoh isi: 'TOMBOL_AMAN', 'VOICE_NOTE', 'TOMBOL_DARURAT'
-    tipe_input VARCHAR(50) NOT NULL,
-
-    -- Status warna untuk merender UI Dashboard secara instan
-    -- Contoh isi: 'HIJAU', 'KUNING', 'MERAH'
-    status_bahaya VARCHAR(20) DEFAULT 'HIJAU',
-
-    -- Teks mentah (jika diketik) atau URL/Base64 audio dari peramban
+    lansia_id UUID REFERENCES lansia(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    tipe_input VARCHAR(50) NOT NULL CHECK (tipe_input IN ('TOMBOL_AMAN', 'TOMBOL_DARURAT', 'VOICE_NOTE')),
+    status_bahaya VARCHAR(20) NOT NULL DEFAULT 'HIJAU' CHECK (status_bahaya IN ('HIJAU', 'KUNING', 'MERAH')),
     raw_data TEXT,
-
-    -- [CORE AI] Hasil ekstraksi dari Gemini (JSONB agar query di dalam JSON cepat)
-    ai_analysis JSONB,
-
-    -- Waktu kejadian dengan zona waktu
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    ai_analysis JSONB,                            -- hasil triase AI: transkrip, gejala, ringkasan
+    latitude DOUBLE PRECISION CHECK (latitude BETWEEN -90 AND 90),     -- lokasi HP saat tombol ditekan
+    longitude DOUBLE PRECISION CHECK (longitude BETWEEN -180 AND 180), -- (null jika izin lokasi ditolak)
+    akurasi_meter REAL CHECK (akurasi_meter >= 0),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS daily_records_lansia_id_created_at_idx ON daily_records(lansia_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS daily_records_status_bahaya_idx ON daily_records(status_bahaya);
 
--- Untuk database yang tabel daily_records-nya sudah ada sebelum grup dibuat:
-ALTER TABLE daily_records ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id) ON DELETE CASCADE;
-
--- 3. Indeks: mempercepat Dashboard Pengawas menarik data terbaru
-CREATE INDEX IF NOT EXISTS idx_daily_records_household_created ON daily_records(household_id, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_daily_records_status ON daily_records(status_bahaya);
-
--- 4. RLS (jalankan SELALU). Tanpa policy, anon/authenticated tidak bisa akses lewat
--- Data API Supabase. Prisma memakai role postgres (bypass RLS), jadi app tetap jalan.
+-- RLS: semua tabel tertutup untuk Data API Supabase (anon/authenticated).
+-- App mengakses database hanya lewat Prisma di server (role postgres, melewati RLS).
 ALTER TABLE households ENABLE ROW LEVEL SECURITY;
+ALTER TABLE members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lansia ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_records ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON TABLE households, daily_records FROM anon, authenticated;
+REVOKE ALL ON TABLE households, members, lansia, daily_records FROM anon, authenticated;
 
--- 5. Cek: rowsecurity harus true
-SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public' AND tablename IN ('households', 'daily_records');
+-- Cek: rowsecurity harus true untuk keempat tabel
+SELECT tablename, rowsecurity FROM pg_tables
+WHERE schemaname = 'public' AND tablename IN ('households', 'members', 'lansia', 'daily_records');

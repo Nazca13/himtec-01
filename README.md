@@ -1,70 +1,127 @@
 # SAPA - Sistem Asisten Pantau Aktif
 
-PWA dua tampilan untuk memantau lansia jarak jauh. Lansia menekan satu dari tiga tombol (atau merekam suara); keluarga melihat status, riwayat, dan bertanya ke asisten AI. Spesifikasi lengkap: `docs/PRD.txt`.
+Aplikasi untuk memantau orang tua (lansia) dari jauh. Orang tua cukup menekan satu dari tiga tombol besar di HP-nya; keluarga langsung melihat kabarnya di dashboard, lengkap dengan ringkasan AI, riwayat, dan lokasi terakhir. Spesifikasi awal: `docs/PRD.txt`.
 
-## Alur pengguna
+## Tiga peran
 
-| Siapa | Perangkat | Cara masuk |
-| --- | --- | --- |
-| Keluarga (anak) | Web biasa (laptop/HP), dashboard | `/` lalu **Buat grup pantau**: isi nama Anda dan nama nenek, dapat dua kode |
-| HP nenek/kakek | **Aplikasi** (bisa di-install ke layar utama) | Buka link WhatsApp dari keluarga (`/hubungkan?kode=...`), tekan **Hubungkan HP ini** sekali |
-| Keluarga lain | Web | `/` lalu **Gabung dengan kode keluarga** |
-| Juri / uji cepat | Satu browser | `/demo`: HP lansia dan dashboard berdampingan, data demo (`/demo?reset=1` untuk mengulang) |
+| Peran | Siapa | Perangkat | Bisa apa | Cara masuk |
+| --- | --- | --- | --- | --- |
+| **Admin** | Anak/pengurus yang mendaftarkan keluarga | Web (laptop/HP): dashboard | Semua yang bisa pemantau, ditambah: tambah/hapus orang tua, bagikan kode HP dan kode undangan, putuskan HP yang hilang, jadikan anggota admin, keluarkan anggota | Halaman depan, lalu **Daftarkan keluarga** (`/daftar`) |
+| **Lansia** | Orang tua yang dipantau | Aplikasi di HP-nya (PWA, bisa di-install) | Tekan **Saya Aman**, **Bicara** (pesan suara dibaca AI), atau **Darurat**. Lokasi HP ikut terkirim jika diizinkan | Buka link kode HP dari admin, lalu **Hubungkan HP ini** (`/hubungkan?kode=...`), cukup sekali |
+| **Pemantau** | Anggota keluarga lain | Web (laptop/HP): dashboard | Lihat status, Ringkasan AI, lokasi terakhir, grafik, riwayat; tanya Asisten AI. Tidak bisa mengubah pengaturan | Halaman depan, lalu **Masuk dengan kode undangan** (`/gabung`) |
 
-- `/lansia`: app lansia. Maskot burung hantu menyapa (pesan ditulis AI), ada hitungan hari berturut-turut, tiga tombol (Saya Aman, Bicara, Darurat). Hanya halaman ini dan `/hubungkan` yang menautkan manifest PWA, jadi hanya ini yang ditawari "Install".
-- `/pengawas`: dashboard web keluarga: Beranda (status, Ringkasan AI live, tren 7 hari), Riwayat, Asisten AI, Keluarga (kode, status HP lansia, putuskan HP, keluar).
-- Data dipisah per grup. Sesi = cookie bertanda tangan (`SESSION_SECRET`), dua cookie terpisah untuk lansia dan keluarga.
-- Kode lansia bisa diganti: **Putuskan HP ini** di tab Keluarga membuat kode baru dan langsung mencabut HP lama.
+Penjelasan yang sama untuk pengguna ada di app: `/panduan`.
+
+## Alur dari awal
+
+1. **Admin mendaftar** di `/daftar`: isi nama sendiri dan nama orang tua. Dibuat keluarga, akun admin, dan orang tua pertama. Admin mendapat dua kode:
+   - **Kode HP** (6 karakter) untuk HP orang tua.
+   - **Kode undangan** (8 karakter) untuk anggota keluarga lain.
+2. **Hubungkan HP orang tua**: admin menekan *Kirim lewat WhatsApp*. Di HP orang tua, link dibuka lalu *Hubungkan HP ini*. HP meminta izin lokasi sekali, lalu menampilkan tiga tombol setiap kali dibuka. Pilih *Tambahkan ke layar utama* agar menjadi aplikasi.
+3. **Orang tua memberi kabar**: Saya Aman (hijau), Bicara (oranye, AI merangkum keluhan dan menilai tingkat bahaya), Darurat (merah). Maskot burung hantu menyapa (pesan ditulis AI) dan menghitung hari berturut-turut.
+4. **Keluarga memantau** di `/pengawas`: status terbaru, Ringkasan AI live, lokasi terakhir (peta), grafik 7 hari, riwayat, dan Asisten AI. Kabar baru muncul dalam ±5 detik tanpa reload.
+5. **Admin mengundang keluarga lain** dari tab *Keluarga*: kirim kode undangan. Penerima masuk sebagai pemantau; admin bisa menjadikannya admin.
+
+Lainnya (semua dari tab *Keluarga*, khusus admin):
+- **Memantau lebih dari satu orang tua**: form *Tambah orang tua*. Setiap orang tua punya kode HP sendiri; pilih namanya di atas dashboard.
+- **HP orang tua hilang/diganti**: *Putuskan HP*. HP lama langsung ditolak, kode baru dibuat.
+- **Membuka dashboard di perangkat lain**: masuk dengan kode undangan (sebagai pemantau), lalu admin menekan *Jadikan admin*.
+- **Mengeluarkan anggota**: *Keluarkan*. Perangkatnya langsung tidak bisa membuka dashboard. Keluarga selalu menyisakan minimal satu admin.
+
+**Juri / uji cepat**: buka `/demo`. Satu browser masuk sebagai admin "Keluarga Demo" sekaligus sebagai HP Oma Siti, ditampilkan berdampingan. `/demo?reset=1` mengembalikan data demo.
 
 ## Menjalankan
 
 ```bash
-npm install                  # wajib setelah clone atau pull: paket baru (mis. motion) harus terpasang
-cp .env.example .env         # isi DATABASE_URL, DIRECT_URL, ORCA_API_KEY, SESSION_SECRET
-npm run db:push             # buat tabel di Supabase (prisma generate jalan otomatis saat npm install)
+npm install                  # wajib setelah clone atau pull
+cp .env.example .env         # isi semua variabel (lihat tabel di bawah)
+npm run db:push              # buat/sinkronkan tabel di Supabase
 npm run dev                  # http://localhost:3000
 ```
 
-Setelah `db push`, aktifkan RLS: jalankan bagian RLS di `prisma/setup.sql` lewat Supabase SQL Editor. Data demo: `npm run db:seed` (menghapus semua baris dulu).
+Setelah `db:push` pada database baru, jalankan `prisma/setup.sql` di Supabase SQL Editor (indeks, CHECK, dan RLS). Database yang dibuat sebelum ada peran: jalankan `prisma/sql/2026-11-07-peran-dan-relasi.sql` lalu `prisma/sql/2026-11-07-lokasi.sql` (memindahkan data, tidak menghapus).
 
-Jika muncul `Module not found`, hentikan server, jalankan `npm install`, lalu `rm -rf .next && npm run dev`.
-
-## Perintah
+Mencoba dari HP di jaringan yang sama: buka `http://<IP-laptop>:3000`. Mikrofon, lokasi, dan *Install* butuh HTTPS di HP, jadi uji penuh di HP memakai hasil deploy (mis. Vercel). Jika muncul `Module not found`: hentikan server, `npm install`, lalu `rm -rf .next && npm run dev`.
 
 | Perintah | Fungsi |
 | --- | --- |
 | `npm run dev` | server pengembangan |
-| `npm run build` / `npm start` | build dan jalankan produksi (PWA dan service worker aktif hanya di sini) |
+| `npm run build` / `npm start` | build dan jalankan produksi (service worker aktif hanya di sini) |
 | `npm run lint` | ESLint |
-| `npm run db:push` | sinkronkan skema Prisma ke database |
-| `npm run db:seed` | isi data demo (MENGHAPUS semua baris dulu) |
+| `npm run db:push` | sinkronkan `prisma/schema.prisma` ke database |
+| `npm run db:seed` | isi ulang Keluarga Demo (hanya data keluarga demo yang direset) |
 | `npm run db:studio` | lihat data di browser |
 
 ## Variabel lingkungan
 
 | Nama | Isi |
 | --- | --- |
-| `DATABASE_URL` | Supabase Transaction pooler (port 6543, `?pgbouncer=true`) |
+| `DATABASE_URL` | Supabase Transaction pooler (port 6543, akhiri dengan `?pgbouncer=true`) |
 | `DIRECT_URL` | Supabase Session pooler (port 5432), untuk migrasi |
 | `ORCA_API_KEY` | OrcaRouter: triase suara, pesan maskot, ringkasan, asisten |
 | `SESSION_SECRET` | Penanda tangan cookie sesi, minimal 32 karakter (`openssl rand -base64 48`) |
 | `ENABLE_DEMO` | Opsional. `false` mematikan `/demo` |
 
-Key anon/service_role Supabase tidak dipakai: akses database lewat Prisma dari server. Jangan commit `.env`.
+Key anon/service_role Supabase tidak dipakai: semua akses database lewat Prisma di server. Jangan commit `.env`.
+
+## Database
+
+```
+households (keluarga)
+ ├─ 1:n members        id, household_id, nama, role (ADMIN | PEMANTAU)
+ └─ 1:n lansia         id, household_id, nama, kode_pairing (unik), device_version, terhubung_at
+          └─ 1:n daily_records   id, lansia_id, tipe_input, status_bahaya, ai_analysis (jsonb),
+                                 latitude, longitude, akurasi_meter, created_at
+households: id, nama, kode_undangan (unik), created_at
+```
+
+- Semua foreign key `ON DELETE CASCADE`: menghapus keluarga menghapus anggota, lansia, dan kabarnya; menghapus lansia menghapus kabarnya.
+- `CHECK` di database: `role`, `tipe_input`, `status_bahaya`, rentang koordinat.
+- RLS aktif di keempat tabel tanpa policy: Data API Supabase (anon/authenticated) tidak bisa membaca atau menulis.
+- Skema: `prisma/schema.prisma`. DDL lengkap: `prisma/setup.sql`. Detail: `docs/supabase.md`.
+
+## Keamanan dan akses
+
+- Tanpa kata sandi. Dua cookie httpOnly bertanda tangan HMAC (`sapa-pengawas` berisi id anggota, `sapa-lansia` berisi id lansia + versi perangkat).
+- Peran dibaca dari database pada setiap request, jadi perubahan peran dan pengeluaran anggota langsung berlaku.
+- Setiap API memeriksa sesi dan membatasi data ke keluarga/lansia milik sesi itu; id dari klien tidak pernah dipercaya. Kode HP dan kode undangan hanya dikirim ke admin.
+- Kode dibuat acak (tanpa huruf mirip seperti 0/O, 1/I), percobaan kode dibatasi per IP.
+- Lokasi hanya diambil saat tombol ditekan, hanya jika diizinkan di HP orang tua, dan hanya terlihat oleh keluarganya.
+
+## API
+
+| Method | Path | Peran | Fungsi |
+| --- | --- | --- | --- |
+| POST | `/api/auth/daftar` | publik | daftarkan keluarga, jadi admin |
+| POST | `/api/auth/gabung` | publik | masuk dengan kode undangan, jadi pemantau |
+| POST | `/api/auth/hubungkan` | publik | hubungkan HP orang tua dengan kode HP |
+| POST | `/api/auth/keluar` | anggota | keluar dari perangkat ini |
+| GET | `/api/dashboard?lansia=` | anggota | data dashboard (peran, keluarga, lansia, anggota, kabar, lokasi terakhir) |
+| GET | `/api/ringkasan?lansia=` | anggota | Ringkasan AI |
+| POST | `/api/assistant` | anggota | tanya Asisten AI tentang satu lansia |
+| POST | `/api/lansia` | admin | tambah orang tua |
+| DELETE | `/api/lansia/:id` | admin | hapus orang tua |
+| POST | `/api/lansia/:id/putus` | admin | putuskan HP, buat kode baru |
+| PATCH | `/api/anggota/:id` | admin | ubah peran (ADMIN/PEMANTAU) |
+| DELETE | `/api/anggota/:id` | admin, atau diri sendiri | keluarkan anggota |
+| POST | `/api/record` | lansia | kirim Saya Aman / Darurat (+ lokasi) |
+| POST | `/api/ai` | lansia | kirim pesan suara (WAV) untuk triase AI (+ lokasi) |
+| GET | `/api/saya`, `/api/saya/sapa` | lansia | keadaan HP lansia dan pesan maskot |
 
 ## Struktur
 
 ```
 docs/               PRD dan dokumentasi Supabase
-design/             logo dan palet warna (sumber aset, tidak dipakai kode)
-prisma/             schema.prisma, setup.sql (DDL + RLS), seed.js
-src/app/            rute dan route handler tipis (/api/record, /api/ai, /api/assistant)
-src/features/       UI per fitur (lansia, pengawas, masuk)
-src/components/     komponen bersama
-src/services/       logika bisnis (record, triase, asisten)
+design/             logo dan palet warna (sumber aset)
+prisma/             schema.prisma, setup.sql, sql/ (migrasi manual), seed.js
+src/app/            halaman dan route handler tipis
+src/features/       UI per fitur: lansia (app HP), pengawas (dashboard), masuk (daftar/gabung/hubungkan)
+src/components/     komponen bersama (Mascot, ShareCode, StatusBadge, Wordmark)
+src/services/       logika bisnis (household, record, triage, mascot, assistant, demo)
 src/hooks/          useRecorder (rekam dan ubah ke WAV)
-src/lib/            db, orca, konstanta, format
+src/lib/            db, orca, session, auth, codes, geo, lokasi, format, dll.
+src/proxy.js        aturan akses halaman berdasarkan sesi
 public/sw.js        service worker (cache aplikasi, offline)
 ```
 
-Dokumentasi: `docs/` (PRD, Supabase). Aset desain (logo, palet): `design/`. Catatan untuk asisten kode: `CLAUDE.md`.
+Catatan untuk asisten kode: `CLAUDE.md`.

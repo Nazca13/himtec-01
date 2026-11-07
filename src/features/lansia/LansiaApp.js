@@ -16,6 +16,7 @@ import {
 import Mascot from '@/components/ui/Mascot';
 import { TIPE_INPUT } from '@/lib/constants';
 import { useRecorder } from '@/hooks/useRecorder';
+import { lokasiUntukKirim, panaskanLokasi } from '@/lib/geo';
 import { kirimSuara, kirimTombol } from './api';
 import styles from './LansiaApp.module.css';
 
@@ -50,13 +51,14 @@ export default function LansiaApp() {
     try {
       const d = await (await fetch('/api/saya', { cache: 'no-store' })).json();
       if (d.role === 'lansia') setInfo({ nama: d.namaLansia, streak: d.streak, sudahHariIni: d.sudahHariIni, sapaan: d.sapaan });
-      const s = await fetch('/api/lansia/sapa', { cache: 'no-store' });
+      const s = await fetch('/api/saya/sapa', { cache: 'no-store' });
       if (s.ok) setPesan((await s.json()).pesan);
     } catch {}
   }, []);
 
   useEffect(() => {
     const t = setTimeout(muat, 0);
+    panaskanLokasi(); // lokasi siap sebelum tombol ditekan (jika izin sudah ada)
     return () => clearTimeout(t);
   }, [muat]);
 
@@ -75,7 +77,8 @@ export default function LansiaApp() {
   const finishRecording = useCallback(async () => {
     setPhase('sending');
     try {
-      const { record } = await kirimSuara(await stop());
+      const [audio, lokasi] = await Promise.all([stop(), lokasiUntukKirim()]);
+      const { record } = await kirimSuara(audio, lokasi);
       selesai(TIPE_INPUT.VOICE, record);
     } catch (err) {
       fail('Pesan suara belum terkirim. Coba lagi.', err);
@@ -111,7 +114,7 @@ export default function LansiaApp() {
   const pressButton = async (tipe) => {
     setPhase('sending');
     try {
-      await kirimTombol(tipe);
+      await kirimTombol(tipe, await lokasiUntukKirim());
       selesai(tipe);
     } catch (err) {
       fail('Pesan belum terkirim. Periksa internet, lalu coba lagi.', err);

@@ -10,33 +10,66 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Satu grup keluarga = satu lansia yang dipantau oleh beberapa anggota keluarga.
-// HP lansia dan HP keluarga dihubungkan lewat dua kode terpisah.
+// Relasi:
+//   Household 1 --- n Member      (anggota keluarga: ADMIN mengelola, PEMANTAU hanya melihat)
+//   Household 1 --- n Lansia      (orang tua yang dipantau; HP-nya dihubungkan lewat kodePairing)
+//   Lansia    1 --- n DailyRecord (kabar dari HP lansia)
+// Menghapus keluarga menghapus anggota, lansia, dan log-nya (cascade).
+
 model Household {
-  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  namaLansia        String    @map("nama_lansia") @db.VarChar(60)
-  kodeLansia        String    @unique @map("kode_lansia") @db.VarChar(12) // dipakai di HP lansia
-  kodeKeluarga      String    @unique @map("kode_keluarga") @db.VarChar(12) // dipakai untuk mengundang keluarga
-  lansiaVersion     Int       @default(1) @map("lansia_version") // dinaikkan saat HP lansia diputus
-  lansiaTerhubungAt DateTime? @map("lansia_terhubung_at") @db.Timestamptz
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  records           DailyRecord[]
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nama         String   @db.VarChar(60) // mis. "Keluarga Budi"
+  kodeUndangan String   @unique @map("kode_undangan") @db.VarChar(12) // untuk bergabung sebagai pemantau
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  members      Member[]
+  lansia       Lansia[]
 
   @@map("households")
 }
 
-model DailyRecord {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  // Nullable hanya agar baris lama (sebelum ada grup) tidak perlu dihapus; semua query memfilter household.
-  householdId  String?   @map("household_id") @db.Uuid
-  household    Household? @relation(fields: [householdId], references: [id], onDelete: Cascade)
-  tipeInput    String    @map("tipe_input") @db.VarChar(50)
-  statusBahaya String    @default("HIJAU") @map("status_bahaya") @db.VarChar(20)
-  rawData      String?   @map("raw_data") @db.Text
-  aiAnalysis   Json?     @map("ai_analysis") @db.JsonB
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+model Member {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  householdId String    @map("household_id") @db.Uuid
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  nama        String    @db.VarChar(40)
+  role        String    @default("PEMANTAU") @db.VarChar(10) // "ADMIN" | "PEMANTAU"
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
-  @@index([householdId, createdAt(sort: Desc)])
+  @@index([householdId])
+  @@map("members")
+}
+
+model Lansia {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  householdId   String        @map("household_id") @db.Uuid
+  household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  nama          String        @db.VarChar(60)
+  kodePairing   String        @unique @map("kode_pairing") @db.VarChar(12) // dimasukkan di HP lansia
+  deviceVersion Int           @default(1) @map("device_version") // naik saat HP diputus: sesi lama tidak berlaku
+  terhubungAt   DateTime?     @map("terhubung_at") @db.Timestamptz
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  records       DailyRecord[]
+
+  @@index([householdId])
+  @@map("lansia")
+}
+
+model DailyRecord {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // Nullable hanya untuk baris lama sebelum ada grup; semua query memfilter lansiaId.
+  lansiaId     String?  @map("lansia_id") @db.Uuid
+  lansia       Lansia?  @relation(fields: [lansiaId], references: [id], onDelete: Cascade)
+  tipeInput    String   @map("tipe_input") @db.VarChar(50) // TOMBOL_AMAN | TOMBOL_DARURAT | VOICE_NOTE
+  statusBahaya String   @default("HIJAU") @map("status_bahaya") @db.VarChar(20) // HIJAU | KUNING | MERAH
+  rawData      String?  @map("raw_data") @db.Text
+  aiAnalysis   Json?    @map("ai_analysis") @db.JsonB // transkrip, gejala, ringkasan
+  // Lokasi HP saat tombol ditekan; null jika izin lokasi tidak diberikan.
+  latitude     Float?   @db.DoublePrecision
+  longitude    Float?   @db.DoublePrecision
+  akurasiMeter Float?   @map("akurasi_meter") @db.Real
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([lansiaId, createdAt(sort: Desc)])
   @@index([statusBahaya])
   @@map("daily_records")
 }

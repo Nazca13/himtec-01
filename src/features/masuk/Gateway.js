@@ -1,58 +1,74 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { PiArrowRightBold, PiHandHeartFill, PiPlusCircleFill, PiUsersThreeFill } from 'react-icons/pi';
+import { PiArrowRightBold, PiCrownFill, PiEyeFill, PiHandHeartFill } from 'react-icons/pi';
+import Mascot from '@/components/ui/Mascot';
+import Wordmark from '@/components/ui/Wordmark';
 import styles from './Gateway.module.css';
 
 const step = (i) => ({ '--i': i });
 
-const PILIHAN = [
+// Tiga peran. Urutan = urutan alur: admin mendaftar dulu, lalu HP orang tua, lalu keluarga lain.
+const PERAN = [
   {
-    grup: 'Saya keluarga yang memantau',
-    items: [
-      { href: '/buat', Icon: PiPlusCircleFill, tone: styles.sky, judul: 'Buat grup pantau', desc: 'Langkah pertama. Anda akan mendapat kode untuk HP nenek atau kakek.' },
-      { href: '/gabung', Icon: PiUsersThreeFill, tone: styles.sky, judul: 'Gabung dengan kode keluarga', desc: 'Sudah ada anggota keluarga yang membuat grup.' },
-    ],
+    href: '/daftar',
+    Icon: PiCrownFill,
+    peran: 'Admin',
+    judul: 'Daftarkan keluarga',
+    desc: 'Untuk anak/pengurus. Tambah orang tua, bagikan kode, atur anggota.',
   },
   {
-    grup: 'Ini HP nenek atau kakek',
-    items: [
-      { href: '/hubungkan', Icon: PiHandHeartFill, tone: styles.teal, judul: 'Hubungkan HP ini', desc: 'Masukkan kode dari keluarga, atau buka link yang dikirim lewat WhatsApp.' },
-    ],
+    href: '/hubungkan',
+    Icon: PiHandHeartFill,
+    peran: 'Lansia',
+    judul: 'Hubungkan HP orang tua',
+    desc: 'Buka di HP nenek atau kakek. Masukkan kode dari admin, cukup sekali.',
+    lansia: true,
+  },
+  {
+    href: '/gabung',
+    Icon: PiEyeFill,
+    peran: 'Pemantau',
+    judul: 'Masuk dengan kode undangan',
+    desc: 'Untuk anggota keluarga lain. Ikut melihat kabar dan bertanya ke AI.',
   },
 ];
 
 const CARA = [
-  'Keluarga membuat grup dan mendapat kode.',
-  'Kode dimasukkan di HP nenek atau kakek, cukup sekali.',
-  'Nenek atau kakek menekan tombol, keluarga langsung melihatnya.',
+  'Admin mendaftarkan keluarga dan orang tua, lalu mendapat kode.',
+  'Kode HP dibuka di HP orang tua (lewat link WhatsApp), cukup sekali.',
+  'Orang tua menekan tombol. Admin dan pemantau langsung melihatnya di dashboard.',
 ];
 
 // Halaman pertama untuk perangkat tanpa sesi. Perangkat yang sudah masuk dialihkan oleh src/proxy.js.
 export default function Gateway() {
   return (
     <main className={styles.page}>
-      <div className={`${styles.rise} ${styles.logoWrap}`} style={step(0)}>
-        <Image src="/logo.png" width={720} height={720} alt="SAPA, Sistem Asisten Pantau Aktif" className={styles.logo} priority />
-      </div>
+      <header className={styles.hero}>
+        <Wordmark />
+        <h1 className={`${styles.rise} ${styles.headline}`} style={step(0)}>
+          Pantau orang tua dari jauh, tanpa membuat mereka repot.
+        </h1>
+        <div className={styles.heroRow}>
+          <p className={`${styles.rise} ${styles.sub}`} style={step(1)}>
+            Nenek atau kakek cukup menekan satu tombol. Keluarga langsung tahu kondisinya.
+          </p>
+          <span className={`${styles.rise} ${styles.mascot}`} style={step(2)}>
+            <Mascot size={120} priority />
+          </span>
+        </div>
+      </header>
 
-      <h1 className={`${styles.rise} ${styles.headline}`} style={step(1)}>
-        Pantau orang tua dari jauh, tanpa membuat mereka repot.
-      </h1>
-      <p className={`${styles.rise} ${styles.sub}`} style={step(2)}>
-        Nenek atau kakek cukup menekan satu tombol. Keluarga langsung tahu kondisinya.
-      </p>
-
-      {PILIHAN.map(({ grup, items }, g) => (
-        <section key={grup} className={`${styles.rise} ${styles.group}`} style={step(3 + g)} aria-label={grup}>
-          <h2>{grup}</h2>
+      <div className={styles.body}>
+        <section className={`${styles.rise} ${styles.group}`} style={step(3)} aria-labelledby="peran">
+          <h2 id="peran">Pilih peran Anda</h2>
           <ul>
-            {items.map(({ href, Icon, tone, judul, desc }) => (
+            {PERAN.map(({ href, Icon, peran, judul, desc, lansia }) => (
               <li key={href}>
-                <Link href={href} className={`${styles.card} ${tone}`}>
+                <Link href={href} className={`${styles.card} ${lansia ? styles.lansia : ''}`}>
                   <span className={styles.icon}>
                     <Icon aria-hidden="true" />
                   </span>
                   <span className={styles.text}>
+                    <span className={styles.role}>{peran}</span>
                     <strong>{judul}</strong>
                     <span>{desc}</span>
                   </span>
@@ -62,20 +78,23 @@ export default function Gateway() {
             ))}
           </ul>
         </section>
-      ))}
 
-      <section className={`${styles.rise} ${styles.cara}`} style={step(5)} aria-labelledby="cara">
-        <h2 id="cara">Cara kerjanya</h2>
-        <ol>
-          {CARA.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ol>
-      </section>
+        <section className={`${styles.rise} ${styles.cara}`} style={step(5)} aria-labelledby="cara">
+          <h2 id="cara">Cara kerjanya</h2>
+          <ol>
+            {CARA.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ol>
+        </section>
 
-      <p className={`${styles.rise} ${styles.demo}`} style={step(6)}>
-        Juri atau ingin mencoba cepat? <Link href="/demo">Buka mode demo</Link>
-      </p>
+        <p className={`${styles.rise} ${styles.demo}`} style={step(6)}>
+          Masih bingung? <Link href="/panduan">Baca panduan lengkap</Link>
+          <br />
+          Juri atau ingin mencoba cepat? {/* <a>, bukan <Link>: /demo memasang cookie, tidak boleh di-prefetch */}
+          <a href="/demo">Buka mode demo</a>
+        </p>
+      </div>
     </main>
   );
 }

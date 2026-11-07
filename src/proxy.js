@@ -4,7 +4,7 @@ import { SESSION_COOKIE, verifySession } from '@/lib/session';
 // Aturan akses halaman berdasarkan sesi (cookie bertanda tangan). Data tetap dijaga lagi di tiap API.
 //   /lansia       : butuh sesi lansia, kalau tidak ke /hubungkan (konteks app lansia)
 //   /pengawas/*   : butuh sesi keluarga, kalau tidak ke /
-//   /, /buat, /gabung : yang sudah punya sesi langsung masuk ke tampilannya
+//   /, /daftar, /gabung : yang sudah punya sesi keluarga langsung masuk ke dashboard
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
   const read = (role) => verifySession(request.cookies.get(SESSION_COOKIE[role])?.value).catch(() => null);
@@ -19,4 +19,4 @@ export async function proxy(request) {
   return NextResponse.next();
 }
 
-export const config = { matcher: ['/', '/buat', '/gabung', '/hubungkan', '/lansia', '/pengawas/:path*'] };
+export const config = { matcher: ['/', '/daftar', '/gabung', '/hubungkan', '/lansia', '/pengawas/:path*'] };

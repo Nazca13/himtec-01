@@ -15,6 +15,7 @@ export default function GabungGrup({ kodeAwal = '' }) {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (!nama.trim() || !kode.trim()) return setError('Isi nama Anda dan kode undangan dulu.');
     setBusy(true);
     setError('');
     const { ok, data } = await postJson('/api/auth/gabung', { nama, kode });
@@ -24,14 +25,14 @@ export default function GabungGrup({ kodeAwal = '' }) {
   };
 
   return (
-    <AuthLayout title="Gabung ke grup keluarga" lead="Minta kode keluarga dari anggota yang membuat grup. Kodenya ada di menu Keluarga.">
+    <AuthLayout title="Masuk sebagai pemantau" lead="Minta kode undangan ke admin keluarga (ada di menu Keluarga miliknya). Anda bisa melihat kabar; admin bisa menaikkan Anda menjadi admin.">
       <form className={styles.form} onSubmit={submit}>
         <div className={styles.field}>
           <label htmlFor="nama">Nama Anda</label>
           <input id="nama" className={styles.input} value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Mis. Sari" maxLength={40} autoComplete="given-name" required />
         </div>
         <div className={styles.field}>
-          <label htmlFor="kode">Kode keluarga</label>
+          <label htmlFor="kode">Kode undangan</label>
           <input id="kode" className={`${styles.input} ${styles.code}`} value={kode} onChange={(e) => setKode(e.target.value)} maxLength={12} autoCapitalize="characters" autoComplete="off" spellCheck={false} required />
         </div>
         {error && (
@@ -39,8 +40,8 @@ export default function GabungGrup({ kodeAwal = '' }) {
             {error}
           </p>
         )}
-        <button className={styles.submit} disabled={busy || !nama.trim() || !kode.trim()}>
-          {busy ? 'Bergabung' : 'Gabung'}
+        <button className={styles.submit} disabled={busy}>
+          {busy ? 'Membuka dashboard' : 'Buka dashboard'}
         </button>
       </form>
     </AuthLayout>

@@ -76,6 +76,6 @@
   align-items: center;
   gap: 8px;
   min-height: 44px;
-  color: var(--sky);
+  color: var(--brand);
   font-weight: 800;
 }

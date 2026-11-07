@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import * as m from 'motion/react-m';
 import { PiPaperPlaneRightFill } from 'react-icons/pi';
 import Mascot from '@/components/ui/Mascot';
+import LansiaSwitcher from './LansiaSwitcher';
+import { useRecords } from './RecordsProvider';
 import styles from './AsistenView.module.css';
 
 const SARAN = [
@@ -13,6 +15,7 @@ const SARAN = [
 ];
 
 export default function AsistenView() {
+  const { dipilih } = useRecords();
   const [question, setQuestion] = useState('');
   const [thread, setThread] = useState([]); // { role: 'user' | 'ai' | 'error', text }
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,7 @@ export default function AsistenView() {
       const res = await fetch('/api/assistant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q }),
+        body: JSON.stringify({ question: q, lansiaId: dipilih?.id }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -46,15 +49,18 @@ export default function AsistenView() {
 
   return (
     <section className={styles.chat} aria-labelledby="judul-asisten">
-      <h1 id="judul-asisten" className={styles.title}>
-        Asisten AI
-      </h1>
+      <div className={styles.titleRow}>
+        <h1 id="judul-asisten" className={styles.title}>
+          Asisten AI
+        </h1>
+        <LansiaSwitcher />
+      </div>
 
       <div className={styles.thread} aria-live="polite">
         {!thread.length && (
           <div className={styles.intro}>
             <Mascot size={84} />
-            <p>Tanya apa saja soal kondisi lansia. Jawaban dibuat dari log aktivitas 7 hari terakhir.</p>
+            <p>Tanya apa saja soal kondisi {dipilih?.nama ?? 'orang tua'}. Jawaban dibuat dari kabar 7 hari terakhir.</p>
             <ul className={styles.chips}>
               {SARAN.map((s) => (
                 <li key={s}>

@@ -22,7 +22,7 @@ const NAV = [
 
 export default function PengawasShell({ children }) {
   const pathname = usePathname();
-  const { error, household, me } = useRecords();
+  const { error, household, me, dipilih } = useRecords();
 
   return (
     <div className={styles.shell}>
@@ -45,7 +45,9 @@ export default function PengawasShell({ children }) {
         {household && (
           <p className={styles.who}>
             <strong>{me?.nama}</strong>
-            <span>memantau {household.namaLansia}</span>
+            <span>{me?.role === 'ADMIN' ? 'Admin' : 'Pemantau'}</span>
+            <span>{household.nama}</span>
+            {dipilih && <span>Melihat {dipilih.nama}</span>}
           </p>
         )}
       </aside>

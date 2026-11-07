@@ -4,6 +4,9 @@ const nextConfig = {
   experimental: {
     agentFeedback: true,
   },
+  // Dev dari HP lewat IP jaringan lokal (mis. http://192.168.1.5:3000). Tanpa ini Next memblokir
+  // skrip dev dari origin lain: halaman tampil tetapi tombol tidak bereaksi.
+  allowedDevOrigins: ['192.168.*.*', '10.*.*.*', '172.*.*.*', '*.local'],
   cacheComponents: true,
   partialPrefetching: true,
   async headers() {
@@ -15,8 +18,8 @@ const nextConfig = {
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' }, // iframe hanya dari situs sendiri (mode demo)
           { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          // Mikrofon hanya untuk halaman sendiri; kamera dan lokasi tidak dipakai.
-          { key: 'Permissions-Policy', value: 'microphone=(self), camera=(), geolocation=()' },
+          // Mikrofon (pesan suara) dan lokasi (lokasi terakhir) hanya untuk situs sendiri; kamera tidak dipakai.
+          { key: 'Permissions-Policy', value: 'microphone=(self), geolocation=(self), camera=()' },
         ],
       },
       {

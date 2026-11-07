@@ -1,17 +1,21 @@
 import { connection, NextResponse } from 'next/server';
-import { AuthError, requireSession, unauthorized } from '@/lib/auth';
+import { authResponse, requireMember } from '@/lib/auth';
+import { lansiaMilik } from '@/services/household.service';
 import { listRecords } from '@/services/record.service';
 import { ringkasanKeluarga } from '@/services/mascot.service';
 
-// Widget AI di dashboard keluarga: ringkasan kondisi terbaru, dibuat ulang hanya saat ada log baru.
+// Widget AI di dashboard: ringkasan kondisi satu lansia, dibuat ulang hanya saat ada log baru.
 export async function GET(request) {
   await connection(); // tandai dinamis: handler ini membaca cookie sesi
   try {
-    const { household } = await requireSession(request, 'pengawas');
-    const records = await listRecords({ householdId: household.id, limit: 30 });
-    return NextResponse.json(await ringkasanKeluarga({ household, records }));
+    const { household } = await requireMember(request);
+    const lansia = await lansiaMilik(household.id, new URL(request.url).searchParams.get('lansia'));
+    if (!lansia) return NextResponse.json({ error: 'Lansia tidak ditemukan.' }, { status: 404 });
+    const records = await listRecords({ lansiaId: lansia.id, limit: 30 });
+    return NextResponse.json(await ringkasanKeluarga({ lansia, records }));
   } catch (error) {
-    if (error instanceof AuthError) return unauthorized();
+    const auth = authResponse(error);
+    if (auth) return auth;
     console.error('GET /api/ringkasan:', error);
     return NextResponse.json({ error: 'Gagal membuat ringkasan.' }, { status: 500 });
   }

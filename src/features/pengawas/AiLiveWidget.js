@@ -9,15 +9,17 @@ import styles from './AiLiveWidget.module.css';
 
 // Widget AI live: ringkasan kondisi dibuat ulang otomatis setiap ada kabar baru (id log terbaru berubah).
 export default function AiLiveWidget() {
-  const { records, household } = useRecords();
-  const ready = records !== null;
-  const latestId = records?.[0]?.id ?? 'kosong';
+  const { records, dipilih } = useRecords();
+  const ready = records !== null && Boolean(dipilih);
+  const lansiaId = dipilih?.id ?? '';
+  // Kunci: lansia terpilih + log terbarunya. Ganti lansia atau ada kabar baru = ringkasan baru.
+  const latestId = `${lansiaId}:${records?.[0]?.id ?? 'kosong'}`;
   const [hasil, setHasil] = useState({ untuk: null, teks: '', sumber: '' });
 
   useEffect(() => {
     if (!ready) return;
     let alive = true;
-    fetch('/api/ringkasan', { cache: 'no-store' })
+    fetch(`/api/ringkasan?lansia=${encodeURIComponent(lansiaId)}`, { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => alive && setHasil({ untuk: latestId, teks: d.ringkasan, sumber: d.sumber }))
       .catch(() => alive && setHasil({ untuk: latestId, teks: 'Ringkasan belum bisa dimuat. Coba lagi sebentar.', sumber: 'lokal' }));
@@ -25,7 +27,7 @@ export default function AiLiveWidget() {
       alive = false;
     };
     // hanya bergantung pada id log terbaru: polling 5 detik tidak memicu ringkasan baru
-  }, [latestId, ready]);
+  }, [latestId, ready, lansiaId]);
 
   const memuat = hasil.untuk !== latestId;
 
@@ -55,7 +57,7 @@ export default function AiLiveWidget() {
       )}
 
       <Link href="/pengawas/asisten" className={styles.more}>
-        Tanya soal {household?.namaLansia ?? 'lansia'}
+        Tanya soal {dipilih?.nama ?? 'lansia'}
         <PiArrowRightBold aria-hidden="true" />
       </Link>
     </section>

@@ -28,8 +28,9 @@
   justify-content: center;
   min-height: 52px;
   padding: 0 28px;
-  border-radius: 999px;
-  background: var(--ink);
+  border-radius: 20px;
+  background: var(--brand-strong);
   color: var(--paper);
   font-weight: 800;
+  box-shadow: 0 5px 0 var(--brand-strong-deep);
 }

@@ -7,20 +7,20 @@ const STATUS_VALID = new Set(Object.values(STATUS));
 
 export class ValidationError extends Error {}
 
-export async function createRecord({ householdId, tipeInput, statusBahaya, aiAnalysis }) {
-  if (!householdId) throw new ValidationError('householdId wajib');
+export async function createRecord({ lansiaId, tipeInput, statusBahaya, aiAnalysis, lokasi = {} }) {
+  if (!lansiaId) throw new ValidationError('lansiaId wajib');
   if (!TIPE_VALID.has(tipeInput)) throw new ValidationError('tipeInput tidak valid');
   if (!STATUS_VALID.has(statusBahaya)) throw new ValidationError('statusBahaya tidak valid');
 
   return db.dailyRecord.create({
-    data: { householdId, tipeInput, statusBahaya, aiAnalysis: aiAnalysis ?? undefined },
+    data: { lansiaId, tipeInput, statusBahaya, aiAnalysis: aiAnalysis ?? undefined, ...lokasi },
   });
 }
 
-// householdId wajib: tidak ada query log yang boleh lintas grup.
-export function listRecords({ householdId, limit = 50, since }) {
+// lansiaId wajib: tidak ada query log yang boleh lintas lansia/keluarga.
+export function listRecords({ lansiaId, limit = 50, since }) {
   return db.dailyRecord.findMany({
-    where: { householdId, ...(since && { createdAt: { gte: since } }) },
+    where: { lansiaId, ...(since && { createdAt: { gte: since } }) },
     orderBy: { createdAt: 'desc' },
     take: Math.min(limit, 200),
   });
@@ -31,9 +31,9 @@ const URUT_STATUS = { HIJAU: 0, KUNING: 1, MERAH: 2 };
 
 // Ringkasan untuk HP lansia: sudah memberi kabar hari ini? berapa hari berturut-turut ada kabar?
 // Hari dihitung menurut WIB. Streak tidak putus sampai hari ini berakhir tanpa kabar.
-export async function ringkasanHarian(householdId) {
+export async function ringkasanHarian(lansiaId) {
   const rows = await db.dailyRecord.findMany({
-    where: { householdId, createdAt: { gte: new Date(Date.now() - 90 * HARI_MS) } },
+    where: { lansiaId, createdAt: { gte: new Date(Date.now() - 90 * HARI_MS) } },
     select: { createdAt: true, statusBahaya: true },
     orderBy: { createdAt: 'desc' },
   });
@@ -50,3 +50,11 @@ export async function ringkasanHarian(householdId) {
 
   return { sudahHariIni, streak, statusHariIni: sudahHariIni ? statusHariIni : null };
 }
+
+// Lokasi terakhir yang diketahui (kabar terbaru yang membawa koordinat).
+export const lokasiTerakhir = (lansiaId) =>
+  db.dailyRecord.findFirst({
+    where: { lansiaId, latitude: { not: null } },
+    orderBy: { createdAt: 'desc' },
+    select: { latitude: true, longitude: true, akurasiMeter: true, createdAt: true, tipeInput: true },
+  });
