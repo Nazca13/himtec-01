@@ -9,6 +9,7 @@ import {
   PiHouseFill,
   PiSignOutBold,
   PiSirenFill,
+  PiSpeakerSimpleHighFill,
   PiSpeakerSimpleSlashFill,
   PiUsersThreeFill,
   PiWifiSlashBold,
@@ -28,7 +29,7 @@ const NAV = [
 export default function PengawasShell({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { error, household, me, dipilih, alarmActive, stopAlarm } = useRecords();
+  const { error, household, me, dipilih, alarmActive, alarmBlocked, stopAlarm, playAlarmAgain } = useRecords();
 
   const keluarPengawas = async () => {
     if (window.confirm('Keluar dari akun pengawas? Nanti tinggal masukkan kode untuk masuk lagi.')) {
@@ -102,10 +103,18 @@ export default function PengawasShell({ children }) {
                 <strong>Sinyal Darurat:</strong> {dipilih ? `Kondisi ${dipilih.nama} berstatus MERAH!` : 'Ada kondisi lansia berstatus MERAH!'}
               </span>
             </div>
-            <button type="button" className={styles.stopAlarmBtn} onClick={stopAlarm}>
-              <PiSpeakerSimpleSlashFill aria-hidden="true" />
-              <span>Hentikan Sirine</span>
-            </button>
+            <div className={styles.alarmBannerActions}>
+              {alarmBlocked && (
+                <button type="button" className={styles.playAlarmBtn} onClick={playAlarmAgain} title="Nyalakan suara sirine">
+                  <PiSpeakerSimpleHighFill aria-hidden="true" />
+                  <span>Bunyikan Sirine</span>
+                </button>
+              )}
+              <button type="button" className={styles.stopAlarmBtn} onClick={stopAlarm}>
+                <PiSpeakerSimpleSlashFill aria-hidden="true" />
+                <span>Hentikan Sirine</span>
+              </button>
+            </div>
           </div>
         )}
 

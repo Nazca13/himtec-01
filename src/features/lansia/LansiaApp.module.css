@@ -534,6 +534,25 @@
   opacity: 0.9;
 }
 
+.instantBtn {
+  width: min(100%, 380px);
+  min-height: 52px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.instantBtn:active {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(0.97);
+}
+
 .bystander {
   width: min(100%, 420px);
   display: grid;

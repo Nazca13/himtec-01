@@ -36,7 +36,8 @@
 }
 
 .simBtnKejang,
-.simBtnJatuh {
+.simBtnJatuh,
+.simBtnDarurat {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -48,6 +49,13 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.simBtnDarurat {
+  background: var(--merah, #d70015);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(215, 0, 21, 0.3);
 }
 
 .simBtnKejang {

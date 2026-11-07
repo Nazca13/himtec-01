@@ -20,10 +20,10 @@ export default function DemoLayar() {
       </header>
       <div className={styles.stage}>
         <div className={styles.phone}>
-          <iframe data-hp-lansia className={styles.frame} allow="geolocation; microphone" src="/lansia" title="HP nenek (aplikasi lansia)" />
+          <iframe data-hp-lansia className={styles.frame} allow="autoplay; geolocation; microphone" src="/lansia" title="HP nenek (aplikasi lansia)" />
         </div>
         <div className={styles.desk}>
-          <iframe className={styles.frame} src="/pengawas" title="Dashboard keluarga" />
+          <iframe className={styles.frame} allow="autoplay; geolocation; microphone" src="/pengawas" title="Dashboard keluarga" />
         </div>
       </div>
       <p className={styles.small}>

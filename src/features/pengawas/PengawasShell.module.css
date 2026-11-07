@@ -287,6 +287,34 @@
   to { transform: rotate(10deg) scale(1.15); }
 }
 
+.alarmBannerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.playAlarmBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef08a;
+  color: #854d0e;
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  animation: pulseButton 1s infinite alternate;
+}
+
+@keyframes pulseButton {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
 .stopAlarmBtn {
   display: inline-flex;
   align-items: center;
@@ -304,7 +332,8 @@
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.stopAlarmBtn:hover {
+.stopAlarmBtn:hover,
+.playAlarmBtn:hover {
   opacity: 0.92;
   transform: scale(1.03);
 }

@@ -15,6 +15,7 @@ import {
   PiUserFill,
 } from 'react-icons/pi';
 import { useRecords } from './RecordsProvider';
+import { playSiren, stopSiren } from '@/lib/siren';
 import Skeleton from './Skeleton';
 import styles from './PengaturanView.module.css';
 
@@ -57,11 +58,9 @@ export default function PengaturanView() {
 
   const tesBunyiAlarm = () => {
     try {
-      const audio = new Audio('/alert/ambulance-2.mp3');
-      audio.play().catch(() => {});
+      playSiren();
       setTimeout(() => {
-        audio.pause();
-        audio.currentTime = 0;
+        stopSiren();
       }, 3500);
     } catch {}
   };

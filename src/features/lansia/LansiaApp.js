@@ -35,6 +35,7 @@ import { lokasiUntukKirim, panaskanLokasi } from '@/lib/geo';
 import { KELUHAN } from '@/lib/keluhan';
 import { useDeteksiGerak, mintaIzinGerak } from '@/hooks/useDeteksiGerak';
 import { useRecorder } from '@/hooks/useRecorder';
+import { playSiren, stopSiren } from '@/lib/siren';
 import { kirimKabar, kirimSuara } from './api';
 import styles from './LansiaApp.module.css';
 
@@ -192,12 +193,16 @@ export default function LansiaApp() {
     const onMessage = (e) => {
       if (e.origin === window.location.origin && e.data?.sapa === 'simulasi') {
         const s = e.data.sebab === 'JATUH' ? 'JATUH' : 'KEJANG';
-        mulaiPeringatan(s);
+        if (e.data.instan) {
+          kirim({ tipeInput: TIPE_INPUT.OTOMATIS, sebab: s });
+        } else {
+          mulaiPeringatan(s);
+        }
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [mulaiPeringatan]);
+  }, [mulaiPeringatan, kirim]);
 
   const ubahDeteksi = async () => {
     const nyala = !deteksiAktif && (await mintaIzinGerak());
@@ -208,17 +213,22 @@ export default function LansiaApp() {
     if (!deteksiAktif && !nyala) fail('Sensor gerak tidak bisa dipakai di HP atau browser ini.');
   };
 
-  // Getaran HP & hitung mundur 30 detik saat kejang/jatuh terdeteksi
+  // Getaran HP, suara sirine darurat & hitung mundur 30 detik saat kejang/jatuh terdeteksi
   useEffect(() => {
-    if (phase !== 'deteksi') return;
+    if (phase !== 'deteksi') {
+      stopSiren();
+      return;
+    }
     navigator.vibrate?.([400, 200, 400]);
-    bunyi();
+    playSiren();
     const t = setInterval(() => {
       setSisa((s) => s - 1);
       navigator.vibrate?.([400, 200, 400]);
-      bunyi();
     }, 1000);
-    return () => clearInterval(t);
+    return () => {
+      clearInterval(t);
+      stopSiren();
+    };
   }, [phase]);
 
   const otomatisTerkirim = useRef(false);
@@ -516,6 +526,16 @@ export default function LansiaApp() {
                 <p className={styles.alertSub}>Keluarga dihubungi otomatis jika tidak dibatalkan.</p>
                 <m.button whileTap={{ scale: 0.97 }} className={styles.okBtn} onClick={() => setPhase('idle')}>
                   Saya baik-baik saja
+                </m.button>
+                <m.button
+                  whileTap={{ scale: 0.97 }}
+                  className={styles.instantBtn}
+                  onClick={() => {
+                    stopSiren();
+                    kirim({ tipeInput: TIPE_INPUT.OTOMATIS, sebab });
+                  }}
+                >
+                  Hubungi Keluarga Sekarang
                 </m.button>
                 <div className={styles.bystander}>
                   <strong>Untuk orang di sekitar</strong>
