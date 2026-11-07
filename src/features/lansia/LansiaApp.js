@@ -13,6 +13,8 @@ import {
   PiClockCountdownFill,
   PiGearFill,
   PiHeartbeatFill,
+  PiKeyFill,
+  PiLightningFill,
   PiMicrophoneFill,
   PiPhoneCallFill,
   PiPhoneFill,
@@ -23,6 +25,7 @@ import {
   PiSmileyNervousFill,
   PiSpiralBold,
   PiStopFill,
+  PiTextAaBold,
   PiThermometerHotFill,
   PiVibrateFill,
   PiWarningCircleFill,
@@ -365,7 +368,7 @@ export default function LansiaApp() {
           <strong>{info.sudahHariIni ? 'Laporan aman hari ini tercatat' : 'Belum memberi kabar hari ini'}</strong>
           <small>
             {info.sudahHariIni
-              ? `${info.streak > 1 ? `🔥 Rutin ${info.streak} hari! ` : ''}Keluarga sudah tahu kondisi Anda.`
+              ? `${info.streak > 1 ? `Rutin ${info.streak} hari berturut-turut. ` : ''}Keluarga sudah tahu kondisi Anda.`
               : 'Tekan tombol hijau di bawah untuk lapor aman.'}
           </small>
         </div>
@@ -427,7 +430,9 @@ export default function LansiaApp() {
             <strong>Tombol Darurat Kejang</strong>
             <small>Ketuk jika orang tua mengalami kejang</small>
           </span>
-          <span className={styles.quickKejangBadge}>⚡ Darurat</span>
+          <span className={styles.quickKejangBadge}>
+            <PiLightningFill aria-hidden="true" /> Darurat
+          </span>
         </m.button>
 
         <div className={styles.cell}>
@@ -613,7 +618,9 @@ export default function LansiaApp() {
               </div>
 
               <div className={styles.settingGroup}>
-                <label className={styles.settingLabel}>🔤 Ukuran Tulisan</label>
+                <label className={styles.settingLabel}>
+                  <PiTextAaBold aria-hidden="true" /> Ukuran Tulisan
+                </label>
                 <div className={styles.sizePicker}>
                   {[
                     { id: 'normal', label: 'Standar' },
@@ -633,7 +640,9 @@ export default function LansiaApp() {
               </div>
 
               <div className={styles.settingGroup}>
-                <label className={styles.settingLabel}>🔑 Ganti Kode / Sambungkan HP Baru</label>
+                <label className={styles.settingLabel}>
+                  <PiKeyFill aria-hidden="true" /> Ganti Kode / Sambungkan HP Baru
+                </label>
                 <p className={styles.settingHint}>Masukkan kode 6 huruf dari keluarga untuk berganti lansia tanpa instal ulang.</p>
                 <form onSubmit={hubungkanKodeBaru} className={styles.codeForm}>
                   <input

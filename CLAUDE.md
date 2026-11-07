@@ -26,7 +26,7 @@ No test framework is configured. Prisma has no npm script; run `npx prisma gener
 - `src/lib/` shared server utilities (e.g. `db.js`).
 - `prisma/` database schema.
 
-The project is SAPA (see `README.md` for the full role/flow/API reference). Three roles: **ADMIN** and **PEMANTAU** are `Member` rows of a `Household` (family) and use the web dashboard (`/pengawas/*`: Beranda, Riwayat, Asisten AI, Keluarga); **LANSIA** is an elder (`Lansia` row) whose phone is paired once via `/hubungkan?kode=` and runs the PWA (`/lansia`; only that page and `/hubungkan` link `/app.webmanifest`). Admin registers at `/daftar` (creates household + admin + first elder), viewers join at `/gabung` with the invite code, the guide is `/panduan`, `/demo` logs one browser into the seeded demo family as admin + elder side by side.
+The project is SAPA (see `README.md` for the full role/flow/API reference). Three roles: **ADMIN** and **PEMANTAU** are `Member` rows of a `Household` (family) and use the web dashboard (`/pengawas/*`: Pemantauan, Riwayat, Asisten AI, Keluarga, Pengaturan); **LANSIA** is an elder (`Lansia` row) whose phone is paired once via `/hubungkan?kode=` and runs the PWA (`/lansia`; only that page and `/hubungkan` link `/app.webmanifest`). Admin registers at `/daftar` (creates household + admin + first elder), viewers join at `/gabung` with the invite code, the guide is `/panduan`, `/demo` logs one browser into the seeded demo family as admin + elder side by side.
 
 DB relations: Household 1-n Member, Household 1-n Lansia, Lansia 1-n DailyRecord (cascade). DailyRecord carries optional `latitude/longitude/akurasiMeter` (sent by the elder phone, validated in `lib/lokasi.js`). Old databases are migrated by the SQL files in `prisma/sql/`.
 

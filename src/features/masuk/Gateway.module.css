@@ -119,10 +119,10 @@
   min-width: 0;
 }
 
+/* lencana peran: gaya dari komponen RolePill */
 .role {
-  color: var(--tint);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
 }
 
 .text strong {
@@ -189,4 +189,18 @@
   align-items: center;
   color: var(--tint);
   font-weight: 500;
+}
+
+/* Judul grup pintu masuk: tegas, bukan label kecil */
+.groupTitle {
+  margin: 0 4px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.groupNote {
+  margin: 2px 4px 10px;
+  color: var(--mute);
+  font-size: 0.9375rem;
 }

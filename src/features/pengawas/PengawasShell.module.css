@@ -230,8 +230,13 @@
     font-size: 0.875rem;
   }
 
-  .who span {
+  .whoMeta {
     color: var(--mute);
+  }
+
+  .whoRole {
+    justify-self: start;
+    margin: 3px 0;
   }
 
   .main {

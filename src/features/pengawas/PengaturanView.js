@@ -1,5 +1,6 @@
 'use client';
 
+import RolePill from '@/components/ui/RolePill';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -243,7 +244,7 @@ export default function PengaturanView() {
             </div>
             <div className={styles.profileItem}>
               <span>Peran</span>
-              <strong>{me.role === 'ADMIN' ? '👑 Admin Keluarga' : '👁️ Pemantau'}</strong>
+              <RolePill role={me.role} />
             </div>
             <div className={styles.profileItem}>
               <span>Nama Keluarga</span>

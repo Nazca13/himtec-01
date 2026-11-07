@@ -166,3 +166,9 @@
   margin-bottom: 2px;
   opacity: 0.8;
 }
+
+.transkripLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

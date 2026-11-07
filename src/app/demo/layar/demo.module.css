@@ -136,3 +136,26 @@
     max-width: none;
   }
 }
+
+.simBtnKejang,
+.simBtnDarurat,
+.simBtnJatuh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.col {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+
+.cap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mute);
+  font-size: 0.9375rem;
+}

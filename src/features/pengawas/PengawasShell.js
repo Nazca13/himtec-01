@@ -6,7 +6,7 @@ import {
   PiChatCircleDotsFill,
   PiClockCounterClockwiseFill,
   PiGearFill,
-  PiHouseFill,
+  PiHeartbeatFill,
   PiSignOutBold,
   PiSirenFill,
   PiSpeakerSimpleHighFill,
@@ -15,11 +15,12 @@ import {
   PiWifiSlashBold,
 } from 'react-icons/pi';
 import Wordmark from '@/components/ui/Wordmark';
+import RolePill from '@/components/ui/RolePill';
 import { useRecords } from './RecordsProvider';
 import styles from './PengawasShell.module.css';
 
 const NAV = [
-  { href: '/pengawas', label: 'Beranda', Icon: PiHouseFill },
+  { href: '/pengawas', label: 'Pemantauan', Icon: PiHeartbeatFill },
   { href: '/pengawas/riwayat', label: 'Riwayat', Icon: PiClockCounterClockwiseFill },
   { href: '/pengawas/asisten', label: 'Asisten AI', Icon: PiChatCircleDotsFill },
   { href: '/pengawas/keluarga', label: 'Keluarga', Icon: PiUsersThreeFill },
@@ -60,9 +61,11 @@ export default function PengawasShell({ children }) {
         {household && (
           <div className={styles.who}>
             <strong>{me?.nama}</strong>
-            <span>{me?.role === 'ADMIN' ? 'Admin' : 'Pemantau'}</span>
-            <span>{household.nama}</span>
-            {dipilih && <span>Melihat {dipilih.nama}</span>}
+            <div className={styles.whoRole}>
+              <RolePill role={me?.role} />
+            </div>
+            <span className={styles.whoMeta}>{household.nama}</span>
+            {dipilih && <span className={styles.whoMeta}>Melihat {dipilih.nama}</span>}
             <button
               type="button"
               className={styles.sideLogoutBtn}
@@ -79,6 +82,7 @@ export default function PengawasShell({ children }) {
         <header className={styles.top}>
           <Wordmark />
           <div className={styles.topRight}>
+            {me && <RolePill role={me.role} />}
             <span className={`${styles.live} ${error ? styles.off : ''}`} role="status">
               {error ? <PiWifiSlashBold aria-hidden="true" /> : <span className={styles.pulse} aria-hidden="true" />}
               {error ? 'Terputus' : 'Langsung'}

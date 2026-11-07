@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { PiPauseFill, PiPlayFill, PiSpinnerGapBold } from 'react-icons/pi';
+import { PiMicrophoneFill, PiPauseFill, PiPlayFill, PiSpinnerGapBold } from 'react-icons/pi';
 import styles from './AudioPlayer.module.css';
 
 // 24 bar visual gelombang suara (seperti pesan suara iOS/WA)
@@ -178,7 +178,9 @@ export default function AudioPlayer({ record, compact = false }) {
 
       {transkrip && (
         <div className={styles.transkripBox}>
-          <span className={styles.transkripLabel}>🗣️ Kata lansia:</span>
+          <span className={styles.transkripLabel}>
+            <PiMicrophoneFill aria-hidden="true" /> Kata lansia:
+          </span>
           &ldquo;{transkrip}&rdquo;
         </div>
       )}

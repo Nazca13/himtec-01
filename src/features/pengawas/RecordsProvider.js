@@ -78,14 +78,19 @@ export default function RecordsProvider({ children }) {
 
   useEffect(() => {
     let alive = true;
+    let sedangMemuat = false; // jaringan lambat: jangan kirim permintaan baru sebelum yang lama selesai
+    let urutan = 0; // hanya jawaban permintaan terbaru yang dipakai (mis. setelah ganti orang tua)
     dipilihRef.current = bacaIngatan();
-    const load = async () => {
-      if (document.hidden) return;
+    const load = async ({ paksa = false } = {}) => {
+      if (!paksa && (document.hidden || sedangMemuat)) return;
+      const saya = ++urutan;
+      sedangMemuat = true;
       try {
         const res = await fetch(`/api/dashboard?lansia=${encodeURIComponent(dipilihRef.current ?? '')}`, { cache: 'no-store' });
         if (res.status === 401) return void router.replace('/'); // sesi habis atau dikeluarkan admin
         if (!res.ok) throw new Error();
         const d = await res.json();
+        if (saya !== urutan) return; // sudah ada permintaan yang lebih baru
         dipilihRef.current = d.dipilihId;
         if (alive) setState({ ...d, error: false, now: Date.now() });
 
@@ -104,26 +109,28 @@ export default function RecordsProvider({ children }) {
           stopSiren();
         }
       } catch {
-        if (alive) setState((s) => ({ ...s, error: true }));
+        if (alive && saya === urutan) setState((s) => ({ ...s, error: true }));
+      } finally {
+        if (saya === urutan) sedangMemuat = false;
       }
     };
     loadRef.current = load;
     load();
     const intervalMs = (typeof window !== 'undefined' && Number(localStorage.getItem('sapa.polling_rate'))) || POLL_MS;
-    const timer = setInterval(load, intervalMs);
+    const timer = setInterval(() => load(), intervalMs);
     return () => {
       alive = false;
       clearInterval(timer);
     };
   }, [router]);
 
-  const refresh = useCallback(() => loadRef.current(), []);
+  const refresh = useCallback(() => loadRef.current({ paksa: true }), []);
   const pilih = useCallback((id) => {
     stopSiren();
     dipilihRef.current = id;
     ingat(id);
     setState((s) => ({ ...s, dipilihId: id, records: null })); // tampilkan kerangka sampai log lansia baru tiba
-    loadRef.current();
+    loadRef.current({ paksa: true });
   }, []);
 
   const dipilih = state.lansia.find((l) => l.id === state.dipilihId) ?? null;
