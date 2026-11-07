@@ -20,10 +20,10 @@
   --sky-deep: var(--brand-strong);
   --ice: #eaf3fc; /* tint sangat muda */
 
-  /* Warna status: versi aksesibel warna sistem Apple, teks putih di atasnya >= 4,5:1 */
-  --hijau: #248a3d;
-  --kuning: #c93400;
-  --merah: #d70015;
+  /* Warna status: HIJAU (Aman), KUNING (Keluhan/Perlu Perhatian), MERAH (Darurat/Bahaya) */
+  --hijau: #16a34a;
+  --kuning: #d97706; /* Kuning Amber hangat yang jelas kontras */
+  --merah: #dc2626;  /* Merah sirine darurat yang tajam */
   --teal: var(--hijau);
   --orange: var(--kuning);
 
@@ -98,21 +98,27 @@ svg {
   }
 }
 
-/* Nada status: satu kelas menyetel warna kuat, warna lembut, dan warna teks di atasnya */
+/* Nada status: satu kelas menyetel warna kuat, warna lembut, border, dan warna teks */
 .tone-HIJAU {
-  --tone: var(--hijau);
-  --tone-soft: #e3f4e8;
+  --tone: #16a34a;
+  --tone-soft: #dcfce7;
+  --tone-border: #86efac;
   --on-tone: #ffffff;
+  --tone-ink: #14532d;
 }
 .tone-KUNING {
-  --tone: var(--kuning);
-  --tone-soft: #fdebdd;
+  --tone: #d97706;
+  --tone-soft: #fef3c7;
+  --tone-border: #fcd34d;
   --on-tone: #ffffff;
+  --tone-ink: #78350f;
 }
 .tone-MERAH {
-  --tone: var(--merah);
-  --tone-soft: #fde4e7;
+  --tone: #dc2626;
+  --tone-soft: #fee2e2;
+  --tone-border: #fca5a5;
   --on-tone: #ffffff;
+  --tone-ink: #7f1d1d;
 }
 
 .sr-only {

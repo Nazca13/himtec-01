@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   PiChatCircleDotsFill,
   PiClockCounterClockwiseFill,
+  PiGearFill,
   PiHouseFill,
   PiSignOutBold,
   PiUsersThreeFill,
@@ -19,6 +20,7 @@ const NAV = [
   { href: '/pengawas/riwayat', label: 'Riwayat', Icon: PiClockCounterClockwiseFill },
   { href: '/pengawas/asisten', label: 'Asisten AI', Icon: PiChatCircleDotsFill },
   { href: '/pengawas/keluarga', label: 'Keluarga', Icon: PiUsersThreeFill },
+  { href: '/pengawas/pengaturan', label: 'Pengaturan', Icon: PiGearFill },
 ];
 
 export default function PengawasShell({ children }) {

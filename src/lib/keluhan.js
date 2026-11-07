@@ -13,7 +13,11 @@ export const KELUHAN = [
   { id: 'TELEPON', label: 'Ingin ditelepon', bahaya: 'KUNING' },
 ];
 
-export const KELUHAN_BY_ID = Object.fromEntries(KELUHAN.map((k) => [k.id, k]));
+export const KELUHAN_EXTRA = [
+  { id: 'SUDAH_OBAT', label: 'Sudah minum obat', bahaya: 'HIJAU' },
+];
+
+export const KELUHAN_BY_ID = Object.fromEntries([...KELUHAN, ...KELUHAN_EXTRA].map((k) => [k.id, k]));
 
 // Penyebab peringatan otomatis dari sensor gerak HP.
 export const SEBAB_OTOMATIS = { KEJANG: 'kemungkinan kejang', JATUH: 'kemungkinan jatuh' };

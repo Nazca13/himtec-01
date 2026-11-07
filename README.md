@@ -1,142 +1,172 @@
-# SAPA - Sistem Asisten Pantau Aktif
+# 🦉 SAPA — Sistem Asisten Pantau Aktif
 
-Aplikasi untuk memantau orang tua (lansia) dari jauh. Tampilan mengikuti Apple Human Interface Guidelines (latar grouped, daftar inset, Large Title, font sistem). Orang tua cukup menekan satu dari tiga tombol besar di HP-nya; keluarga langsung melihat kabarnya di dashboard, lengkap dengan ringkasan AI, riwayat, dan lokasi terakhir. Spesifikasi awal: `docs/PRD.txt`. Laporan lengkap (latar belakang, analisis, desain, implementasi, pengujian): [`readthis.md`](readthis.md).
+> **Platform Pemantauan Lansia Terpadu Berbasis AI Multimodal, PWA, dan Desain Aksesibel Apple Human Interface Guidelines.**
 
-## Tiga peran
+[![Next.js](https://img.shields.io/badge/Next.js-16.4.5-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.3.0-blue?style=flat-square&logo=react)](https://react.dev/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.19-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-8E75B2?style=flat-square&logo=google)](https://orcarouter.ai/)
 
-| Peran | Siapa | Perangkat | Bisa apa | Cara masuk |
-| --- | --- | --- | --- | --- |
-| **Admin** | Anak/pengurus yang mendaftarkan keluarga | Web (laptop/HP): dashboard | Semua yang bisa pemantau, ditambah: tambah/hapus orang tua, bagikan kode HP dan kode undangan, putuskan HP yang hilang, jadikan anggota admin, keluarkan anggota | Halaman depan, lalu **Daftarkan keluarga** (`/daftar`) |
-| **Lansia** | Orang tua yang dipantau | Aplikasi di HP-nya (PWA, bisa di-install) | Tekan **Saya Aman**, **Keluhan** (bicara, atau ketuk gambar bagi yang sulit bicara), atau **Darurat**. Lokasi HP ikut terkirim jika diizinkan | Buka link kode HP dari admin, lalu **Hubungkan HP ini** (`/hubungkan?kode=...`), cukup sekali |
-| **Pemantau** | Anggota keluarga lain | Web (laptop/HP): dashboard | Lihat status, Ringkasan AI, lokasi terakhir, grafik, riwayat; tanya Asisten AI. Tidak bisa mengubah pengaturan | Halaman depan, lalu **Masuk dengan kode undangan** (`/gabung`) |
+---
 
-Penjelasan yang sama untuk pengguna ada di app: `/panduan`.
+## 🌟 Mengapa SAPA Diciptakan?
 
-## Alur dari awal
+Banyak orang tua lanjut usia di Indonesia tinggal terpisah dari anak-anaknya. Saat terjadi keadaan darurat (seperti **jatuh, serangan jantung, atau kejang**), lansia sering kali tidak sempat atau kesulitan mengoperasikan aplikasi perpesanan yang rumit. 
 
-1. **Admin mendaftar** di `/daftar`: isi nama sendiri dan nama orang tua. Dibuat keluarga, akun admin, dan orang tua pertama. Admin mendapat dua kode:
-   - **Kode HP** (6 karakter) untuk HP orang tua.
-   - **Kode undangan** (8 karakter) untuk anggota keluarga lain.
-2. **Hubungkan HP orang tua**: admin menekan *Kirim lewat WhatsApp*. Di HP orang tua, link dibuka lalu *Hubungkan HP ini*. HP meminta izin lokasi sekali, lalu menampilkan tiga tombol setiap kali dibuka. Pilih *Tambahkan ke layar utama* agar menjadi aplikasi.
-3. **Orang tua memberi kabar**: Saya Aman (hijau), Keluhan (oranye), Darurat (merah). Maskot burung hantu menyapa (pesan ditulis AI) dan menghitung hari berturut-turut.
-   - **Keluhan tanpa suara**: selain merekam suara (AI merangkum dan menilai tingkat bahaya), orang tua bisa mengetuk gambar keluhan: Pusing, Nyeri dada, Sesak napas, Jatuh, Baru kejang, Mual, Demam, Obat habis, Ingin ditelepon (3×3, satu ketukan langsung terkirim). Nyeri dada, sesak, jatuh, dan kejang otomatis berstatus merah.
-4. **Keluarga memantau** di `/pengawas`: status terbaru, Ringkasan AI live, lokasi terakhir (peta), grafik 7 hari, riwayat, dan Asisten AI. Kabar baru muncul dalam ±5 detik tanpa reload. Saat status merah, muncul kartu **pertolongan pertama** (kejang, jatuh, atau darurat umum) dengan tombol telepon 119/112 dan lokasi. Belum ada kabar sama sekali: dashboard menampilkan satu kartu langkah awal, bukan kartu-kartu kosong.
-5. **Admin mengundang keluarga lain** dari tab *Keluarga*: kirim kode undangan. Penerima masuk sebagai pemantau; admin bisa menjadikannya admin.
+**SAPA (Sistem Asisten Pantau Aktif)** hadir memberikan solusi dengan prinsip **Zero Cognitive Load** untuk lansia:
+- **Di HP Orang Tua**: Hanya ada **tiga tombol besar** (Aman, Keluhan, Darurat), tombol cepat darurat kejang, dan pengingat minum obat 1-ketuk. Tanpa password, tanpa menu bertingkat.
+- **Di Layar Keluarga / Petugas**: Dashboard *real-time* cerdas yang menyajikan ringkasan kondisi medis dari AI, pemutar rekaman suara asli lansia, peta lokasi GPS, serta panduan pertolongan pertama terarah.
 
-Lainnya (semua dari tab *Keluarga*, khusus admin):
-- **Memantau lebih dari satu orang tua**: form *Tambah orang tua*. Setiap orang tua punya kode HP sendiri; pilih namanya di atas dashboard.
-- **HP orang tua hilang/diganti**: *Putuskan HP*. HP lama langsung ditolak, kode baru dibuat.
-- **Membuka dashboard di perangkat lain**: masuk dengan kode undangan (sebagai pemantau), lalu admin menekan *Jadikan admin*.
-- **Mengeluarkan anggota**: *Keluarkan*. Perangkatnya langsung tidak bisa membuka dashboard. Keluarga selalu menyisakan minimal satu admin.
+---
 
-**Juri / uji cepat**: buka `/demo`. Satu browser masuk sebagai admin "Keluarga Demo" sekaligus sebagai HP Oma Siti, ditampilkan berdampingan. `/demo?reset=1` mengembalikan data demo.
+## 🎯 6 Fitur Unggulan
 
-## Menjalankan
+### 1. 🔊 Pemutar Suara Nenek Asli (*Voice Memo Player*)
+Rekaman ucapan lansia dikonversi menjadi audio WAV standar mono 16 kHz dan disimpan aman di server. Petugas/keluarga dapat:
+- Memutar suara asli lansia langsung di kartu status dan timeline riwayat.
+- Melihat animasi visual gelombang suara (*audio wave bars*).
+- Mengatur kecepatan putar (**1x / 1.5x / 2x**).
+- Membaca transkrip teks dan analisis klinis otomatis yang dihasilkan oleh AI.
+
+### 2. ⚡ Tombol Darurat Kejang & Sensor Getar (Vibrate)
+- **Tombol Cepat Kejang**: Terletak tepat di bawah tombol utama untuk respons darurat kilat saat orang tua mengalami kejang.
+- **Deteksi Gerak & Akselerometer**: Membaca guncangan ritmis khas kejang atau benturan jatuh keras saat ponsel terbuka.
+- **Respon Getar & Hitung Mundur**: HP lansia bergetar hebat (`navigator.vibrate`) dan membunyikan sirine lokal. Jika tidak dibatalkan dalam 30 detik, sistem otomatis mengirim status **MERAH** ke seluruh keluarga beserta kartu pertolongan pertama dan panggilan 119.
+
+### 3. 🎨 Palet Warna Ergonomis & Kontras Tinggi (Apple HIG)
+Memisahkan kategori status secara tegas agar tidak memicu ambiguitas visual:
+- 🟢 **HIJAU (`#16a34a`)**: Kondisi Aman, laporan harian rutin, dan konfirmasi minum obat.
+- 🟡 **KUNING (`#d97706`)**: Keluhan ringan/sedang (pusing, demam, mual, obat habis) yang memerlukan perhatian keluarga tanpa panik.
+- 🔴 **MERAH (`#dc2626`)**: Keadaan gawat darurat (kejang, jatuh, nyeri dada, sesak napas) dengan denyut alarm visual berulang (*pulsing alarm*).
+
+### 4. 💊 Pengingat Minum Obat & Absensi Laporan Harian (*Daily Streak*)
+- Indikator status harian di HP orang tua: *"Hari ini sudah lapor aman"* vs *"Belum ada kabar hari ini"*.
+- Perhitungan rentetan hari (*streak*) kedisiplinan orang tua dalam memberi kabar.
+- Tombol 1-ketuk **`💊 Sudah Obat`** untuk mencatat kepatuhan minum obat secara instan.
+
+### 5. ⚙️ Pengaturan Lengkap di Kedua Sisi
+- **Di Sisi Lansia**:
+  - Pilihan skala ukuran font layar: **Standar (100%)**, **Besar (115%)**, atau **Sangat Besar (130%)**.
+  - **Ganti Kode Tanpa Instal Ulang**: Form input kode 6-digit langsung di tempat tanpa perlu uninstall PWA atau klik link tautan.
+- **Di Sisi Pengawas (`/pengawas/pengaturan`)**:
+  - Saklar sirine alarm otomatis saat status darurat merah masuk.
+  - Pilihan interval pembaruan data (*polling rate* 3s / 5s / 15s).
+  - Panggilan cepat darurat medis (**Ambulans 119, Darurat 112, Polisi 110, Damkar 113**).
+  - **Ekspor Riwayat ke CSV / Excel** untuk diserahkan ke dokter spesialis geriatri.
+  - Fitur **Cetak PDF Ringkasan Medis**.
+
+### 6. 🤖 Triase Klinis & Chatbot Asisten AI
+Ditenagai model **Gemini 2.5 Flash** melalui OrcaRouter. AI menganalisis rekaman suara daerah/tidak jelas, mengekstraksi gejala spesifik, menentukan derajat keparahan secara obyektif, dan melayani konsultasi tanya-jawab keluarga seputar kondisi lansia.
+
+---
+
+## 👥 Tiga Peran Pengguna
+
+| Peran | Perangkat | Hak Akses & Fitur | Cara Masuk |
+|---|---|---|---|
+| **Admin** | Web Desktop / Ponsel | Mengelola keluarga, menambah/menghapus lansia, mengundang anggota, memutus HP hilang, melihat seluruh riwayat & analitik. | `/daftar` |
+| **Lansia** | Ponsel (PWA) | 3 tombol utama (Aman, Keluhan, Darurat), tombol kejang, deteksi getar, pengingat obat, pengaturan ukuran font. | `/hubungkan?kode=...` |
+| **Pemantau** | Web Desktop / Ponsel | Melihat status real-time, mendengarkan rekaman suara, peta lokasi GPS, ekspor CSV, dan konsultasi AI. | `/gabung` |
+
+---
+
+## 🚀 Uji Coba Cepat (Mode Demo 1-Klik)
+
+Untuk presentasi juri atau evaluasi tanpa perlu setup dua HP:
 
 ```bash
-npm install                  # wajib setelah clone atau pull
-cp .env.example .env         # isi semua variabel (lihat tabel di bawah)
-npm run db:push              # buat/sinkronkan tabel di Supabase
-npm run dev                  # http://localhost:3000
+# Jalankan aplikasi, lalu buka:
+http://localhost:3000/demo
 ```
 
-Setelah `db:push` pada database baru, jalankan `prisma/setup.sql` di Supabase SQL Editor (indeks, CHECK, dan RLS). Database lama: jalankan file di `prisma/sql/` berurutan menurut nama (memindahkan data, tidak menghapus).
+Layar split-screen otomatis terbuka:
+- **Kiri**: Simulasi HP Nenek (Oma Siti).
+- **Kanan**: Dashboard Keluarga Real-Time (Tamu Demo).
+- **Atas**: Tombol simulasi instan (`⚡ Simulasikan Kejang` dan `💥 Simulasikan Jatuh`).
 
-Mencoba dari HP di jaringan yang sama: buka `http://<IP-laptop>:3000`. Mikrofon, lokasi, dan *Install* butuh HTTPS di HP, jadi uji penuh di HP memakai hasil deploy (mis. Vercel). Jika muncul `Module not found`: hentikan server, `npm install`, lalu `rm -rf .next && npm run dev`.
+> Baca selengkapnya di [**docs/PANDUAN_JURI.md**](docs/PANDUAN_JURI.md) untuk panduan penilaian lengkap.
 
-| Perintah | Fungsi |
-| --- | --- |
-| `npm run dev` | server pengembangan |
-| `npm run build` / `npm start` | build dan jalankan produksi (service worker aktif hanya di sini) |
-| `npm run lint` | ESLint |
-| `npm run db:push` | sinkronkan `prisma/schema.prisma` ke database |
-| `npm run db:seed` | isi ulang Keluarga Demo (hanya data keluarga demo yang direset) |
-| `npm run db:studio` | lihat data di browser |
+---
 
-## Deploy (Vercel)
+## 💻 Panduan Instalasi Lokal
 
-`vercel.json` menaruh server di Mumbai (`bom1`), sama dengan region database Supabase (`ap-south-1`), supaya setiap query tidak menyeberang benua.
+### 1. Prasyarat
+- Node.js versi `>= 20.9.0`
+- Akun PostgreSQL (direkomendasikan [Supabase](https://supabase.com/))
+- API Key [OrcaRouter](https://orcarouter.ai/)
+
+### 2. Langkah Instalasi
 
 ```bash
-npx vercel login                      # sekali, lewat browser
-npx vercel link                       # hubungkan folder ini ke project Vercel
-npx vercel env add DATABASE_URL production   # ulangi untuk DIRECT_URL, ORCA_API_KEY, SESSION_SECRET
-npx vercel deploy --prod
+# 1. Clone repositori
+git clone https://github.com/Nazca13/himtec-01.git
+cd himtec-01
+
+# 2. Install dependensi
+npm install
+
+# 3. Konfigurasi Environment Variables
+cp .env.example .env
+# Edit file .env dan masukkan DATABASE_URL, DIRECT_URL, ORCA_API_KEY, dan SESSION_SECRET
+
+# 4. Sinkronkan Skema Database
+npm run db:push
+
+# 5. Jalankan Server Pengembangan
+npm run dev
 ```
 
-Atau lewat dashboard: *Add New Project*, import repo GitHub ini, isi Environment Variables, lalu *Deploy*. Setiap push ke `main` akan di-deploy otomatis.
+Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-## Variabel lingkungan
+---
 
-| Nama | Isi |
-| --- | --- |
-| `DATABASE_URL` | Supabase Transaction pooler (port 6543, akhiri dengan `?pgbouncer=true`) |
-| `DIRECT_URL` | Supabase Session pooler (port 5432), untuk migrasi |
-| `ORCA_API_KEY` | OrcaRouter: triase suara, pesan maskot, ringkasan, asisten |
-| `SESSION_SECRET` | Penanda tangan cookie sesi, minimal 32 karakter (`openssl rand -base64 48`) |
-| `ENABLE_DEMO` | Opsional. `false` mematikan `/demo` |
-
-Key anon/service_role Supabase tidak dipakai: semua akses database lewat Prisma di server. Jangan commit `.env`.
-
-## Database
+## 📁 Struktur Folder Proyek
 
 ```
-households (keluarga)
- ├─ 1:n members        id, household_id, nama, role (ADMIN | PEMANTAU)
- └─ 1:n lansia         id, household_id, nama, kode_pairing (unik), device_version, terhubung_at
-          └─ 1:n daily_records   id, lansia_id, tipe_input (TOMBOL_AMAN | TOMBOL_DARURAT | VOICE_NOTE | KELUHAN),
-                                 status_bahaya, ai_analysis (jsonb),
-                                 latitude, longitude, akurasi_meter, created_at
-households: id, nama, kode_undangan (unik), created_at
+himtec-01/
+├── docs/                     # Dokumentasi komprehensif
+│   ├── PANDUAN_JURI.md       # Panduan pengujian fitur untuk dewan juri
+│   ├── ARSITEKTUR.md         # Diagram arsitektur teknis & database ERD
+│   ├── PRD.txt               # Product Requirements Document
+│   └── supabase.md           # Panduan konfigurasi Supabase & RLS
+├── prisma/                   # Skema database & migrasi
+│   ├── schema.prisma         # Definisi model Prisma ORM
+│   └── setup.sql             # Skrip SQL indeks, constraints, dan RLS
+├── public/                   # Aset PWA (icons, sw.js, manifest, offline.html)
+└── src/
+    ├── app/                  # Next.js 16 App Router (halaman & API routes)
+    │   ├── api/              # 16 Endpoint RESTful API
+    │   ├── demo/layar/       # Mode demo split-screen untuk presentasi
+    │   ├── lansia/           # Tampilan aplikasi orang tua (PWA)
+    │   └── pengawas/         # Dashboard monitoring keluarga (5 tab)
+    ├── components/           # Komponen UI global (AudioPlayer, Mascot, Badge)
+    ├── features/             # Modul fungsional per peran (lansia, pengawas, masuk)
+    ├── hooks/                # Custom React hooks (useRecorder, useDeteksiGerak)
+    ├── lib/                  # Server utilities (auth, session HMAC, deteksi, geo)
+    ├── services/             # Lapisan logika bisnis (record, triage, household, demo)
+    └── proxy.js              # Middleware kontrol akses & navigasi sesi
 ```
 
-- Semua foreign key `ON DELETE CASCADE`: menghapus keluarga menghapus anggota, lansia, dan kabarnya; menghapus lansia menghapus kabarnya.
-- `CHECK` di database: `role`, `tipe_input`, `status_bahaya`, rentang koordinat.
-- RLS aktif di keempat tabel tanpa policy: Data API Supabase (anon/authenticated) tidak bisa membaca atau menulis.
-- Skema: `prisma/schema.prisma`. DDL lengkap: `prisma/setup.sql`. Detail: `docs/supabase.md`.
+---
 
-## Keamanan dan akses
+## 📡 Daftar Endpoint API Utama
 
-- Tanpa kata sandi. Dua cookie httpOnly bertanda tangan HMAC (`sapa-pengawas` berisi id anggota, `sapa-lansia` berisi id lansia + versi perangkat).
-- Peran dibaca dari database pada setiap request, jadi perubahan peran dan pengeluaran anggota langsung berlaku.
-- Setiap API memeriksa sesi dan membatasi data ke keluarga/lansia milik sesi itu; id dari klien tidak pernah dipercaya. Kode HP dan kode undangan hanya dikirim ke admin.
-- Kode dibuat acak (tanpa huruf mirip seperti 0/O, 1/I), percobaan kode dibatasi per IP.
-- Lokasi hanya diambil saat tombol ditekan, hanya jika diizinkan di HP orang tua, dan hanya terlihat oleh keluarganya.
+| Method | Endpoint | Fungsi |
+|---|---|---|
+| `POST` | `/api/auth/daftar` | Registrasi admin dan pembentukan keluarga baru |
+| `POST` | `/api/auth/gabung` | Masuk keluarga sebagai pemantau via kode undangan |
+| `POST` | `/api/auth/hubungkan`| Menghubungkan HP orang tua via kode pairing |
+| `POST` | `/api/auth/keluar` | Menghapus cookie sesi (spesifik lansia atau pengawas) |
+| `GET` | `/api/dashboard` | Polling data kondisi keluarga, lansia, dan riwayat |
+| `POST` | `/api/ai` | Penerimaan rekaman audio WAV + triase AI multimodal |
+| `GET` | `/api/audio/[id]` | Streaming file audio WAV rekaman suara lansia |
+| `POST` | `/api/record` | Pencatatan status tombol aman, darurat, keluhan, obat |
+| `GET` | `/api/saya` | Memuat data profil lansia, streak harian, dan absensi |
+| `POST` | `/api/assistant` | Chat interaktif dengan AI asisten keluarga |
 
-## API
+---
 
-| Method | Path | Peran | Fungsi |
-| --- | --- | --- | --- |
-| POST | `/api/auth/daftar` | publik | daftarkan keluarga, jadi admin |
-| POST | `/api/auth/gabung` | publik | masuk dengan kode undangan, jadi pemantau |
-| POST | `/api/auth/hubungkan` | publik | hubungkan HP orang tua dengan kode HP |
-| POST | `/api/auth/keluar` | anggota | keluar dari perangkat ini |
-| GET | `/api/dashboard?lansia=` | anggota | data dashboard (peran, keluarga, lansia, anggota, kabar, lokasi terakhir) |
-| GET | `/api/ringkasan?lansia=` | anggota | Ringkasan AI |
-| POST | `/api/assistant` | anggota | tanya Asisten AI tentang satu lansia |
-| POST | `/api/lansia` | admin | tambah orang tua |
-| DELETE | `/api/lansia/:id` | admin | hapus orang tua |
-| POST | `/api/lansia/:id/putus` | admin | putuskan HP, buat kode baru |
-| PATCH | `/api/anggota/:id` | admin | ubah peran (ADMIN/PEMANTAU) |
-| DELETE | `/api/anggota/:id` | admin, atau diri sendiri | keluarkan anggota |
-| POST | `/api/record` | lansia | kirim Saya Aman, Darurat, atau keluhan pilihan (`keluhan: [..]`); status ditentukan server (+ lokasi) |
-| POST | `/api/ai` | lansia | kirim pesan suara (WAV) untuk triase AI (+ lokasi) |
-| GET | `/api/saya`, `/api/saya/sapa` | lansia | keadaan HP lansia dan pesan maskot |
-
-## Struktur
-
-```
-docs/               PRD dan dokumentasi Supabase
-design/             logo dan palet warna (sumber aset)
-prisma/             schema.prisma, setup.sql, sql/ (migrasi manual), seed.js
-src/app/            halaman dan route handler tipis
-src/features/       UI per fitur: lansia (app HP), pengawas (dashboard), masuk (daftar/gabung/hubungkan)
-src/components/     komponen bersama (Mascot, ShareCode, StatusBadge, Wordmark)
-src/services/       logika bisnis (household, record, triage, mascot, assistant, demo)
-src/hooks/          useRecorder (rekam dan ubah ke WAV)
-src/lib/            db, orca, session, auth, codes, geo, lokasi, format, dll.
-src/proxy.js        aturan akses halaman berdasarkan sesi
-public/sw.js        service worker (cache aplikasi, offline)
-```
-
-Catatan untuk asisten kode: `CLAUDE.md`.
+## 📄 Lisensi & Hak Cipta
+Hak Cipta © 2026 **Tim Pengembang SAPA**. Seluruh hak cipta dilindungi undang-undang.
+*Mendedikasikan teknologi untuk keselamatan dan ketenangan keluarga Indonesia.* 🇮🇩

@@ -16,14 +16,18 @@ export function tafsirkanKabar({ tipeInput, keluhan, sebab, nama }) {
       const dipilih = [...new Set(Array.isArray(keluhan) ? keluhan : [])].map((id) => KELUHAN_BY_ID[id]).filter(Boolean);
       if (!dipilih.length || dipilih.length > 6) throw new ValidationError('Pilih 1 sampai 6 keluhan.');
       const gawat = dipilih.filter((k) => k.bahaya === STATUS.MERAH);
+      const aman = dipilih.filter((k) => k.bahaya === STATUS.HIJAU);
       const daftar = dipilih.map((k) => k.label.toLowerCase()).join(', ');
+      const statusBahaya = gawat.length ? STATUS.MERAH : aman.length === dipilih.length ? STATUS.HIJAU : STATUS.KUNING;
       return {
-        statusBahaya: gawat.length ? STATUS.MERAH : STATUS.KUNING,
+        statusBahaya,
         aiAnalysis: {
           sumber: 'pilihan',
           gejala: dipilih.map((k) => k.label),
           ringkasan: gawat.length
             ? `${nama} melaporkan ${daftar}. Ini tanda gawat: segera hubungi ${nama}.`
+            : aman.length === dipilih.length
+            ? `${nama} mengonfirmasi: ${daftar}. Kondisi terpantau baik.`
             : `${nama} melaporkan ${daftar} lewat pilihan gambar.`,
         },
       };

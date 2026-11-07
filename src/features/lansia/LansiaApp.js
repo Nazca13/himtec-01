@@ -9,6 +9,9 @@ import {
   PiArrowFatLinesDownFill,
   PiBrainFill,
   PiChatTeardropDotsFill,
+  PiCheckCircleFill,
+  PiClockCountdownFill,
+  PiGearFill,
   PiHeartbeatFill,
   PiMicrophoneFill,
   PiPhoneCallFill,
@@ -24,6 +27,7 @@ import {
   PiVibrateFill,
   PiWarningCircleFill,
   PiWindFill,
+  PiXBold,
 } from 'react-icons/pi';
 import Mascot from '@/components/ui/Mascot';
 import { TIPE_INPUT } from '@/lib/constants';
@@ -94,10 +98,21 @@ export default function LansiaApp() {
   const [errorText, setErrorText] = useState('');
   const [putus, setPutus] = useState(false); // HP ini diputus keluarga: perlu dihubungkan ulang
   const [detik, setDetik] = useState(0);
-  const [info, setInfo] = useState({ nama: 'Nenek', sapaan: 'Halo. Tekan tombol hijau kalau baik-baik saja ya.' });
+  const [info, setInfo] = useState({ nama: 'Nenek', sapaan: 'Halo. Tekan tombol hijau kalau baik-baik saja ya.', sudahHariIni: false, streak: 0 });
   const [tanggal, setTanggal] = useState('');
   const [pesan, setPesan] = useState(null); // pesan maskot dari AI; null = pakai sapaan lokal
   const [balas, setBalas] = useState('');
+  const [bukaSetting, setBukaSetting] = useState(false);
+  const [fontSize, setFontSize] = useState(() => {
+    try {
+      return (typeof window !== 'undefined' && localStorage.getItem('sapa.font_size')) || 'normal';
+    } catch {
+      return 'normal';
+    }
+  });
+  const [kodeBaru, setKodeBaru] = useState('');
+  const [settingBusy, setSettingBusy] = useState(false);
+  const [settingError, setSettingError] = useState('');
   const [deteksiAktif, setDeteksiAktif] = useState(() => {
     try {
       return typeof window !== 'undefined' && localStorage.getItem(DETEKSI_KEY) === '1';
@@ -113,7 +128,14 @@ export default function LansiaApp() {
   const muat = useCallback(async () => {
     try {
       const d = await (await fetch('/api/saya', { cache: 'no-store' })).json();
-      if (d.role === 'lansia') setInfo({ nama: d.namaLansia, sapaan: d.sapaan });
+      if (d.role === 'lansia') {
+        setInfo({
+          nama: d.namaLansia,
+          sapaan: d.sapaan,
+          sudahHariIni: Boolean(d.sudahHariIni),
+          streak: d.streak ?? 0,
+        });
+      }
       const s = await fetch('/api/saya/sapa', { cache: 'no-store' });
       if (s.ok) setPesan((await s.json()).pesan);
     } catch {}
@@ -263,18 +285,89 @@ export default function LansiaApp() {
     }
   };
 
+  const ubahUkuran = (ukuran) => {
+    setFontSize(ukuran);
+    try {
+      localStorage.setItem('sapa.font_size', ukuran);
+    } catch {}
+  };
+
+  const hubungkanKodeBaru = async (e) => {
+    e.preventDefault();
+    if (!kodeBaru.trim()) return setSettingError('Masukkan kode dulu.');
+    setSettingBusy(true);
+    setSettingError('');
+    try {
+      const res = await fetch('/api/auth/hubungkan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kode: kodeBaru.trim().toUpperCase() }),
+      });
+      const data = await res.json();
+      setSettingBusy(false);
+      if (res.ok) {
+        setBukaSetting(false);
+        setKodeBaru('');
+        muat();
+        alert(`Berhasil terhubung ke ${data.namaLansia}!`);
+      } else {
+        setSettingError(data.error || 'Kode tidak valid.');
+      }
+    } catch {
+      setSettingBusy(false);
+      setSettingError('Gagal menghubungkan. Periksa internet.');
+    }
+  };
+
   const teksMaskot = pesan ?? info.sapaan;
 
   return (
-    <main className={styles.app}>
+    <main className={`${styles.app} ${fontSize === 'besar' ? styles.fontBesar : fontSize === 'ekstra' ? styles.fontEkstra : ''}`}>
       <header className={styles.top}>
-        <h1 className={styles.hello}>Halo, {info.nama}</h1>
-        <p className={styles.date}>{tanggal}</p>
+        <div className={styles.topRow}>
+          <div>
+            <h1 className={styles.hello}>Halo, {info.nama}</h1>
+            <p className={styles.date}>{tanggal}</p>
+          </div>
+          <button
+            type="button"
+            className={styles.settingsBtn}
+            onClick={() => setBukaSetting(true)}
+            aria-label="Pengaturan"
+            title="Buka pengaturan & ganti kode"
+          >
+            <PiGearFill aria-hidden="true" />
+          </button>
+        </div>
       </header>
 
       <section className={styles.talk} role="status" aria-live="polite">
         <Mascot size={68} mood={phase === 'sent' ? 'senang' : 'idle'} priority />
         <p key={teksMaskot}>{teksMaskot}</p>
+      </section>
+
+      {/* Baris Laporan Absensi Harian & Tombol Cepat Minum Obat */}
+      <section className={`${styles.statusBanner} ${info.sudahHariIni ? styles.bannerSudah : styles.bannerBelum}`} aria-label="Status kabar hari ini">
+        <span className={styles.bannerIcon}>
+          {info.sudahHariIni ? <PiCheckCircleFill aria-hidden="true" /> : <PiClockCountdownFill aria-hidden="true" />}
+        </span>
+        <div className={styles.bannerContent}>
+          <strong>{info.sudahHariIni ? 'Laporan aman hari ini tercatat' : 'Belum memberi kabar hari ini'}</strong>
+          <small>
+            {info.sudahHariIni
+              ? `${info.streak > 1 ? `🔥 Rutin ${info.streak} hari! ` : ''}Keluarga sudah tahu kondisi Anda.`
+              : 'Tekan tombol hijau di bawah untuk lapor aman.'}
+          </small>
+        </div>
+        <button
+          type="button"
+          className={styles.pillQuickBtn}
+          onClick={() => kirim({ tipeInput: TIPE_INPUT.KELUHAN, keluhan: ['SUDAH_OBAT'] })}
+          title="Konfirmasi sudah minum obat"
+        >
+          <PiPillFill aria-hidden="true" />
+          <span>Sudah Obat</span>
+        </button>
       </section>
 
       <div className={styles.buttons}>
@@ -469,6 +562,85 @@ export default function LansiaApp() {
                 )}
               </>
             )}
+          </m.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sheet Pengaturan Lansia & Ganti Kode Langsung */}
+      <AnimatePresence>
+        {bukaSetting && (
+          <m.div
+            key="settingsModal"
+            className={styles.settingsOverlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setBukaSetting(false)}
+          >
+            <m.div
+              className={styles.settingsSheet}
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 26, stiffness: 280 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.sheetHead}>
+                <h2>Pengaturan Lansia</h2>
+                <button type="button" className={styles.closeBtn} onClick={() => setBukaSetting(false)} aria-label="Tutup">
+                  <PiXBold aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className={styles.settingGroup}>
+                <label className={styles.settingLabel}>🔤 Ukuran Tulisan</label>
+                <div className={styles.sizePicker}>
+                  {[
+                    { id: 'normal', label: 'Standar' },
+                    { id: 'besar', label: 'Besar' },
+                    { id: 'ekstra', label: 'Sangat Besar' },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      className={`${styles.sizeBtn} ${fontSize === s.id ? styles.sizeActive : ''}`}
+                      onClick={() => ubahUkuran(s.id)}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.settingGroup}>
+                <label className={styles.settingLabel}>🔑 Ganti Kode / Sambungkan HP Baru</label>
+                <p className={styles.settingHint}>Masukkan kode 6 huruf dari keluarga untuk berganti lansia tanpa instal ulang.</p>
+                <form onSubmit={hubungkanKodeBaru} className={styles.codeForm}>
+                  <input
+                    type="text"
+                    maxLength={12}
+                    value={kodeBaru}
+                    onChange={(e) => setKodeBaru(e.target.value.toUpperCase())}
+                    placeholder="Contoh: DEMO72"
+                    className={styles.codeInput}
+                    autoCapitalize="characters"
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <button type="submit" disabled={settingBusy || !kodeBaru.trim()} className={styles.codeSubmitBtn}>
+                    {settingBusy ? 'Menyambungkan...' : 'Sambungkan'}
+                  </button>
+                </form>
+                {settingError && <p className={styles.settingErr}>{settingError}</p>}
+              </div>
+
+              <div className={styles.settingGroup}>
+                <button type="button" className={styles.fullLogoutBtn} onClick={keluarLansia}>
+                  <PiSignOutBold aria-hidden="true" />
+                  Keluar dari Perangkat Ini
+                </button>
+              </div>
+            </m.div>
           </m.div>
         )}
       </AnimatePresence>

@@ -29,6 +29,7 @@ export default function RecordsProvider({ children }) {
   const [state, setState] = useState(EMPTY); // records null = belum termuat
   const dipilihRef = useRef(null);
   const loadRef = useRef(async () => {});
+  const lastAlertRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
@@ -42,13 +43,35 @@ export default function RecordsProvider({ children }) {
         const d = await res.json();
         dipilihRef.current = d.dipilihId;
         if (alive) setState({ ...d, error: false, now: Date.now() });
+
+        // Sirine darurat jika kabar terbaru berstatus MERAH
+        if (d.records?.[0]?.statusBahaya === 'MERAH' && d.records[0].id !== lastAlertRef.current) {
+          lastAlertRef.current = d.records[0].id;
+          try {
+            if (typeof window !== 'undefined' && localStorage.getItem('sapa.notif_suara') !== '0') {
+              const Ctx = window.AudioContext || window.webkitAudioContext;
+              const ctx = new Ctx();
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'sawtooth';
+              osc.frequency.setValueAtTime(880, ctx.currentTime);
+              osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.35);
+              gain.gain.value = 0.25;
+              osc.connect(gain).connect(ctx.destination);
+              osc.start();
+              osc.stop(ctx.currentTime + 0.4);
+              osc.onended = () => ctx.close();
+            }
+          } catch {}
+        }
       } catch {
         if (alive) setState((s) => ({ ...s, error: true }));
       }
     };
     loadRef.current = load;
     load();
-    const timer = setInterval(load, POLL_MS);
+    const intervalMs = (typeof window !== 'undefined' && Number(localStorage.getItem('sapa.polling_rate'))) || POLL_MS;
+    const timer = setInterval(load, intervalMs);
     return () => {
       alive = false;
       clearInterval(timer);
