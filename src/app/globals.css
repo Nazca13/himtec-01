@@ -2,38 +2,42 @@
    Teks di atas biru logo selalu navy (5,4:1), seperti subjudul logo; putih di atas biru logo hanya 2,7:1.
    Toska/oranye/merah dipakai HANYA sebagai warna status (aman/perhatian/darurat). */
 :root {
-  --ink: #142445; /* navy logo: teks, ikon */
-  --brand: #45a7f2; /* biru logo: panel, header, sidebar */
-  --brand-deep: #2c8ddb; /* sisi bawah 3D panel biru */
-  --brand-strong: #1565c0; /* tombol utama dan tautan: putih di atasnya 5,75:1 */
+  /* Gaya Apple (HIG): latar grouped abu-abu, kartu putih, satu warna tint, teks label sistem. */
+  --bg: #f2f2f7; /* systemGroupedBackground */
+  --paper: #ffffff; /* secondarySystemGroupedBackground */
+  --fill: #e9e9eb; /* tertiarySystemFill: tombol sekunder, track segmented control */
+  --ink: #1c1c1e; /* label */
+  --mute: #636366; /* secondaryLabel (kontras 5,6:1 di atas putih) */
+  --sep: rgba(60, 60, 67, 0.18); /* separator */
+
+  /* Identitas dari logo: biru logo untuk ubin ikon, tint gelap untuk tombol/tautan (putih di atasnya 5,75:1) */
+  --brand: #45a7f2;
+  --brand-deep: #2c8ddb;
+  --brand-strong: #1565c0;
   --brand-strong-deep: #0d4a96;
+  --tint: var(--brand-strong);
   --sky: var(--brand);
   --sky-deep: var(--brand-strong);
-  --teal: #14b8a6;
-  --orange: #ff9800;
-  --ice: #ebf5fb;
-  --paper: #ffffff;
-  --merah: #d32f2f;
+  --ice: #eaf3fc; /* tint sangat muda */
 
-  /* Sisi bawah tombol 3D (gaya Duolingo): satu tingkat lebih gelap dari warna tombol */
-  --teal-deep: #0b8d80;
-  --orange-deep: #c97700;
-  --merah-deep: #9f2121;
+  /* Warna status: versi aksesibel warna sistem Apple, teks putih di atasnya >= 4,5:1 */
+  --hijau: #248a3d;
+  --kuning: #c93400;
+  --merah: #d70015;
+  --teal: var(--hijau);
+  --orange: var(--kuning);
 
-  --mute: #4a5f78;
-  --line: rgba(17, 42, 70, 0.12);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 22px;
 
-  --r-sm: 12px;
-  --r-md: 20px;
-  --r-lg: 28px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.08);
 
-  /* Dasar putih: pemisah antar-kartu memakai cincin tipis + bayangan lembut */
-  --shadow-sm: 0 0 0 1px rgba(17, 42, 70, 0.08), 0 2px 8px rgba(17, 42, 70, 0.05);
-  --shadow-md: 0 0 0 1px rgba(17, 42, 70, 0.06), 0 12px 32px rgba(17, 42, 70, 0.12);
-
-  --font: var(--font-jakarta), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', var(--font-inter), system-ui, 'Segoe UI', Roboto, sans-serif;
   --gutter: 20px;
-  --nav-h: 72px;
+  --nav-h: 64px;
+  --glass: rgba(249, 249, 249, 0.82); /* bar tembus pandang */
 }
 
 *,
@@ -50,11 +54,12 @@ html {
 
 body {
   min-height: 100dvh;
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
-  font-size: 1.0625rem; /* 17px: dasar yang nyaman untuk pembaca senior */
-  line-height: 1.55;
+  font-size: 1.0625rem; /* 17px: ukuran Body di iOS, nyaman untuk pembaca senior */
+  line-height: 1.47;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -80,8 +85,8 @@ svg {
 }
 
 :focus-visible {
-  outline: 3px solid var(--sky-deep);
-  outline-offset: 3px;
+  outline: 3px solid var(--tint);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -95,22 +100,19 @@ svg {
 
 /* Nada status: satu kelas menyetel warna kuat, warna lembut, dan warna teks di atasnya */
 .tone-HIJAU {
-  --tone: var(--teal);
-  --tone-deep: var(--teal-deep);
-  --tone-soft: #d6f4ef;
-  --on-tone: var(--ink);
+  --tone: var(--hijau);
+  --tone-soft: #e3f4e8;
+  --on-tone: #ffffff;
 }
 .tone-KUNING {
-  --tone: var(--orange);
-  --tone-deep: var(--orange-deep);
-  --tone-soft: #ffecc9;
-  --on-tone: var(--ink);
+  --tone: var(--kuning);
+  --tone-soft: #fdebdd;
+  --on-tone: #ffffff;
 }
 .tone-MERAH {
   --tone: var(--merah);
-  --tone-deep: var(--merah-deep);
-  --tone-soft: #fde1df;
-  --on-tone: var(--paper);
+  --tone-soft: #fde4e7;
+  --on-tone: #ffffff;
 }
 
 .sr-only {

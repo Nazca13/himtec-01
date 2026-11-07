@@ -1,12 +1,18 @@
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
-import { PiMapPinFill, PiMicrophoneFill, PiShieldCheckFill, PiSirenFill } from 'react-icons/pi';
+import { PiChatTeardropDotsFill, PiMapPinFill, PiMicrophoneFill, PiShieldCheckFill, PiSirenFill, PiVibrateFill } from 'react-icons/pi';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { TIPE_LABEL } from '@/lib/constants';
 import { formatWaktu } from '@/lib/format';
 import styles from './pengawas.module.css';
 
-const ICON = { TOMBOL_AMAN: PiShieldCheckFill, VOICE_NOTE: PiMicrophoneFill, TOMBOL_DARURAT: PiSirenFill };
+const ICON = {
+  TOMBOL_AMAN: PiShieldCheckFill,
+  VOICE_NOTE: PiMicrophoneFill,
+  TOMBOL_DARURAT: PiSirenFill,
+  KELUHAN: PiChatTeardropDotsFill,
+  DETEKSI_OTOMATIS: PiVibrateFill,
+};
 
 // Garis waktu: terbaru di atas. Urutan memang bermakna, jadi memakai daftar berurutan.
 export default function Timeline({ records }) {

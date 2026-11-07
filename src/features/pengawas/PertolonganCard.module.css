@@ -1,0 +1,55 @@
+.card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  background: #fff0f1;
+  box-shadow: inset 0 0 0 1px rgba(215, 0, 21, 0.25);
+}
+
+.card h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #a1000f;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.card ol {
+  display: grid;
+  gap: 6px;
+  padding-left: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.primary {
+  background: var(--merah);
+  color: #fff;
+}
+
+.secondary {
+  background: var(--paper);
+  color: var(--merah);
+}
+
+.note {
+  color: var(--mute);
+  font-size: 0.8125rem;
+}

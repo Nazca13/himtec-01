@@ -1,11 +1,12 @@
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import MotionProvider from '@/components/MotionProvider';
 import RegisterSW from '@/components/RegisterSW';
 import './globals.css';
 
-const jakarta = Plus_Jakarta_Sans({
+// Font sistem dulu (SF di perangkat Apple); Inter sebagai cadangan yang mirip di Android/Windows.
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-jakarta',
+  variable: '--font-inter',
   display: 'swap',
 });
 
@@ -18,7 +19,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: '#ffffff',
+  themeColor: '#f2f2f7',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -26,7 +27,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id" className={jakarta.variable}>
+    <html lang="id" className={inter.variable}>
       <body>
         <MotionProvider>{children}</MotionProvider>
         <RegisterSW />

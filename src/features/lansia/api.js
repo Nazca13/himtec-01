@@ -23,5 +23,6 @@ async function postJson(url, body) {
   throw lastError;
 }
 
-export const kirimTombol = (tipeInput, lokasi) => postJson('/api/record', { tipeInput, lokasi });
+// kabar = { tipeInput, keluhan?, sebab? } ; lokasi opsional
+export const kirimKabar = (kabar, lokasi) => postJson('/api/record', { ...kabar, lokasi });
 export const kirimSuara = ({ audioBase64, mimeType }, lokasi) => postJson('/api/ai', { audioBase64, mimeType, lokasi });

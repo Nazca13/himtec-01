@@ -5,38 +5,93 @@ import Link from 'next/link';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import {
+  PiArrowFatLinesDownFill,
+  PiBandaidsFill,
+  PiBatteryLowFill,
+  PiBrainFill,
+  PiCheckBold,
   PiCheckCircleFill,
+  PiChatTeardropDotsFill,
   PiFireFill,
+  PiHeartbeatFill,
   PiMicrophoneFill,
+  PiMoonStarsFill,
+  PiPhoneCallFill,
+  PiPhoneFill,
+  PiPillFill,
   PiShieldCheckFill,
   PiSirenFill,
+  PiSmileyNervousFill,
+  PiSpiralBold,
   PiStopFill,
+  PiThermometerHotFill,
+  PiVibrateFill,
   PiWarningCircleFill,
+  PiWindFill,
 } from 'react-icons/pi';
 import Mascot from '@/components/ui/Mascot';
 import { TIPE_INPUT } from '@/lib/constants';
-import { useRecorder } from '@/hooks/useRecorder';
 import { lokasiUntukKirim, panaskanLokasi } from '@/lib/geo';
-import { kirimSuara, kirimTombol } from './api';
+import { KELUHAN, KELUHAN_BY_ID } from '@/lib/keluhan';
+import { useDeteksiGerak, mintaIzinGerak } from '@/hooks/useDeteksiGerak';
+import { useRecorder } from '@/hooks/useRecorder';
+import { kirimKabar, kirimSuara } from './api';
 import styles from './LansiaApp.module.css';
 
 const MAX_REKAM_S = 30;
+const HITUNG_MUNDUR_S = 30;
 const TAMPIL_TERKIRIM_MS = 3_200;
-const KONFETI = Array.from({ length: 14 }, (_, i) => i);
+const DETEKSI_KEY = 'sapa.deteksi';
 
-// Balasan maskot setelah sebuah tombol: cepat (tanpa menunggu AI) dan menyebut nama.
-function balasan(tipe, nama, record) {
-  if (tipe === TIPE_INPUT.DARURAT) return `Tenang ya, ${nama}. Keluarga sudah diberi tahu dan segera menghubungi.`;
-  if (tipe === TIPE_INPUT.VOICE) {
-    if (record?.statusBahaya === 'MERAH') return `Tenang ya, ${nama}. Keluarga sudah diberi tahu dan segera menghubungi.`;
-    const gejala = record?.aiAnalysis?.gejala?.slice(0, 2).join(' dan ');
+const IKON_KELUHAN = {
+  PUSING: PiSpiralBold,
+  NYERI_DADA: PiHeartbeatFill,
+  SESAK: PiWindFill,
+  JATUH: PiArrowFatLinesDownFill,
+  KEJANG: PiBrainFill,
+  MUAL: PiSmileyNervousFill,
+  LEMAS: PiBatteryLowFill,
+  DEMAM: PiThermometerHotFill,
+  SAKIT: PiBandaidsFill,
+  OBAT_HABIS: PiPillFill,
+  SUSAH_TIDUR: PiMoonStarsFill,
+  TELEPON: PiPhoneCallFill,
+};
+
+// Petunjuk untuk orang di sekitar saat peringatan otomatis (pertolongan pertama umum).
+const PETUNJUK = {
+  KEJANG: ['Miringkan tubuhnya ke samping.', 'Jangan masukkan apa pun ke mulutnya.', 'Jauhkan benda keras atau tajam.', 'Jangan menahan gerakannya.', 'Kejang lebih dari 5 menit: telepon 119.'],
+  JATUH: ['Jangan langsung mengangkat tubuhnya.', 'Tanyakan apa yang sakit; periksa kepala dan pinggul.', 'Tidak sadar atau tidak bisa bergerak: telepon 119.'],
+};
+
+// Balasan maskot setelah kabar terkirim: cepat (tanpa menunggu AI) dan menyebut nama.
+function balasan(kabar, nama, record) {
+  if (record?.statusBahaya === 'MERAH') return `Tenang ya, ${nama}. Keluarga sudah diberi tahu dan segera menghubungi.`;
+  if (kabar.tipeInput === TIPE_INPUT.KELUHAN || kabar.tipeInput === TIPE_INPUT.VOICE) {
+    const gejala = record?.aiAnalysis?.gejala?.slice(0, 2).join(' dan ').toLowerCase();
     return gejala ? `Terima kasih sudah cerita, ${nama}. Keluarga sudah tahu soal ${gejala}.` : `Pesan ${nama} sudah sampai. Keluarga akan membacanya.`;
   }
   return `Terima kasih, ${nama}. Keluarga sudah tahu ${nama} baik-baik saja.`;
 }
 
+// Bunyi peringatan singkat untuk menarik perhatian orang di sekitar (bisa gagal jika browser memblokir audio).
+function bunyi() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = 880;
+    gain.gain.value = 0.25;
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.35);
+    osc.onended = () => ctx.close();
+  } catch {}
+}
+
 export default function LansiaApp() {
-  // idle | recording | sending | sent | error
+  // idle | keluhan | recording | sending | sent | error | deteksi
   const [phase, setPhase] = useState('idle');
   const [errorText, setErrorText] = useState('');
   const [putus, setPutus] = useState(false); // HP ini diputus keluarga: perlu dihubungkan ulang
@@ -44,6 +99,10 @@ export default function LansiaApp() {
   const [info, setInfo] = useState({ nama: 'Nenek', streak: 0, sudahHariIni: false, sapaan: 'Halo. Tekan tombol hijau kalau baik-baik saja ya.' });
   const [pesan, setPesan] = useState(null); // pesan maskot dari AI; null = pakai sapaan lokal
   const [balas, setBalas] = useState('');
+  const [pilihan, setPilihan] = useState([]); // keluhan yang dipilih
+  const [deteksiAktif, setDeteksiAktif] = useState(false);
+  const [sebab, setSebab] = useState(null); // KEJANG | JATUH saat hitung mundur
+  const [sisa, setSisa] = useState(HITUNG_MUNDUR_S);
   const { start, stop } = useRecorder();
 
   // Keadaan terbaru: sapaan lokal langsung, pesan AI menyusul dan menggantikannya.
@@ -57,7 +116,12 @@ export default function LansiaApp() {
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(muat, 0);
+    const t = setTimeout(() => {
+      muat();
+      try {
+        if (localStorage.getItem(DETEKSI_KEY) === '1') setDeteksiAktif(true);
+      } catch {}
+    }, 0);
     panaskanLokasi(); // lokasi siap sebelum tombol ditekan (jika izin sudah ada)
     return () => clearTimeout(t);
   }, [muat]);
@@ -68,24 +132,40 @@ export default function LansiaApp() {
     setPhase('error');
   }, []);
 
-  const selesai = useCallback((tipe, record) => {
-    setBalas(balasan(tipe, info.nama, record));
-    setPesan(null);
-    setPhase('sent');
-  }, [info.nama]);
+  const terkirim = useCallback(
+    (kabar, record) => {
+      setBalas(balasan(kabar, info.nama, record));
+      setPesan(null);
+      setPhase('sent');
+    },
+    [info.nama]
+  );
+
+  const kirim = useCallback(
+    async (kabar) => {
+      setPhase('sending');
+      try {
+        const { record } = await kirimKabar(kabar, await lokasiUntukKirim());
+        terkirim(kabar, record);
+      } catch (err) {
+        fail('Pesan belum terkirim. Periksa internet, lalu coba lagi.', err);
+      }
+    },
+    [terkirim, fail]
+  );
 
   const finishRecording = useCallback(async () => {
     setPhase('sending');
     try {
       const [audio, lokasi] = await Promise.all([stop(), lokasiUntukKirim()]);
       const { record } = await kirimSuara(audio, lokasi);
-      selesai(TIPE_INPUT.VOICE, record);
+      terkirim({ tipeInput: TIPE_INPUT.VOICE }, record);
     } catch (err) {
       fail('Pesan suara belum terkirim. Coba lagi.', err);
     }
-  }, [stop, fail, selesai]);
+  }, [stop, fail, terkirim]);
 
-  // Setelah perayaan: kembali ke tombol dan ambil hitungan hari serta pesan terbaru.
+  // Setelah terkirim: kembali ke tombol dan ambil hitungan hari serta pesan terbaru.
   useEffect(() => {
     if (phase !== 'sent') return;
     const t = setTimeout(() => {
@@ -111,15 +191,59 @@ export default function LansiaApp() {
     }
   }, [phase, detik, finishRecording]);
 
-  const pressButton = async (tipe) => {
-    setPhase('sending');
-    try {
-      await kirimTombol(tipe, await lokasiUntukKirim());
-      selesai(tipe);
-    } catch (err) {
-      fail('Pesan belum terkirim. Periksa internet, lalu coba lagi.', err);
+  // --- Deteksi kejang/jatuh: hitung mundur 30 detik, lalu DARURAT otomatis ---
+  const mulaiPeringatan = useCallback((s) => {
+    setSebab(s);
+    setSisa(HITUNG_MUNDUR_S);
+    setPhase((p) => (p === 'recording' || p === 'sending' ? p : 'deteksi'));
+  }, []);
+
+  useDeteksiGerak(deteksiAktif, mulaiPeringatan);
+
+  // Demo/presentasi: halaman /demo bisa memicu simulasi lewat postMessage (hanya dari situs sendiri).
+  useEffect(() => {
+    const onMessage = (e) => {
+      if (e.origin === window.location.origin && e.data?.sapa === 'simulasi') mulaiPeringatan(e.data.sebab === 'JATUH' ? 'JATUH' : 'KEJANG');
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [mulaiPeringatan]);
+
+  useEffect(() => {
+    if (phase !== 'deteksi') return;
+    const t = setInterval(() => {
+      setSisa((s) => s - 1);
+      navigator.vibrate?.([400, 200, 400]);
+      bunyi();
+    }, 1000);
+    return () => clearInterval(t);
+  }, [phase]);
+
+  const otomatisTerkirim = useRef(false);
+  useEffect(() => {
+    if (phase !== 'deteksi') otomatisTerkirim.current = false;
+    else if (sisa <= 0 && !otomatisTerkirim.current) {
+      otomatisTerkirim.current = true;
+      kirim({ tipeInput: TIPE_INPUT.OTOMATIS, sebab });
     }
+  }, [phase, sisa, sebab, kirim]);
+
+  const ubahDeteksi = async () => {
+    const nyala = !deteksiAktif && (await mintaIzinGerak());
+    setDeteksiAktif(nyala);
+    try {
+      localStorage.setItem(DETEKSI_KEY, nyala ? '1' : '0');
+    } catch {}
+    if (!deteksiAktif && !nyala) fail('Sensor gerak tidak bisa dipakai di HP atau browser ini.');
   };
+
+  // --- Keluhan ---
+  const bukaKeluhan = () => {
+    setPilihan([]);
+    setPhase('keluhan');
+  };
+
+  const pilih = (id) => setPilihan((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
 
   const startRecording = async () => {
     try {
@@ -127,38 +251,36 @@ export default function LansiaApp() {
       setDetik(0);
       setPhase('recording');
     } catch {
-      fail('Izin mikrofon dibutuhkan. Minta keluarga mengaktifkannya.');
+      fail('Izin mikrofon dibutuhkan. Pilih gambar keluhan saja, atau minta keluarga mengaktifkan mikrofon.');
     }
   };
 
   const teksMaskot = pesan ?? info.sapaan;
+  const gawat = pilihan.some((id) => KELUHAN_BY_ID[id]?.bahaya === 'MERAH');
 
   return (
     <main className={styles.app}>
-      <section className={styles.sky}>
-        <div className={styles.bar}>
-          <span className={styles.hello}>Halo, {info.nama}</span>
-          <span className={`${styles.streak} ${info.streak ? styles.hot : ''}`}>
-            <PiFireFill aria-hidden="true" />
-            {info.streak ? (
-              <>
-                {info.streak} hari<span className="sr-only"> berturut-turut</span>
-              </>
-            ) : (
-              'Mulai hari ini'
-            )}
-          </span>
-        </div>
-        <div className={styles.talk}>
-          <Mascot size={118} mood={phase === 'sent' ? 'senang' : 'idle'} priority />
-          <div className={styles.bubble} role="status" aria-live="polite">
-            <p key={teksMaskot}>{teksMaskot}</p>
-          </div>
-        </div>
+      <header className={styles.top}>
+        <h1 className={styles.hello}>Halo, {info.nama}</h1>
+        <span className={`${styles.streak} ${info.streak ? styles.hot : ''}`}>
+          <PiFireFill aria-hidden="true" />
+          {info.streak ? (
+            <>
+              {info.streak} hari<span className="sr-only"> berturut-turut</span>
+            </>
+          ) : (
+            'Mulai hari ini'
+          )}
+        </span>
+      </header>
+
+      <section className={styles.talk} role="status" aria-live="polite">
+        <Mascot size={68} mood={phase === 'sent' ? 'senang' : 'idle'} priority />
+        <p key={teksMaskot}>{teksMaskot}</p>
       </section>
 
       <div className={styles.buttons}>
-        <m.button whileTap={{ y: 5 }} className={`${styles.big} tone-HIJAU`} onClick={() => pressButton(TIPE_INPUT.AMAN)}>
+        <m.button whileTap={{ scale: 0.97 }} className={`${styles.big} tone-HIJAU`} onClick={() => kirim({ tipeInput: TIPE_INPUT.AMAN })}>
           <span className={styles.disc}>
             <PiShieldCheckFill aria-hidden="true" />
           </span>
@@ -168,80 +290,148 @@ export default function LansiaApp() {
           </span>
         </m.button>
 
-        <m.button whileTap={{ y: 5 }} className={`${styles.big} tone-KUNING`} onClick={startRecording}>
+        <m.button whileTap={{ scale: 0.97 }} className={`${styles.big} tone-KUNING`} onClick={bukaKeluhan}>
           <span className={styles.disc}>
-            <PiMicrophoneFill aria-hidden="true" />
+            <PiChatTeardropDotsFill aria-hidden="true" />
           </span>
           <span className={styles.label}>
-            <strong>Bicara</strong>
-            <span>Ceritakan keluhan lewat suara</span>
+            <strong>Keluhan</strong>
+            <span>Bicara, atau pilih gambar</span>
           </span>
         </m.button>
 
-        <m.button whileTap={{ y: 5 }} className={`${styles.big} ${styles.danger} tone-MERAH`} onClick={() => pressButton(TIPE_INPUT.DARURAT)}>
+        <m.button whileTap={{ scale: 0.97 }} className={`${styles.big} tone-MERAH`} onClick={() => kirim({ tipeInput: TIPE_INPUT.DARURAT })}>
           <span className={styles.disc}>
             <PiSirenFill aria-hidden="true" />
           </span>
           <span className={styles.label}>
-            <strong>DARURAT</strong>
+            <strong>Darurat</strong>
             <span>Panggil keluarga sekarang</span>
           </span>
         </m.button>
       </div>
 
-      <p className={`${styles.today} ${info.sudahHariIni ? styles.done : ''}`}>
-        {info.sudahHariIni ? <PiCheckCircleFill aria-hidden="true" /> : null}
-        {info.sudahHariIni ? 'Hari ini sudah memberi kabar' : 'Belum memberi kabar hari ini'}
-      </p>
+      <ul className={styles.group}>
+        <li className={styles.cell}>
+          <PiCheckCircleFill className={info.sudahHariIni ? styles.done : styles.todo} aria-hidden="true" />
+          <span>{info.sudahHariIni ? 'Hari ini sudah memberi kabar' : 'Belum memberi kabar hari ini'}</span>
+        </li>
+        <li className={styles.cell}>
+          <PiVibrateFill className={styles.cellIcon} aria-hidden="true" />
+          <span className={styles.cellText}>
+            Deteksi jatuh dan kejang
+            <small>{deteksiAktif ? 'Aktif selama aplikasi terbuka' : 'Kirim darurat otomatis bila tidak bisa menekan tombol'}</small>
+          </span>
+          <button role="switch" aria-checked={deteksiAktif} aria-label="Deteksi jatuh dan kejang" className={`${styles.switch} ${deteksiAktif ? styles.on : ''}`} onClick={ubahDeteksi}>
+            <span />
+          </button>
+        </li>
+      </ul>
 
       <AnimatePresence>
         {phase !== 'idle' && (
           <m.div
             key="overlay"
             className={`${styles.overlay} ${styles[phase]}`}
-            role="status"
+            role={phase === 'deteksi' ? 'alertdialog' : 'status'}
             aria-live="assertive"
-            initial={{ opacity: 0, scale: 1.03 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
           >
+            {phase === 'keluhan' && (
+              <div className={styles.sheet}>
+                <div className={styles.sheetHead}>
+                  <h2>Apa keluhannya?</h2>
+                  <button className={styles.textBtn} onClick={() => setPhase('idle')}>
+                    Batal
+                  </button>
+                </div>
+                <button className={styles.speak} onClick={startRecording}>
+                  <PiMicrophoneFill aria-hidden="true" />
+                  Bicara
+                </button>
+                <p className={styles.or}>atau ketuk gambar keluhan</p>
+                <ul className={styles.grid}>
+                  {KELUHAN.map((k) => {
+                    const Icon = IKON_KELUHAN[k.id];
+                    const on = pilihan.includes(k.id);
+                    return (
+                      <li key={k.id}>
+                        <button className={`${styles.tile} ${on ? styles.tileOn : ''} ${k.bahaya === 'MERAH' ? styles.tileRed : ''}`} aria-pressed={on} onClick={() => pilih(k.id)}>
+                          <Icon aria-hidden="true" />
+                          {k.label}
+                          {on && <PiCheckBold className={styles.tick} aria-hidden="true" />}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <button className={`${styles.send} ${gawat ? styles.sendRed : ''}`} disabled={!pilihan.length} onClick={() => kirim({ tipeInput: TIPE_INPUT.KELUHAN, keluhan: pilihan })}>
+                  {pilihan.length ? `Kirim ${pilihan.length} keluhan` : 'Pilih minimal satu'}
+                </button>
+              </div>
+            )}
+
             {phase === 'recording' && (
               <>
                 <span className={styles.listen}>
-                  <Mascot size={120} mood="mendengar" />
+                  <Mascot size={110} mood="mendengar" />
                 </span>
                 <p className={styles.msg}>Silakan bicara</p>
                 <p className={styles.timer}>
                   0:{String(detik).padStart(2, '0')} / 0:{MAX_REKAM_S}
                 </p>
-                <m.button whileTap={{ scale: 0.96 }} className={styles.action} onClick={finishRecording}>
+                <m.button whileTap={{ scale: 0.97 }} className={styles.action} onClick={finishRecording}>
                   <PiStopFill aria-hidden="true" />
                   Selesai bicara
                 </m.button>
               </>
             )}
+
+            {phase === 'deteksi' && (
+              <>
+                <p className={styles.alertTitle}>{sebab === 'JATUH' ? 'Sepertinya Anda jatuh' : 'Terdeteksi guncangan seperti kejang'}</p>
+                <p className={styles.count} aria-label={`${sisa} detik`}>
+                  {Math.max(sisa, 0)}
+                </p>
+                <p className={styles.alertSub}>Keluarga dihubungi otomatis jika tidak dibatalkan.</p>
+                <m.button whileTap={{ scale: 0.97 }} className={styles.okBtn} onClick={() => setPhase('idle')}>
+                  Saya baik-baik saja
+                </m.button>
+                <div className={styles.bystander}>
+                  <strong>Untuk orang di sekitar</strong>
+                  <ul>
+                    {(PETUNJUK[sebab] ?? PETUNJUK.KEJANG).map((t) => (
+                      <li key={t}>{t}</li>
+                    ))}
+                  </ul>
+                  <a href="tel:119" className={styles.call}>
+                    <PiPhoneFill aria-hidden="true" />
+                    Telepon 119
+                  </a>
+                </div>
+              </>
+            )}
+
             {phase === 'sending' && (
               <>
-                <Mascot size={110} mood="mendengar" />
+                <Mascot size={100} mood="mendengar" />
                 <p className={styles.msg}>Mengirim</p>
               </>
             )}
+
             {phase === 'sent' && (
               <>
-                <div className={styles.confetti} aria-hidden="true">
-                  {KONFETI.map((i) => (
-                    <i key={i} style={{ '--i': i }} />
-                  ))}
-                </div>
-                <Mascot size={150} mood="senang" />
+                <Mascot size={130} mood="senang" />
                 <p className={styles.msg}>Pesan Tersampaikan</p>
                 <p className={styles.reply}>{balas}</p>
               </>
             )}
+
             {phase === 'error' && (
               <>
-                <Mascot size={110} mood="siaga" />
                 <PiWarningCircleFill className={styles.warn} aria-hidden="true" />
                 <p className={`${styles.msg} ${styles.errText}`}>{errorText}</p>
                 {putus ? (
@@ -249,7 +439,7 @@ export default function LansiaApp() {
                     Hubungkan ulang
                   </Link>
                 ) : (
-                  <m.button whileTap={{ scale: 0.96 }} className={styles.action} onClick={() => setPhase('idle')}>
+                  <m.button whileTap={{ scale: 0.97 }} className={styles.action} onClick={() => setPhase('idle')}>
                     Kembali
                   </m.button>
                 )}

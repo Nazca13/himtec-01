@@ -1,4 +1,4 @@
-/* Mobile first: bar bawah. Di layar lebar (>=900px) menjadi sidebar kiri. */
+/* Ponsel: tab bar bawah tembus pandang (gaya iOS). Layar lebar (>=900px): sidebar kiri. */
 .shell {
   min-height: 100dvh;
 }
@@ -7,8 +7,10 @@
   position: fixed;
   inset: auto 0 0 0;
   z-index: 30;
-  background: var(--paper);
-  box-shadow: 0 -1px 0 var(--line), 0 -8px 24px rgba(17, 42, 70, 0.06);
+  background: var(--glass);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: inset 0 0.5px 0 var(--sep);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -30,9 +32,9 @@
   justify-content: center;
   gap: 2px;
   min-height: var(--nav-h);
-  color: var(--mute);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  color: #8e8e93;
+  font-size: 0.6875rem;
+  font-weight: 500;
 }
 
 .item svg {
@@ -40,24 +42,11 @@
 }
 
 .active {
-  color: var(--ink);
-  font-weight: 800;
+  color: var(--tint);
 }
 
-.active svg {
-  color: var(--brand-strong);
-}
-
-/* Penanda tab aktif: batang tipis di atas (ponsel), latar lembut di samping (desktop) */
 .pill {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 36px;
-  height: 4px;
-  margin-left: -18px;
-  border-radius: 0 0 4px 4px;
-  background: var(--brand-strong);
+  display: none;
 }
 
 .item > :not(.pill) {
@@ -65,7 +54,7 @@
 }
 
 .main {
-  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 24px);
 }
 
 .top {
@@ -75,23 +64,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(env(safe-area-inset-top) + 12px) var(--gutter) 12px;
-  margin-bottom: 16px;
-  background: var(--brand); /* biru logo; tanpa blur: backdrop-filter berat di HP murah */
-  border-radius: 0 0 24px 24px;
-  box-shadow: 0 5px 0 var(--brand-deep);
+  padding: calc(env(safe-area-inset-top) + 10px) var(--gutter) 10px;
+  background: var(--glass);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: inset 0 -0.5px 0 var(--sep);
 }
 
 .live {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--paper);
-  box-shadow: var(--shadow-sm);
+  gap: 6px;
+  color: var(--mute);
   font-size: 0.875rem;
-  font-weight: 700;
 }
 
 .off {
@@ -99,10 +84,10 @@
 }
 
 .pulse {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--teal);
+  background: var(--hijau);
   animation: blink 2s ease-in-out infinite;
 }
 
@@ -113,18 +98,17 @@
 }
 
 .banner {
-  margin: 0 var(--gutter) 8px;
+  margin: 12px var(--gutter) 0;
   padding: 12px 16px;
-  border-radius: var(--r-sm);
-  background: #ffecc9;
-  font-weight: 600;
+  border-radius: var(--r-md);
+  background: #fdebdd;
   font-size: 0.9375rem;
 }
 
 .content {
   max-width: 1120px;
   margin-inline: auto;
-  padding: 8px var(--gutter) 0;
+  padding: 20px var(--gutter) 0;
 }
 
 @media (min-width: 900px) {
@@ -133,6 +117,7 @@
     grid-template-columns: 260px 1fr;
   }
 
+  /* Sidebar gaya macOS/iPadOS: abu terang, baris terpilih tint */
   .side {
     position: sticky;
     top: 0;
@@ -140,59 +125,64 @@
     height: 100dvh;
     display: flex;
     flex-direction: column;
-    gap: 32px;
-    padding: 28px 16px;
-    background: var(--brand); /* sidebar biru logo, teks navy */
-    box-shadow: 6px 0 0 var(--brand-deep);
+    gap: 24px;
+    padding: 24px 12px;
+    background: #f7f7f9;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: inset -0.5px 0 0 var(--sep);
   }
 
   .brand {
     display: block;
-    padding-inline: 12px;
+    padding-inline: 10px;
   }
 
   .nav {
-    display: grid;
     grid-template-columns: 1fr;
-    gap: 4px;
+    gap: 2px;
   }
 
   .item {
     flex-direction: row;
     justify-content: flex-start;
-    gap: 14px;
-    min-height: 52px;
-    padding: 0 14px;
-    border-radius: var(--r-sm);
+    gap: 12px;
+    min-height: 40px;
+    padding: 0 10px;
+    border-radius: 8px;
     color: var(--ink);
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 0.9375rem;
+  }
+
+  .item svg {
+    font-size: 1.25rem;
+    color: var(--tint);
   }
 
   .item:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(0, 0, 0, 0.04);
   }
 
-  .pill {
-    inset: 0;
-    width: auto;
-    height: auto;
-    margin: 0;
-    border-radius: var(--r-sm);
-    background: var(--paper);
-    box-shadow: 0 4px 0 var(--brand-deep);
+  .active,
+  .active:hover {
+    background: var(--tint);
+    color: #fff;
+  }
+
+  .active svg {
+    color: #fff;
   }
 
   .who {
     display: grid;
+    gap: 1px;
     margin-top: auto;
-    padding: 12px;
-    font-size: 0.9375rem;
+    padding: 10px;
+    font-size: 0.875rem;
   }
 
-  .who {
-    border-radius: var(--r-sm);
-    background: rgba(255, 255, 255, 0.35);
+  .who span {
+    color: var(--mute);
   }
 
   .main {
@@ -204,7 +194,6 @@
   }
 
   .content {
-    padding-top: 32px;
-    padding-inline: 40px;
+    padding: 36px 40px 0;
   }
 }

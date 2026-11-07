@@ -1,37 +1,36 @@
+/* Widget gaya iOS: kartu putih, ikon maskot, label kecil, teks isi */
 .card {
   display: grid;
-  gap: 14px;
-  padding: 20px;
-  border-radius: var(--r-md);
-  background: var(--ink);
-  color: var(--paper);
-  box-shadow: var(--shadow-md);
+  gap: 12px;
+  padding: 18px;
+  border-radius: var(--r-lg);
+  background: var(--paper);
 }
 
 .head {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .head h2 {
-  font-size: 1.1875rem;
-  font-weight: 800;
+  font-size: 1.0625rem;
+  font-weight: 600;
 }
 
 .live {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #c9dcf0;
-  font-size: 0.875rem;
+  gap: 6px;
+  color: var(--mute);
+  font-size: 0.8125rem;
 }
 
 .dot {
-  width: 9px;
-  height: 9px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--teal);
+  background: var(--hijau);
   animation: blink 2s ease-in-out infinite;
 }
 
@@ -42,13 +41,14 @@
 }
 
 .text {
-  font-size: 1.0625rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-line;
   transition: opacity 200ms;
 }
 
 .stale {
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .skel {
@@ -57,9 +57,9 @@
 }
 
 .skel i {
-  height: 14px;
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.18);
+  height: 12px;
+  border-radius: 6px;
+  background: var(--bg);
   animation: blink 1.4s ease-in-out infinite;
 }
 
@@ -74,8 +74,8 @@
 .more {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  color: var(--brand);
-  font-weight: 800;
+  gap: 4px;
+  min-height: 40px;
+  color: var(--tint);
+  font-size: 0.9375rem;
 }

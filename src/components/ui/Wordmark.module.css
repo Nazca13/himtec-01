@@ -2,13 +2,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-size: 1.1875rem;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .badge {
-  border-radius: 12px;
-  /* cincin putih: ubin logo yang biru tetap terlihat di atas header biru */
-  box-shadow: 0 0 0 2px var(--paper), var(--shadow-sm);
+  border-radius: 9px; /* proporsi sudut ikon iOS */
 }

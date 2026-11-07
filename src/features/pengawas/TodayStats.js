@@ -4,9 +4,9 @@ import { isHariIni } from '@/lib/format';
 import styles from './pengawas.module.css';
 
 const TILES = [
-  { tipe: TIPE_INPUT.AMAN, label: 'Kabar aman', Icon: PiShieldCheckFill, tone: 'HIJAU' },
-  { tipe: TIPE_INPUT.VOICE, label: 'Pesan suara', Icon: PiMicrophoneFill, tone: 'KUNING' },
-  { tipe: TIPE_INPUT.DARURAT, label: 'Darurat', Icon: PiSirenFill, tone: 'MERAH' },
+  { key: 'aman', tipe: [TIPE_INPUT.AMAN], label: 'Kabar aman', Icon: PiShieldCheckFill, tone: 'HIJAU' },
+  { key: 'keluhan', tipe: [TIPE_INPUT.VOICE, TIPE_INPUT.KELUHAN], label: 'Keluhan', Icon: PiMicrophoneFill, tone: 'KUNING' },
+  { key: 'darurat', tipe: [TIPE_INPUT.DARURAT, TIPE_INPUT.OTOMATIS], label: 'Darurat', Icon: PiSirenFill, tone: 'MERAH' },
 ];
 
 export default function TodayStats({ records }) {
@@ -18,12 +18,12 @@ export default function TodayStats({ records }) {
         Hari ini
       </h2>
       <ul className={styles.stats}>
-        {TILES.map(({ tipe, label, Icon, tone }) => (
-          <li key={tipe} className={`${styles.stat} tone-${tone}`}>
+        {TILES.map(({ key, tipe, label, Icon, tone }) => (
+          <li key={key} className={`${styles.stat} tone-${tone}`}>
             <span className={styles.statIcon}>
               <Icon aria-hidden="true" />
             </span>
-            <strong>{today.filter((r) => r.tipeInput === tipe).length}</strong>
+            <strong>{today.filter((r) => tipe.includes(r.tipeInput)).length}</strong>
             <span>{label}</span>
           </li>
         ))}

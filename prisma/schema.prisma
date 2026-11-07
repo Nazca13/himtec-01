@@ -59,7 +59,7 @@ model DailyRecord {
   // Nullable hanya untuk baris lama sebelum ada grup; semua query memfilter lansiaId.
   lansiaId     String?  @map("lansia_id") @db.Uuid
   lansia       Lansia?  @relation(fields: [lansiaId], references: [id], onDelete: Cascade)
-  tipeInput    String   @map("tipe_input") @db.VarChar(50) // TOMBOL_AMAN | TOMBOL_DARURAT | VOICE_NOTE
+  tipeInput    String   @map("tipe_input") @db.VarChar(50) // TOMBOL_AMAN | TOMBOL_DARURAT | VOICE_NOTE | KELUHAN | DETEKSI_OTOMATIS
   statusBahaya String   @default("HIJAU") @map("status_bahaya") @db.VarChar(20) // HIJAU | KUNING | MERAH
   rawData      String?  @map("raw_data") @db.Text
   aiAnalysis   Json?    @map("ai_analysis") @db.JsonB // transkrip, gejala, ringkasan

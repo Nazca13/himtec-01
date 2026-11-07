@@ -1,33 +1,38 @@
+/* Segmented control gaya iOS */
 .row {
-  display: flex;
-  gap: 8px;
+  justify-self: start; /* selebar isinya, seperti segmented control iOS */
+  display: inline-flex;
+  max-width: 100%;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--fill);
   overflow-x: auto;
-  padding-bottom: 4px;
   scrollbar-width: none;
 }
 
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
   flex: none;
-  min-height: 44px;
+  min-height: 34px;
   padding: 0 16px;
-  border-radius: 999px;
-  background: var(--paper);
-  box-shadow: 0 0 0 2px #dbe9f5;
-  font-weight: 700;
+  border-radius: 7px;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 500;
 }
 
 .on {
-  background: var(--ink);
-  color: var(--paper);
-  box-shadow: none;
+  background: var(--paper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  font-weight: 600;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--tone, #b9c7d6);
+  background: var(--tone, #c7c7cc);
 }

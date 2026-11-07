@@ -42,7 +42,7 @@ CREATE INDEX IF NOT EXISTS lansia_household_id_idx ON lansia(household_id);
 CREATE TABLE IF NOT EXISTS daily_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     lansia_id UUID REFERENCES lansia(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    tipe_input VARCHAR(50) NOT NULL CHECK (tipe_input IN ('TOMBOL_AMAN', 'TOMBOL_DARURAT', 'VOICE_NOTE')),
+    tipe_input VARCHAR(50) NOT NULL CHECK (tipe_input IN ('TOMBOL_AMAN', 'TOMBOL_DARURAT', 'VOICE_NOTE', 'KELUHAN', 'DETEKSI_OTOMATIS')),
     status_bahaya VARCHAR(20) NOT NULL DEFAULT 'HIJAU' CHECK (status_bahaya IN ('HIJAU', 'KUNING', 'MERAH')),
     raw_data TEXT,
     ai_analysis JSONB,                            -- hasil triase AI: transkrip, gejala, ringkasan

@@ -3,9 +3,9 @@
 }
 
 .block h2 {
-  margin-bottom: 14px;
+  margin: 0 4px 10px;
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .roles {
@@ -16,17 +16,15 @@
 .role {
   padding: 18px;
   border-radius: var(--r-md);
-  background: var(--ice);
+  background: var(--paper);
 }
 
 .role h3 {
   display: inline-block;
   margin-bottom: 10px;
-  padding: 2px 12px;
-  border-radius: 999px;
-  background: var(--brand);
-  font-size: 1rem;
-  font-weight: 800;
+  color: var(--tint);
+  font-size: 1.125rem;
+  font-weight: 600;
 }
 
 .role dl {
@@ -48,7 +46,9 @@
 .steps {
   display: grid;
   gap: 14px;
-  padding-left: 1.25rem;
+  padding: 18px 18px 18px 2.25rem;
+  border-radius: var(--r-md);
+  background: var(--paper);
 }
 
 .steps li::marker {
@@ -61,7 +61,20 @@
 }
 
 .qa {
-  border-bottom: 2px solid var(--ice);
+  padding: 0 16px;
+  background: var(--paper);
+}
+
+.qa:first-of-type {
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+
+.qa:last-of-type {
+  border-radius: 0 0 var(--r-md) var(--r-md);
+}
+
+.qa + .qa {
+  box-shadow: inset 0 0.5px 0 var(--sep);
 }
 
 .qa summary {
@@ -69,7 +82,7 @@
   min-height: 52px;
   display: flex;
   align-items: center;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .qa p {
@@ -88,17 +101,16 @@
   align-items: center;
   justify-content: center;
   min-height: 56px;
-  border-radius: 20px;
-  font-weight: 800;
+  border-radius: var(--r-md);
+  font-weight: 600;
 }
 
 .primary {
-  background: var(--brand-strong);
-  color: var(--paper);
-  box-shadow: 0 5px 0 var(--brand-strong-deep);
+  background: var(--tint);
+  color: #fff;
 }
 
 .secondary {
-  box-shadow: inset 0 0 0 2px #dbe9f5;
-  color: var(--brand-strong);
+  background: var(--fill);
+  color: var(--tint);
 }

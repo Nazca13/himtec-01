@@ -1,25 +1,37 @@
 .stack {
   display: grid;
   grid-template-columns: minmax(0, 1fr); /* kolom tidak melebar mengikuti isi terlebar */
-  gap: 28px;
+  gap: 24px;
 }
 
-.h1 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+.narrow {
+  max-width: 720px;
+}
+
+/* Large Title */
+.h1,
+.heading {
+  font-size: 2.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
 }
 
 .h2 {
-  font-size: 1.1875rem;
-  font-weight: 800;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.headRow {
+  display: grid;
+  gap: 14px;
 }
 
 .row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .row .h2 {
@@ -29,34 +41,36 @@
 .more {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-height: 44px;
-  color: var(--sky-deep);
-  font-weight: 700;
+  color: var(--tint);
+  font-size: 0.9375rem;
 }
 
 section > .h2 {
-  margin-bottom: 12px;
+  margin: 0 4px 8px;
 }
 
 .empty {
-  padding: 20px;
+  padding: 18px;
   border-radius: var(--r-md);
   background: var(--paper);
-  box-shadow: var(--shadow-sm);
   color: var(--mute);
 }
 
-/* Kartu status: elemen utama halaman; satu-satunya blok berwarna penuh */
+.muted {
+  color: var(--mute);
+}
+
+/* Kartu status: satu-satunya blok berwarna penuh di halaman */
 .status {
   display: flex;
-  gap: 18px;
-  align-items: flex-start;
-  padding: 22px;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
   border-radius: var(--r-lg);
   background: var(--tone);
   color: var(--on-tone);
-  box-shadow: var(--shadow-md);
 }
 
 .statusEmpty {
@@ -70,72 +84,75 @@ section > .h2 {
   display: grid;
   place-items: center;
   flex: none;
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background: var(--paper);
-  color: var(--ink);
-  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 1.75rem;
 }
 
-/* Denyut hanya untuk DARURAT, agar mata tertarik ke satu hal ini */
-.alarm {
-  color: var(--merah);
-}
-
+/* Denyut hanya untuk DARURAT */
 .alarm::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 3px solid var(--paper);
+  border: 2px solid #fff;
   animation: alarm 1.4s ease-out infinite;
 }
 
 @keyframes alarm {
   to {
-    transform: scale(1.7);
+    transform: scale(1.6);
     opacity: 0;
   }
 }
 
 .statusWord {
-  font-size: clamp(1.75rem, 7vw, 2.5rem);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.statusEmpty .statusWord {
+  font-size: 1.25rem;
 }
 
 .statusMeta {
-  margin-top: 6px;
+  margin-top: 2px;
   font-size: 0.9375rem;
-  opacity: 0.92;
+  opacity: 0.9;
+}
+
+.statusEmpty .statusMeta {
+  color: var(--mute);
+  opacity: 1;
 }
 
 .statusNote {
-  margin-top: 12px;
-  font-size: 1.0625rem;
-  font-weight: 600;
+  margin-top: 8px;
+  font-weight: 500;
 }
 
 .sepi {
   display: flex;
   gap: 8px;
   align-items: center;
-  margin-top: 12px;
+  margin-top: 10px;
   padding: 8px 12px;
   border-radius: var(--r-sm);
-  background: rgba(255, 255, 255, 0.85);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.22);
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 500;
 }
 
+/* Hari ini: tiga ubin */
 .stats {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 10px;
 }
 
 .stat {
@@ -145,71 +162,85 @@ section > .h2 {
   padding: 14px;
   border-radius: var(--r-md);
   background: var(--paper);
-  box-shadow: var(--shadow-sm);
 }
 
 .stat strong {
-  margin-top: 8px;
-  font-size: 2rem;
-  font-weight: 800;
+  margin-top: 6px;
+  font-size: 1.75rem;
+  font-weight: 700;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat > span:last-child {
   color: var(--mute);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
 }
 
 .statIcon {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   background: var(--tone);
   color: var(--on-tone);
-  font-size: 1.25rem;
+  font-size: 1.0625rem;
 }
 
+/* Riwayat: daftar inset grouped dengan pemisah tipis */
 .timeline {
   list-style: none;
   display: grid;
-  gap: 12px;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  overflow: hidden;
 }
 
 .entry {
+  position: relative;
   display: flex;
   gap: 14px;
-  padding: 16px;
-  border-radius: var(--r-md);
-  background: var(--paper);
-  box-shadow: var(--shadow-sm);
+  padding: 14px 16px;
+}
+
+.entry + .entry::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 66px;
+  height: 0.5px;
+  background: var(--sep);
 }
 
 .entryIcon {
   display: grid;
   place-items: center;
   flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   background: var(--tone);
   color: var(--on-tone);
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .entryBody {
   min-width: 0;
   display: grid;
-  gap: 4px;
+  gap: 2px;
 }
 
 .entryHead {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 12px;
+  gap: 4px 10px;
+}
+
+.entryHead strong {
+  font-weight: 600;
 }
 
 .entryBody time {
@@ -219,6 +250,7 @@ section > .h2 {
 
 .entryBody p {
   margin-top: 4px;
+  font-size: 0.9375rem;
 }
 
 .tags {
@@ -232,28 +264,37 @@ section > .h2 {
 .tags li {
   padding: 2px 10px;
   border-radius: 999px;
-  background: var(--ice);
-  font-size: 0.875rem;
-  font-weight: 600;
+  background: var(--bg);
+  font-size: 0.8125rem;
 }
 
-/* Kerangka muat: menjaga tata letak tetap stabil sebelum data tiba */
+.loc {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  color: var(--tint);
+  font-size: 0.875rem;
+}
+
+/* Kerangka muat */
 .skel {
   border-radius: var(--r-md);
-  background: linear-gradient(90deg, #dcebf5 25%, #eef6fb 50%, #dcebf5 75%);
+  background: linear-gradient(90deg, #e8e8ed 25%, #f2f2f6 50%, #e8e8ed 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
 
 .skelHero {
-  height: 160px;
-  margin-bottom: 28px;
+  height: 120px;
+  margin-bottom: 24px;
   border-radius: var(--r-lg);
 }
 
 .skelRow {
-  height: 88px;
-  margin-bottom: 12px;
+  height: 72px;
+  margin-bottom: 10px;
 }
 
 @keyframes shimmer {
@@ -262,100 +303,34 @@ section > .h2 {
   }
 }
 
-@media (min-width: 900px) {
-  .stat {
-    padding: 18px;
-  }
-}
-
-/* Tab Keluarga */
-.panel {
-  display: grid;
-  gap: 12px;
-  padding: 20px;
-  border-radius: var(--r-md);
-  background: var(--paper);
-  box-shadow: var(--shadow-sm);
-}
-
-.muted {
-  color: var(--mute);
-}
-
-.pill {
-  justify-self: start;
-  padding: 4px 14px;
-  border-radius: 999px;
-  font-size: 0.9375rem;
-  font-weight: 800;
-}
-
-.ok {
-  background: #d6f4ef;
-}
-
-.warn {
-  background: #ffecc9;
-}
-
-.outline,
-.danger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 0 20px;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 2px rgba(17, 42, 70, 0.2);
-  font-weight: 800;
-}
-
-.danger {
-  box-shadow: inset 0 0 0 2px var(--merah);
-  color: var(--merah);
-}
-
-.outline svg,
-.danger svg {
-  font-size: 1.25rem;
-}
-
-.outline:disabled,
-.danger:disabled {
-  opacity: 0.5;
-}
-
-/* Beranda: peringatan HP lansia belum terhubung */
+/* Beranda: peringatan HP belum terhubung */
 .notice {
   display: flex;
   gap: 14px;
   align-items: center;
-  padding: 16px;
+  padding: 14px 16px;
   border-radius: var(--r-md);
-  background: #ffecc9;
+  background: #fdebdd;
+  font-size: 0.9375rem;
 }
 
 .notice strong {
   display: block;
+  font-weight: 600;
 }
 
 .notice a {
   margin-left: auto;
   flex: none;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: 999px;
-  background: var(--ink);
-  color: var(--paper);
-  font-weight: 800;
+  background: var(--tint);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9375rem;
 }
 
-.heading {
-  font-size: 1.1875rem;
-  font-weight: 800;
-}
-
-/* Dashboard dua kolom di layar lebar; ponsel tetap satu kolom (AI live tepat di bawah status) */
+/* Dashboard dua kolom di layar lebar; ponsel satu kolom (AI live tepat di bawah status) */
 .dash {
   display: grid;
   gap: 24px;
@@ -366,10 +341,11 @@ section > .h2 {
   display: grid;
   gap: 24px;
   align-content: start;
+  min-width: 0;
 }
 
 .side {
-  order: -1; /* ponsel: AI live naik ke atas */
+  order: -1;
 }
 
 @media (min-width: 1000px) {
@@ -385,41 +361,82 @@ section > .h2 {
   }
 }
 
-.narrow {
-  max-width: 760px;
-}
-
-.headRow {
-  display: grid;
-  gap: 12px;
-}
-
+/* Tombol */
 .cta {
   justify-self: start;
   display: inline-flex;
   align-items: center;
-  min-height: 52px;
-  padding: 0 22px;
-  border-radius: 18px;
-  background: var(--brand-strong);
-  color: var(--paper);
-  font-weight: 800;
-  box-shadow: 0 5px 0 var(--brand-strong-deep);
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: var(--tint);
+  color: #fff;
+  font-weight: 600;
 }
 
-/* Tab Keluarga: daftar orang tua dan anggota */
+.outline,
+.danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: var(--fill);
+  color: var(--tint);
+  font-weight: 600;
+}
+
+.danger {
+  color: var(--merah);
+}
+
+.outline svg,
+.danger svg {
+  font-size: 1.125rem;
+}
+
+.cta:active,
+.outline:active,
+.danger:active {
+  opacity: 0.7;
+}
+
+.cta:disabled,
+.outline:disabled,
+.danger:disabled {
+  opacity: 0.5;
+}
+
+/* Tab Keluarga */
+.panel {
+  display: grid;
+  gap: 12px;
+}
+
+.panel > .h2 {
+  margin: 0 4px;
+}
+
 .list {
   list-style: none;
   display: grid;
-  gap: 12px;
+  border-radius: var(--r-md);
+  background: var(--paper);
+  overflow: hidden;
 }
 
 .item {
   display: grid;
   gap: 12px;
   padding: 16px;
-  border-radius: var(--r-sm);
-  background: var(--ice);
+}
+
+.item + .item {
+  box-shadow: inset 0 0.5px 0 var(--sep);
 }
 
 .itemHead {
@@ -427,15 +444,37 @@ section > .h2 {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px 12px;
+  gap: 6px 12px;
 }
 
 .itemHead strong {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.pill {
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--mute);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.ok {
+  background: #e3f4e8;
+  color: #1c6b30;
+}
+
+.warn {
+  background: #fdebdd;
+  color: #9a2800;
 }
 
 .admin {
-  background: var(--brand);
+  background: var(--ice);
+  color: var(--tint);
 }
 
 .actions {
@@ -446,33 +485,38 @@ section > .h2 {
 
 .actions .outline,
 .actions .danger {
-  min-height: 44px;
-  padding: 0 16px;
+  min-height: 40px;
+  padding: 0 14px;
   font-size: 0.9375rem;
 }
 
 .details summary {
   cursor: pointer;
-  min-height: 44px;
+  min-height: 40px;
   display: flex;
   align-items: center;
-  color: var(--brand-strong);
-  font-weight: 800;
+  color: var(--tint);
+  font-size: 0.9375rem;
 }
 
 .details[open] summary {
   margin-bottom: 8px;
 }
 
+.details :global(div) {
+  background: var(--bg);
+}
+
 .addForm {
   display: grid;
   gap: 8px;
-  padding-top: 8px;
-  border-top: 2px solid var(--ice);
+  padding: 16px;
+  border-radius: var(--r-md);
+  background: var(--paper);
 }
 
 .addForm label {
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .addRow {
@@ -483,46 +527,32 @@ section > .h2 {
 .input {
   flex: 1;
   min-width: 0;
-  min-height: 52px;
+  min-height: 48px;
   padding: 0 14px;
   border: 0;
-  border-radius: var(--r-sm);
-  background: var(--paper);
-  box-shadow: inset 0 0 0 2px rgba(20, 36, 69, 0.18);
+  border-radius: 12px;
+  background: var(--bg);
   font-size: 1.0625rem;
 }
 
 .input:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 3px var(--brand-strong);
-}
-
-.cta svg {
-  margin-right: 6px;
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.35);
 }
 
 .formError,
 .formOk {
   padding: 12px 16px;
-  border-radius: var(--r-sm);
-  font-weight: 700;
+  border-radius: var(--r-md);
+  font-size: 0.9375rem;
 }
 
 .formError {
-  background: #fde1df;
+  background: #fde4e7;
+  color: #a1000f;
 }
 
 .formOk {
-  background: #d6f4ef;
-}
-
-.loc {
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 36px;
-  color: var(--brand-strong);
-  font-size: 0.9375rem;
-  font-weight: 700;
+  background: #e3f4e8;
+  color: #1c6b30;
 }

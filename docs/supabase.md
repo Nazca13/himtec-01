@@ -38,13 +38,14 @@ lansia     1 --- n daily_records  (kabar dari HP lansia)
 | `households` | `nama`, `kode_undangan` (unik, untuk bergabung sebagai pemantau) |
 | `members` | `household_id` (FK), `nama`, `role` (`ADMIN` / `PEMANTAU`, CHECK) |
 | `lansia` | `household_id` (FK), `nama`, `kode_pairing` (unik, untuk HP lansia), `device_version` (naik saat HP diputus), `terhubung_at` |
-| `daily_records` | `lansia_id` (FK; nullable hanya untuk baris lama), `tipe_input`, `status_bahaya` (CHECK), `ai_analysis` (jsonb), `latitude`, `longitude`, `akurasi_meter` (CHECK rentang), `created_at` |
+| `daily_records` | `lansia_id` (FK; nullable hanya untuk baris lama), `tipe_input` (CHECK: TOMBOL_AMAN, TOMBOL_DARURAT, VOICE_NOTE, KELUHAN, DETEKSI_OTOMATIS), `status_bahaya` (CHECK), `ai_analysis` (jsonb), `latitude`, `longitude`, `akurasi_meter` (CHECK rentang), `created_at` |
 
 Semua FK `ON DELETE CASCADE`. Indeks utama: `daily_records(lansia_id, created_at desc)`. Semua query wajib memfilter keluarga/lansia dari sesi, bukan dari input klien.
 
 Migrasi manual untuk database lama (dijalankan berurutan, masing-masing satu transaksi):
 1. `prisma/sql/2026-11-07-peran-dan-relasi.sql`: grup lama menjadi keluarga + lansia, log dipindah ke lansia.
 2. `prisma/sql/2026-11-07-lokasi.sql`: kolom lokasi.
+3. `prisma/sql/2026-11-08-keluhan-deteksi.sql`: tipe kabar KELUHAN dan DETEKSI_OTOMATIS.
 
 Data demo: `npm run db:seed` (hanya mereset Keluarga Demo).
 

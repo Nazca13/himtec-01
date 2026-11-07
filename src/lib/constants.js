@@ -2,6 +2,8 @@ export const TIPE_INPUT = {
   AMAN: 'TOMBOL_AMAN',
   DARURAT: 'TOMBOL_DARURAT',
   VOICE: 'VOICE_NOTE',
+  KELUHAN: 'KELUHAN', // dipilih lewat gambar, tanpa suara
+  OTOMATIS: 'DETEKSI_OTOMATIS', // sensor HP mendeteksi kejang/jatuh, tidak dibatalkan dalam 30 detik
 };
 
 export const STATUS = {
@@ -20,6 +22,8 @@ export const TIPE_LABEL = {
   TOMBOL_AMAN: 'Tombol Aman',
   TOMBOL_DARURAT: 'Tombol Darurat',
   VOICE_NOTE: 'Pesan Suara',
+  KELUHAN: 'Keluhan',
+  DETEKSI_OTOMATIS: 'Deteksi otomatis',
 };
 
 // Batas payload audio (base64 chars). ~30 detik rekaman opus masih jauh di bawah ini.

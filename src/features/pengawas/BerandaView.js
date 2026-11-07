@@ -5,6 +5,7 @@ import { PiArrowRightBold } from 'react-icons/pi';
 import AiLiveWidget from './AiLiveWidget';
 import LansiaSwitcher from './LansiaSwitcher';
 import LokasiCard from './LokasiCard';
+import PertolonganCard from './PertolonganCard';
 import Skeleton from './Skeleton';
 import StatusCard from './StatusCard';
 import Timeline from './Timeline';
@@ -15,7 +16,7 @@ import styles from './pengawas.module.css';
 
 // Dashboard: kolom kiri = kondisi sekarang, kolom kanan = AI live dan tren. Satu kolom di ponsel.
 export default function BerandaView() {
-  const { records, lansia, dipilih, isAdmin, now, me } = useRecords();
+  const { records, lansia, dipilih, isAdmin, now, me, lokasiTerakhir } = useRecords();
   if (!me) return <Skeleton />;
 
   if (!lansia.length) {
@@ -57,6 +58,7 @@ export default function BerandaView() {
         <div className={styles.dash}>
           <div className={styles.main}>
             <StatusCard latest={records[0]} now={now} />
+            {records[0]?.statusBahaya === 'MERAH' && <PertolonganCard record={records[0]} nama={dipilih?.nama} lokasi={lokasiTerakhir} />}
             <TodayStats records={records} />
             <section aria-labelledby="terbaru">
               <div className={styles.row}>

@@ -16,7 +16,7 @@ const PERAN = [
     nama: 'Lansia',
     siapa: 'Orang tua yang dipantau (nenek atau kakek).',
     perangkat: 'Aplikasi di HP-nya sendiri (bisa di-install ke layar utama).',
-    bisa: 'Menekan Saya Aman, Bicara (pesan suara yang dibaca AI), atau Darurat. Maskot menyapa dan menghitung hari berturut-turut.',
+    bisa: 'Menekan Saya Aman, Keluhan (bicara, atau ketuk gambar keluhan bagi yang sulit bicara), atau Darurat. Deteksi jatuh dan kejang bisa diaktifkan. Maskot menyapa dan menghitung hari berturut-turut.',
     masuk: 'Membuka link kode HP dari admin, lalu "Hubungkan HP ini". Cukup sekali.',
   },
   {
@@ -31,7 +31,7 @@ const PERAN = [
 const ALUR = [
   ['Admin mendaftar', 'Buka halaman depan, pilih "Daftarkan keluarga", isi nama Anda dan nama orang tua. Anda langsung menjadi admin dan mendapat dua kode: kode HP (untuk orang tua) dan kode undangan (untuk keluarga lain).'],
   ['Hubungkan HP orang tua', 'Tekan "Kirim lewat WhatsApp" pada kode HP. Di HP orang tua, buka link itu lalu tekan "Hubungkan HP ini". Setelah itu HP menampilkan tiga tombol setiap kali dibuka. Agar seperti aplikasi, pilih "Tambahkan ke layar utama" di menu browser.'],
-  ['Orang tua memberi kabar', 'Saya Aman (hijau), Bicara (oranye, rekam suara: AI merangkum keluhan dan menilai tingkat bahaya), atau Darurat (merah).'],
+  ['Orang tua memberi kabar', 'Saya Aman (hijau), Keluhan (oranye: bicara dan AI merangkum, atau ketuk gambar seperti Pusing, Sesak napas, Jatuh), atau Darurat (merah). Keluhan berbahaya otomatis berstatus merah.'],
   ['Keluarga memantau', 'Dashboard menampilkan status terbaru, Ringkasan AI yang diperbarui otomatis, grafik 7 hari, riwayat, dan Asisten AI untuk bertanya. Kabar baru muncul dalam hitungan detik.'],
   ['Admin mengundang keluarga lain', 'Di menu Keluarga, kirim kode undangan. Penerima memilih "Masuk dengan kode undangan" dan menjadi pemantau. Admin bisa menjadikannya admin kapan saja.'],
 ];
@@ -41,6 +41,8 @@ const TANYA = [
   ['Bagaimana memantau lebih dari satu orang tua?', 'Admin membuka menu Keluarga, lalu "Tambah orang tua". Setiap orang tua punya kode HP sendiri. Pilih namanya di bagian atas dashboard untuk berpindah.'],
   ['HP orang tua hilang atau diganti?', 'Admin membuka menu Keluarga, tekan "Putuskan HP". HP lama langsung tidak bisa mengirim kabar, dan kode baru dibuat untuk HP baru.'],
   ['Bagaimana mengeluarkan anggota keluarga?', 'Admin membuka menu Keluarga, lalu "Keluarkan" pada nama anggota. Perangkatnya langsung tidak bisa membuka dashboard. Keluarga selalu menyisakan minimal satu admin.'],
+  ['Bagaimana jika orang tua tidak bisa bicara?', 'Tekan Keluhan, lalu ketuk gambar keluhannya (boleh lebih dari satu) dan tekan Kirim. Tidak perlu suara atau mengetik.'],
+  ['Bagaimana jika orang tua kejang atau jatuh dan tidak bisa menekan tombol?', 'Aktifkan "Deteksi jatuh dan kejang" di HP orang tua. Jika HP mendeteksi guncangan seperti kejang atau benturan jatuh, layar menghitung mundur 30 detik dengan tombol besar "Saya baik-baik saja". Jika tidak ditekan, Darurat terkirim otomatis beserta lokasi, dan layar menampilkan petunjuk pertolongan untuk orang di sekitar. Keluarga melihat langkah pertolongan pertama di dashboard. Deteksi hanya bekerja selama aplikasi terbuka di layar; ini membantu, bukan pengganti pengawasan medis.'],
   ['Apakah data keluarga saya terlihat orang lain?', 'Tidak. Setiap keluarga hanya melihat datanya sendiri, dan semua akses diperiksa di server. Bagikan kode hanya ke keluarga.'],
   ['Ingin mencoba tanpa mendaftar?', 'Buka mode demo: satu layar berisi HP orang tua dan dashboard admin berdampingan, dengan data contoh.'],
 ];
