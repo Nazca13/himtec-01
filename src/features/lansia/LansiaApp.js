@@ -117,6 +117,18 @@ export default function LansiaApp() {
     [terkirim, fail]
   );
 
+  // Demo / pengujian: /demo/layar bisa memicu simulasi kejang/jatuh lewat postMessage
+  useEffect(() => {
+    const onMessage = (e) => {
+      if (e.origin === window.location.origin && e.data?.sapa === 'simulasi') {
+        const sebab = e.data.sebab === 'JATUH' ? 'JATUH' : 'KEJANG';
+        kirim({ tipeInput: TIPE_INPUT.KELUHAN, keluhan: [sebab] });
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [kirim]);
+
   const finishRecording = useCallback(async () => {
     setPhase('sending');
     try {

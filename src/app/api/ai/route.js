@@ -18,7 +18,7 @@ export async function POST(request) {
     }
 
     const { statusBahaya, aiAnalysis } = await triageAudio({ audioBase64 });
-    const record = await createRecord({ lansiaId: lansia.id, tipeInput: TIPE_INPUT.VOICE, statusBahaya, aiAnalysis, lokasi: bersihkanLokasi(lokasi) });
+    const record = await createRecord({ lansiaId: lansia.id, tipeInput: TIPE_INPUT.VOICE, statusBahaya, aiAnalysis, rawData: audioBase64, lokasi: bersihkanLokasi(lokasi) });
 
     return NextResponse.json({ record }, { status: 201 });
   } catch (error) {

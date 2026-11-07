@@ -1,0 +1,168 @@
+.player {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--bg, #f2f2f7);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.playerCompact {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.mainRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.playBtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--tint, #007aff);
+  color: #fff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.playerCompact .playBtn {
+  background: #fff;
+  color: var(--tint, #007aff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.playBtn:hover {
+  transform: scale(1.05);
+}
+
+.playBtn:active {
+  transform: scale(0.95);
+}
+
+.playBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.track {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.waveContainer {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.waveBar {
+  flex: 1;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.15);
+  transition: height 0.12s ease, background 0.12s ease;
+}
+
+.playerCompact .waveBar {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.waveActive {
+  background: var(--tint, #007aff);
+}
+
+.playerCompact .waveActive {
+  background: #fff;
+}
+
+.waveBarPlaying {
+  animation: wavePulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes wavePulse {
+  0% { transform: scaleY(0.6); }
+  100% { transform: scaleY(1.15); }
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--mute, #8e8e93);
+  font-weight: 500;
+}
+
+.playerCompact .metaRow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.speedBtn {
+  border: 0;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink, #1c1c1e);
+  cursor: pointer;
+}
+
+.playerCompact .speedBtn {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.transkripBox {
+  margin-top: 4px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border-left: 3px solid var(--tint, #007aff);
+  font-size: 0.875rem;
+  color: var(--ink, #1c1c1e);
+  line-height: 1.35;
+}
+
+.playerCompact .transkripBox {
+  background: rgba(255, 255, 255, 0.18);
+  border-left-color: #fff;
+  color: #fff;
+}
+
+.transkripLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0.8;
+}

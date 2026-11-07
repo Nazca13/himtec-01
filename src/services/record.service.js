@@ -7,23 +7,40 @@ const STATUS_VALID = new Set(Object.values(STATUS));
 
 export class ValidationError extends Error {}
 
-export async function createRecord({ lansiaId, tipeInput, statusBahaya, aiAnalysis, lokasi = {} }) {
+export async function createRecord({ lansiaId, tipeInput, statusBahaya, aiAnalysis, rawData, lokasi = {} }) {
   if (!lansiaId) throw new ValidationError('lansiaId wajib');
   if (!TIPE_VALID.has(tipeInput)) throw new ValidationError('tipeInput tidak valid');
   if (!STATUS_VALID.has(statusBahaya)) throw new ValidationError('statusBahaya tidak valid');
 
   return db.dailyRecord.create({
-    data: { lansiaId, tipeInput, statusBahaya, aiAnalysis: aiAnalysis ?? undefined, ...lokasi },
+    data: { lansiaId, tipeInput, statusBahaya, aiAnalysis: aiAnalysis ?? undefined, rawData: rawData ?? undefined, ...lokasi },
   });
 }
 
 // lansiaId wajib: tidak ada query log yang boleh lintas lansia/keluarga.
-export function listRecords({ lansiaId, limit = 50, since }) {
-  return db.dailyRecord.findMany({
+export async function listRecords({ lansiaId, limit = 50, since }) {
+  const rows = await db.dailyRecord.findMany({
     where: { lansiaId, ...(since && { createdAt: { gte: since } }) },
     orderBy: { createdAt: 'desc' },
     take: Math.min(limit, 200),
+    select: {
+      id: true,
+      lansiaId: true,
+      tipeInput: true,
+      statusBahaya: true,
+      aiAnalysis: true,
+      latitude: true,
+      longitude: true,
+      akurasiMeter: true,
+      createdAt: true,
+      rawData: true,
+    },
   });
+
+  return rows.map(({ rawData, ...r }) => ({
+    ...r,
+    hasAudio: Boolean(rawData) || r.tipeInput === TIPE_INPUT.VOICE,
+  }));
 }
 
 const HARI_MS = 24 * 60 * 60 * 1000;

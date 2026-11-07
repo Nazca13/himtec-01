@@ -24,7 +24,7 @@ const LANGKAH = {
 
 function sebabDari(record) {
   const a = record?.aiAnalysis ?? {};
-  if (a.sebab === 'KEJANG' || a.gejala?.includes('Baru kejang')) return 'KEJANG';
+  if (a.sebab === 'KEJANG' || a.gejala?.includes('Kejang') || a.gejala?.includes('Baru kejang')) return 'KEJANG';
   if (a.sebab === 'JATUH' || a.gejala?.includes('Jatuh')) return 'JATUH';
   return 'UMUM';
 }

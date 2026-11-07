@@ -1,6 +1,7 @@
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import { PiChatTeardropDotsFill, PiMapPinFill, PiMicrophoneFill, PiShieldCheckFill, PiSirenFill, PiVibrateFill } from 'react-icons/pi';
+import AudioPlayer from '@/components/ui/AudioPlayer';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { TIPE_LABEL } from '@/lib/constants';
 import { formatWaktu } from '@/lib/format';
@@ -44,6 +45,7 @@ export default function Timeline({ records }) {
               </div>
               <time dateTime={new Date(r.createdAt).toISOString()}>{formatWaktu(r.createdAt)}</time>
               {analysis?.ringkasan && <p>{analysis.ringkasan}</p>}
+              {(r.tipeInput === 'VOICE_NOTE' || r.hasAudio) && <AudioPlayer record={r} />}
               {r.latitude != null && (
                 <a className={styles.loc} href={`https://www.google.com/maps/search/?api=1&query=${r.latitude},${r.longitude}`} target="_blank" rel="noopener noreferrer">
                   <PiMapPinFill aria-hidden="true" />

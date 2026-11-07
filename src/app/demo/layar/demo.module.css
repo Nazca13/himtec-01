@@ -30,6 +30,42 @@
   gap: 8px 16px;
 }
 
+.sim {
+  display: flex;
+  gap: 8px;
+}
+
+.simBtnKejang,
+.simBtnJatuh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.simBtnKejang {
+  background: #fde4e7;
+  color: var(--merah, #d70015);
+}
+
+.simBtnJatuh {
+  background: #fdebdd;
+  color: #c93400;
+}
+
+.simBtnKejang:active,
+.simBtnJatuh:active {
+  transform: scale(0.96);
+  opacity: 0.8;
+}
+
 .head a,
 .small a {
   color: var(--sky-deep);

@@ -6,7 +6,7 @@ export const KELUHAN = [
   { id: 'NYERI_DADA', label: 'Nyeri dada', bahaya: 'MERAH' },
   { id: 'SESAK', label: 'Sesak napas', bahaya: 'MERAH' },
   { id: 'JATUH', label: 'Jatuh', bahaya: 'MERAH' },
-  { id: 'KEJANG', label: 'Baru kejang', bahaya: 'MERAH' },
+  { id: 'KEJANG', label: 'Kejang', bahaya: 'MERAH' },
   { id: 'MUAL', label: 'Mual', bahaya: 'KUNING' },
   { id: 'DEMAM', label: 'Demam', bahaya: 'KUNING' },
   { id: 'OBAT_HABIS', label: 'Obat habis', bahaya: 'KUNING' },

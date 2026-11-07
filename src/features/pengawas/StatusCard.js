@@ -1,5 +1,6 @@
 import * as m from 'motion/react-m';
 import { PiMicrophoneFill, PiShieldCheckFill, PiSirenFill, PiWarningFill } from 'react-icons/pi';
+import AudioPlayer from '@/components/ui/AudioPlayer';
 import { STATUS_LABEL, TIPE_LABEL } from '@/lib/constants';
 import { formatLalu, formatWaktu } from '@/lib/format';
 import styles from './pengawas.module.css';
@@ -42,6 +43,9 @@ export default function StatusCard({ latest, now }) {
           {formatLalu(latest.createdAt)}
         </p>
         {ringkasan && <p className={styles.statusNote}>{ringkasan}</p>}
+        {(latest.tipeInput === 'VOICE_NOTE' || latest.hasAudio) && (
+          <AudioPlayer record={latest} compact />
+        )}
         {sepi && (
           <p className={styles.sepi}>
             <PiWarningFill aria-hidden="true" />
