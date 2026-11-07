@@ -6,18 +6,20 @@ const STATUS_VALID = new Set(Object.values(STATUS));
 
 export class ValidationError extends Error {}
 
-export async function createRecord({ tipeInput, statusBahaya, aiAnalysis }) {
+export async function createRecord({ householdId, tipeInput, statusBahaya, aiAnalysis }) {
+  if (!householdId) throw new ValidationError('householdId wajib');
   if (!TIPE_VALID.has(tipeInput)) throw new ValidationError('tipeInput tidak valid');
   if (!STATUS_VALID.has(statusBahaya)) throw new ValidationError('statusBahaya tidak valid');
 
   return db.dailyRecord.create({
-    data: { tipeInput, statusBahaya, aiAnalysis: aiAnalysis ?? undefined },
+    data: { householdId, tipeInput, statusBahaya, aiAnalysis: aiAnalysis ?? undefined },
   });
 }
 
-export function listRecords({ limit = 50, since } = {}) {
+// householdId wajib: tidak ada query log yang boleh lintas grup.
+export function listRecords({ householdId, limit = 50, since }) {
   return db.dailyRecord.findMany({
-    where: since ? { createdAt: { gte: since } } : undefined,
+    where: { householdId, ...(since && { createdAt: { gte: since } }) },
     orderBy: { createdAt: 'desc' },
     take: Math.min(limit, 200),
   });

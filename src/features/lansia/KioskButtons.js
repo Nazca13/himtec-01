@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import {
@@ -24,12 +25,22 @@ export default function KioskButtons() {
   // idle | recording | sending | sent | error
   const [phase, setPhase] = useState('idle');
   const [errorText, setErrorText] = useState('');
+  const [putus, setPutus] = useState(false); // HP ini diputus keluarga: perlu dihubungkan ulang
+  const [nama, setNama] = useState('');
   const [detik, setDetik] = useState(0);
   const { start, stop } = useRecorder();
 
-  const fail = useCallback((text) => {
-    setErrorText(text);
+  const fail = useCallback((text, err) => {
+    setPutus(err?.message === 'putus');
+    setErrorText(err?.message === 'putus' ? 'HP ini diputus oleh keluarga. Minta kode baru, lalu hubungkan lagi.' : text);
     setPhase('error');
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/saya')
+      .then((r) => r.json())
+      .then((d) => d.namaLansia && setNama(d.namaLansia))
+      .catch(() => {});
   }, []);
 
   const finishRecording = useCallback(async () => {
@@ -37,8 +48,8 @@ export default function KioskButtons() {
     try {
       await kirimSuara(await stop());
       setPhase('sent');
-    } catch {
-      fail('Pesan suara belum terkirim. Coba lagi.');
+    } catch (err) {
+      fail('Pesan suara belum terkirim. Coba lagi.', err);
     }
   }, [stop, fail]);
 
@@ -70,8 +81,8 @@ export default function KioskButtons() {
     try {
       await kirimTombol(tipe);
       setPhase('sent');
-    } catch {
-      fail('Pesan belum terkirim. Periksa internet, lalu coba lagi.');
+    } catch (err) {
+      fail('Pesan belum terkirim. Periksa internet, lalu coba lagi.', err);
     }
   };
 
@@ -89,7 +100,7 @@ export default function KioskButtons() {
     <main className={styles.kiosk}>
       <header className={styles.head}>
         <Wordmark />
-        <p>Tekan satu tombol</p>
+        <p>{nama ? `Halo, ${nama}` : 'Tekan satu tombol'}</p>
       </header>
 
       <div className={styles.buttons}>
@@ -169,9 +180,15 @@ export default function KioskButtons() {
             <>
               <PiWarningCircleFill className={`${styles.bigIcon} ${styles.warn}`} aria-hidden="true" />
               <p className={`${styles.msg} ${styles.errText}`}>{errorText}</p>
-              <m.button whileTap={{ scale: 0.96 }} className={styles.action} onClick={() => setPhase('idle')}>
-                Kembali
-              </m.button>
+              {putus ? (
+                <Link href="/hubungkan" className={styles.action}>
+                  Hubungkan ulang
+                </Link>
+              ) : (
+                <m.button whileTap={{ scale: 0.96 }} className={styles.action} onClick={() => setPhase('idle')}>
+                  Kembali
+                </m.button>
+              )}
             </>
           )}
         </m.div>

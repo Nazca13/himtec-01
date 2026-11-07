@@ -13,13 +13,13 @@
 }
 
 .brand,
-.switch {
+.who {
   display: none;
 }
 
 .nav {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .item {
@@ -77,23 +77,6 @@
   justify-content: space-between;
   padding: calc(env(safe-area-inset-top) + 12px) var(--gutter) 12px;
   background: var(--paper); /* tanpa blur: backdrop-filter berat di HP murah */
-}
-
-.topEnd {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.switchBtn {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--paper);
-  box-shadow: var(--shadow-sm);
-  font-size: 1.25rem;
 }
 
 .live {
@@ -193,13 +176,15 @@
     background: var(--ice);
   }
 
-  .switch {
-    display: block;
+  .who {
+    display: grid;
     margin-top: auto;
     padding: 12px;
-    color: var(--mute);
     font-size: 0.9375rem;
-    font-weight: 600;
+  }
+
+  .who span {
+    color: var(--mute);
   }
 
   .main {

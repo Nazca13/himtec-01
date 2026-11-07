@@ -10,11 +10,21 @@ import { useRecords } from './RecordsProvider';
 import styles from './pengawas.module.css';
 
 export default function BerandaView() {
-  const { records, now } = useRecords();
+  const { records, household, now } = useRecords();
   if (!records) return <Skeleton />;
 
   return (
     <div className={styles.stack}>
+      {household && !household.lansiaTerhubungAt && (
+        <div className={styles.notice}>
+          <p>
+            <strong>HP {household.namaLansia} belum terhubung</strong>
+            Kabar baru muncul setelah HP itu dihubungkan.
+          </p>
+          <Link href="/pengawas/keluarga">Hubungkan</Link>
+        </div>
+      )}
+      {household && <h1 className={styles.heading}>Kondisi {household.namaLansia}</h1>}
       <StatusCard latest={records[0]} now={now} />
       <TodayStats records={records} />
       <section aria-labelledby="terbaru">

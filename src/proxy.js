@@ -1,17 +1,23 @@
 import { NextResponse } from 'next/server';
+import { SESSION_COOKIE, verifySession } from '@/lib/session';
 
-// Disalin dari src/lib/roles.js: proxy berjalan terpisah dari kode render, jangan impor modul bersama.
 const HOME = { lansia: '/lansia', pengawas: '/pengawas' };
 
-// Perangkat yang sudah memilih peran langsung dialihkan di server: tidak ada kedipan halaman pemilih.
-export function proxy(request) {
-  const { searchParams } = request.nextUrl;
-  if (searchParams.has('ganti')) return NextResponse.next();
+// Aturan akses halaman berdasarkan sesi (cookie bertanda tangan). Data tetap dijaga lagi di tiap API.
+//   tanpa sesi  : hanya halaman masuk (/, /buat, /gabung, /hubungkan)
+//   lansia      : hanya /lansia (dan /hubungkan untuk menghubungkan ulang)
+//   pengawas    : hanya /pengawas/*
+export async function proxy(request) {
+  const { pathname } = request.nextUrl;
+  const session = await verifySession(request.cookies.get(SESSION_COOKIE)?.value).catch(() => null);
+  const role = session?.r;
+  const go = (path) => NextResponse.redirect(new URL(path, request.url));
 
-  const target = HOME[request.cookies.get('sapa-role')?.value];
-  if (!target) return NextResponse.next();
-
-  return NextResponse.redirect(new URL(target, request.url));
+  if (pathname === '/lansia') return role === 'lansia' ? NextResponse.next() : go(HOME[role] ?? '/');
+  if (pathname.startsWith('/pengawas')) return role === 'pengawas' ? NextResponse.next() : go(HOME[role] ?? '/');
+  if (pathname === '/hubungkan') return role === 'pengawas' ? go(HOME.pengawas) : NextResponse.next();
+  // '/', '/buat', '/gabung': yang sudah punya sesi langsung masuk ke tampilannya
+  return role ? go(HOME[role]) : NextResponse.next();
 }
 
-export const config = { matcher: '/' };
+export const config = { matcher: ['/', '/buat', '/gabung', '/hubungkan', '/lansia', '/pengawas/:path*'] };

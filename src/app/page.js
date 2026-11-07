@@ -1,5 +1,5 @@
-import RoleGateway from '@/features/role/RoleGateway';
+import Gateway from '@/features/masuk/Gateway';
 
 export default function Home() {
-  return <RoleGateway />;
+  return <Gateway />;
 }

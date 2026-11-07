@@ -10,15 +10,33 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model DailyRecord {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tipeInput    String   @map("tipe_input") @db.VarChar(50)
-  statusBahaya String   @default("HIJAU") @map("status_bahaya") @db.VarChar(20)
-  rawData      String?  @map("raw_data") @db.Text
-  aiAnalysis   Json?    @map("ai_analysis") @db.JsonB
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+// Satu grup keluarga = satu lansia yang dipantau oleh beberapa anggota keluarga.
+// HP lansia dan HP keluarga dihubungkan lewat dua kode terpisah.
+model Household {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  namaLansia        String    @map("nama_lansia") @db.VarChar(60)
+  kodeLansia        String    @unique @map("kode_lansia") @db.VarChar(12) // dipakai di HP lansia
+  kodeKeluarga      String    @unique @map("kode_keluarga") @db.VarChar(12) // dipakai untuk mengundang keluarga
+  lansiaVersion     Int       @default(1) @map("lansia_version") // dinaikkan saat HP lansia diputus
+  lansiaTerhubungAt DateTime? @map("lansia_terhubung_at") @db.Timestamptz
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  records           DailyRecord[]
 
-  @@index([createdAt(sort: Desc)])
+  @@map("households")
+}
+
+model DailyRecord {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // Nullable hanya agar baris lama (sebelum ada grup) tidak perlu dihapus; semua query memfilter household.
+  householdId  String?   @map("household_id") @db.Uuid
+  household    Household? @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  tipeInput    String    @map("tipe_input") @db.VarChar(50)
+  statusBahaya String    @default("HIJAU") @map("status_bahaya") @db.VarChar(20)
+  rawData      String?   @map("raw_data") @db.Text
+  aiAnalysis   Json?     @map("ai_analysis") @db.JsonB
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([householdId, createdAt(sort: Desc)])
   @@index([statusBahaya])
   @@map("daily_records")
 }

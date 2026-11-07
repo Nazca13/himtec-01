@@ -6,7 +6,7 @@ import {
   PiChatCircleDotsFill,
   PiClockCounterClockwiseFill,
   PiHouseFill,
-  PiArrowsLeftRightBold,
+  PiUsersThreeFill,
   PiWifiSlashBold,
 } from 'react-icons/pi';
 import Wordmark from '@/components/ui/Wordmark';
@@ -17,11 +17,12 @@ const NAV = [
   { href: '/pengawas', label: 'Beranda', Icon: PiHouseFill },
   { href: '/pengawas/riwayat', label: 'Riwayat', Icon: PiClockCounterClockwiseFill },
   { href: '/pengawas/asisten', label: 'Asisten AI', Icon: PiChatCircleDotsFill },
+  { href: '/pengawas/keluarga', label: 'Keluarga', Icon: PiUsersThreeFill },
 ];
 
 export default function PengawasShell({ children }) {
   const pathname = usePathname();
-  const { error } = useRecords();
+  const { error, household, me } = useRecords();
 
   return (
     <div className={styles.shell}>
@@ -41,23 +42,22 @@ export default function PengawasShell({ children }) {
             );
           })}
         </nav>
-        <Link href="/?ganti" className={styles.switch}>
-          Ganti peran
-        </Link>
+        {household && (
+          <p className={styles.who}>
+            <strong>{me?.nama}</strong>
+            <span>memantau {household.namaLansia}</span>
+          </p>
+        )}
       </aside>
 
       <div className={styles.main}>
         <header className={styles.top}>
           <Wordmark />
-          <div className={styles.topEnd}>
           <span className={`${styles.live} ${error ? styles.off : ''}`} role="status">
             {error ? <PiWifiSlashBold aria-hidden="true" /> : <span className={styles.pulse} aria-hidden="true" />}
             {error ? 'Terputus' : 'Langsung'}
           </span>
-          <Link href="/?ganti" className={styles.switchBtn} aria-label="Ganti peran">
-            <PiArrowsLeftRightBold aria-hidden="true" />
-          </Link>
-          </div>
+
         </header>
 
         {error && (

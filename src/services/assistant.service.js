@@ -25,13 +25,13 @@ function buildContext(records) {
     .join('\n');
 }
 
-export async function askAssistant(question) {
+export async function askAssistant({ question, household }) {
   const orca = getOrca();
   if (!orca) throw new Error('ORCA_API_KEY belum diisi.');
 
   const since = new Date(Date.now() - DAYS_BACK * 24 * 60 * 60 * 1000);
-  const records = await listRecords({ limit: 100, since });
-  const prompt = `Log ${DAYS_BACK} hari terakhir (terbaru di atas):\n${buildContext(records)}\n\nPertanyaan pengawas: ${question}`;
+  const records = await listRecords({ householdId: household.id, limit: 100, since });
+  const prompt = `Lansia yang dipantau: ${household.namaLansia}.\nLog ${DAYS_BACK} hari terakhir (terbaru di atas):\n${buildContext(records)}\n\nPertanyaan pengawas: ${question}`;
 
   const res = await orca.chat.completions.create({
     model: ORCA_TEXT_MODEL,

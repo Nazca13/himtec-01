@@ -10,12 +10,13 @@ async function postJson(url, body) {
         body: JSON.stringify(body),
       });
       if (res.ok) return res.json();
+      if (res.status === 401) throw new Error('putus'); // sesi tidak berlaku: HP diputus keluarga
       // 4xx = permintaan salah, mengulang tidak membantu.
       if (res.status < 500) throw new Error('Permintaan ditolak');
       lastError = new Error('Server gagal');
     } catch (err) {
       lastError = err;
-      if (err.message === 'Permintaan ditolak') break;
+      if (err.message === 'Permintaan ditolak' || err.message === 'putus') break;
     }
     await new Promise((r) => setTimeout(r, 800 * (i + 1)));
   }
