@@ -45,7 +45,8 @@ Semua FK `ON DELETE CASCADE`. Indeks utama: `daily_records(lansia_id, created_at
 Migrasi manual untuk database lama (dijalankan berurutan, masing-masing satu transaksi):
 1. `prisma/sql/2026-11-07-peran-dan-relasi.sql`: grup lama menjadi keluarga + lansia, log dipindah ke lansia.
 2. `prisma/sql/2026-11-07-lokasi.sql`: kolom lokasi.
-3. `prisma/sql/2026-11-08-keluhan-deteksi.sql`: tipe kabar KELUHAN dan DETEKSI_OTOMATIS.
+3. `prisma/sql/2026-11-08-keluhan-deteksi.sql`: tipe kabar KELUHAN (dan DETEKSI_OTOMATIS untuk riwayat lama).
+4. `prisma/sql/2026-11-08-hapus-deteksi.sql`: hapus kolom pengaturan deteksi (fitur dihapus).
 
 Data demo: `npm run db:seed` (hanya mereset Keluarga Demo).
 

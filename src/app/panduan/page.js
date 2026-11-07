@@ -16,7 +16,7 @@ const PERAN = [
     nama: 'Lansia',
     siapa: 'Orang tua yang dipantau (nenek atau kakek).',
     perangkat: 'Aplikasi di HP-nya sendiri (bisa di-install ke layar utama).',
-    bisa: 'Menekan Saya Aman, Keluhan (bicara, atau ketuk gambar keluhan bagi yang sulit bicara), atau Darurat. Deteksi jatuh dan kejang bisa diaktifkan. Maskot menyapa dan menghitung hari berturut-turut.',
+    bisa: 'Menekan Saya Aman, Keluhan (bicara, atau ketuk gambar keluhan bagi yang sulit bicara), atau Darurat. Maskot menyapa dan menghitung hari berturut-turut.',
     masuk: 'Membuka link kode HP dari admin, lalu "Hubungkan HP ini". Cukup sekali.',
   },
   {
@@ -42,7 +42,7 @@ const TANYA = [
   ['HP orang tua hilang atau diganti?', 'Admin membuka menu Keluarga, tekan "Putuskan HP". HP lama langsung tidak bisa mengirim kabar, dan kode baru dibuat untuk HP baru.'],
   ['Bagaimana mengeluarkan anggota keluarga?', 'Admin membuka menu Keluarga, lalu "Keluarkan" pada nama anggota. Perangkatnya langsung tidak bisa membuka dashboard. Keluarga selalu menyisakan minimal satu admin.'],
   ['Bagaimana jika orang tua tidak bisa bicara?', 'Tekan Keluhan, lalu ketuk gambar keluhannya (boleh lebih dari satu) dan tekan Kirim. Tidak perlu suara atau mengetik.'],
-  ['Bagaimana jika orang tua kejang atau jatuh dan tidak bisa menekan tombol?', 'Aktifkan "Deteksi jatuh dan kejang" di HP orang tua. Jika HP mendeteksi guncangan seperti kejang atau benturan jatuh, layar menghitung mundur 30 detik dengan tombol besar "Saya baik-baik saja". Jika tidak ditekan, Darurat terkirim otomatis beserta lokasi, dan layar menampilkan petunjuk pertolongan untuk orang di sekitar. Keluarga melihat langkah pertolongan pertama di dashboard. Deteksi hanya bekerja selama aplikasi terbuka di layar; ini membantu, bukan pengganti pengawasan medis.'],
+  ['Bagaimana jika orang tua kejang atau jatuh?', 'Orang tua atau orang di dekatnya menekan Darurat, atau Keluhan lalu ketuk "Baru kejang" atau "Jatuh". Keduanya langsung berstatus merah. Keluarga melihat langkah pertolongan pertama di dashboard beserta lokasi terakhir dan tombol telepon 119.'],
   ['Apakah data keluarga saya terlihat orang lain?', 'Tidak. Setiap keluarga hanya melihat datanya sendiri, dan semua akses diperiksa di server. Bagikan kode hanya ke keluarga.'],
   ['Ingin mencoba tanpa mendaftar?', 'Buka mode demo: satu layar berisi HP orang tua dan dashboard admin berdampingan, dengan data contoh.'],
 ];

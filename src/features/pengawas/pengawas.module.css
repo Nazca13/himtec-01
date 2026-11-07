@@ -336,16 +336,14 @@ section > .h2 {
   gap: 24px;
 }
 
-.main,
-.side {
-  display: grid;
-  gap: 24px;
-  align-content: start;
+.dash > * {
   min-width: 0;
 }
 
+/* Ponsel: kedua kolom "dilebur" agar kartu bisa diurutkan menurut kepentingan (.o1-.o7) */
+.main,
 .side {
-  order: -1;
+  display: contents;
 }
 
 @media (min-width: 1000px) {
@@ -354,11 +352,14 @@ section > .h2 {
     align-items: start;
   }
 
+  .main,
   .side {
-    order: 0;
-    position: sticky;
-    top: 24px;
+    display: grid;
+    gap: 24px;
+    align-content: start;
+    min-width: 0;
   }
+
 }
 
 /* Tombol */
@@ -414,6 +415,7 @@ section > .h2 {
 /* Tab Keluarga */
 .panel {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* kode besar di kotak berbagi tidak boleh melebarkan panel */
   gap: 12px;
 }
 
@@ -431,6 +433,7 @@ section > .h2 {
 
 .item {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   padding: 16px;
 }
@@ -556,3 +559,12 @@ section > .h2 {
   background: #e3f4e8;
   color: #1c6b30;
 }
+
+/* Urutan Beranda di ponsel: yang paling penting dulu (status), tren paling akhir */
+.o1 { order: 1; }
+.o2 { order: 2; }
+.o3 { order: 3; }
+.o4 { order: 4; }
+.o5 { order: 5; }
+.o6 { order: 6; }
+.o7 { order: 7; }

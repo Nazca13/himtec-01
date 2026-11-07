@@ -57,7 +57,7 @@ export default function AsistenView() {
       </div>
 
       <div className={styles.thread} aria-live="polite">
-        {!thread.length && (
+        {!thread.length && dipilih && (
           <div className={styles.intro}>
             <Mascot size={84} />
             <p>Tanya apa saja soal kondisi {dipilih?.nama ?? 'orang tua'}. Jawaban dibuat dari kabar 7 hari terakhir.</p>

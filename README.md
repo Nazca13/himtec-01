@@ -1,13 +1,13 @@
 # SAPA - Sistem Asisten Pantau Aktif
 
-Aplikasi untuk memantau orang tua (lansia) dari jauh. Tampilan mengikuti Apple Human Interface Guidelines (latar grouped, daftar inset, Large Title, font sistem). Orang tua cukup menekan satu dari tiga tombol besar di HP-nya; keluarga langsung melihat kabarnya di dashboard, lengkap dengan ringkasan AI, riwayat, dan lokasi terakhir. Spesifikasi awal: `docs/PRD.txt`.
+Aplikasi untuk memantau orang tua (lansia) dari jauh. Tampilan mengikuti Apple Human Interface Guidelines (latar grouped, daftar inset, Large Title, font sistem). Orang tua cukup menekan satu dari tiga tombol besar di HP-nya; keluarga langsung melihat kabarnya di dashboard, lengkap dengan ringkasan AI, riwayat, dan lokasi terakhir. Spesifikasi awal: `docs/PRD.txt`. Laporan lengkap (latar belakang, analisis, desain, implementasi, pengujian): [`readthis.md`](readthis.md).
 
 ## Tiga peran
 
 | Peran | Siapa | Perangkat | Bisa apa | Cara masuk |
 | --- | --- | --- | --- | --- |
 | **Admin** | Anak/pengurus yang mendaftarkan keluarga | Web (laptop/HP): dashboard | Semua yang bisa pemantau, ditambah: tambah/hapus orang tua, bagikan kode HP dan kode undangan, putuskan HP yang hilang, jadikan anggota admin, keluarkan anggota | Halaman depan, lalu **Daftarkan keluarga** (`/daftar`) |
-| **Lansia** | Orang tua yang dipantau | Aplikasi di HP-nya (PWA, bisa di-install) | Tekan **Saya Aman**, **Keluhan** (bicara, atau ketuk gambar bagi yang sulit bicara), atau **Darurat**. Deteksi jatuh/kejang opsional. Lokasi HP ikut terkirim jika diizinkan | Buka link kode HP dari admin, lalu **Hubungkan HP ini** (`/hubungkan?kode=...`), cukup sekali |
+| **Lansia** | Orang tua yang dipantau | Aplikasi di HP-nya (PWA, bisa di-install) | Tekan **Saya Aman**, **Keluhan** (bicara, atau ketuk gambar bagi yang sulit bicara), atau **Darurat**. Lokasi HP ikut terkirim jika diizinkan | Buka link kode HP dari admin, lalu **Hubungkan HP ini** (`/hubungkan?kode=...`), cukup sekali |
 | **Pemantau** | Anggota keluarga lain | Web (laptop/HP): dashboard | Lihat status, Ringkasan AI, lokasi terakhir, grafik, riwayat; tanya Asisten AI. Tidak bisa mengubah pengaturan | Halaman depan, lalu **Masuk dengan kode undangan** (`/gabung`) |
 
 Penjelasan yang sama untuk pengguna ada di app: `/panduan`.
@@ -19,9 +19,8 @@ Penjelasan yang sama untuk pengguna ada di app: `/panduan`.
    - **Kode undangan** (8 karakter) untuk anggota keluarga lain.
 2. **Hubungkan HP orang tua**: admin menekan *Kirim lewat WhatsApp*. Di HP orang tua, link dibuka lalu *Hubungkan HP ini*. HP meminta izin lokasi sekali, lalu menampilkan tiga tombol setiap kali dibuka. Pilih *Tambahkan ke layar utama* agar menjadi aplikasi.
 3. **Orang tua memberi kabar**: Saya Aman (hijau), Keluhan (oranye), Darurat (merah). Maskot burung hantu menyapa (pesan ditulis AI) dan menghitung hari berturut-turut.
-   - **Keluhan tanpa suara**: selain merekam suara (AI merangkum dan menilai tingkat bahaya), orang tua bisa mengetuk gambar keluhan: Pusing, Nyeri dada, Sesak napas, Jatuh, Baru kejang, Mual, Lemas, Demam, Badan sakit, Obat habis, Susah tidur, Ingin ditelepon. Nyeri dada, sesak, jatuh, dan kejang otomatis berstatus merah.
-   - **Deteksi jatuh dan kejang** (saklar di HP orang tua): sensor gerak mendeteksi guncangan berirama ≥10 detik (kemungkinan kejang) atau jatuh bebas lalu benturan (kemungkinan jatuh). Layar menghitung mundur 30 detik dengan tombol "Saya baik-baik saja", berbunyi dan bergetar, serta menampilkan petunjuk pertolongan untuk orang di sekitar dan tombol telepon 119. Tidak dibatalkan = Darurat terkirim otomatis beserta lokasi. Hanya bekerja selama aplikasi terbuka (layar dijaga tetap menyala); deteksi di latar belakang butuh aplikasi native atau jam pintar.
-4. **Keluarga memantau** di `/pengawas`: status terbaru, Ringkasan AI live, lokasi terakhir (peta), grafik 7 hari, riwayat, dan Asisten AI. Kabar baru muncul dalam ±5 detik tanpa reload. Saat status merah, muncul kartu **pertolongan pertama** (kejang, jatuh, atau darurat umum) dengan tombol telepon 119/112 dan lokasi.
+   - **Keluhan tanpa suara**: selain merekam suara (AI merangkum dan menilai tingkat bahaya), orang tua bisa mengetuk gambar keluhan: Pusing, Nyeri dada, Sesak napas, Jatuh, Baru kejang, Mual, Demam, Obat habis, Ingin ditelepon (3×3, satu ketukan langsung terkirim). Nyeri dada, sesak, jatuh, dan kejang otomatis berstatus merah.
+4. **Keluarga memantau** di `/pengawas`: status terbaru, Ringkasan AI live, lokasi terakhir (peta), grafik 7 hari, riwayat, dan Asisten AI. Kabar baru muncul dalam ±5 detik tanpa reload. Saat status merah, muncul kartu **pertolongan pertama** (kejang, jatuh, atau darurat umum) dengan tombol telepon 119/112 dan lokasi. Belum ada kabar sama sekali: dashboard menampilkan satu kartu langkah awal, bukan kartu-kartu kosong.
 5. **Admin mengundang keluarga lain** dari tab *Keluarga*: kirim kode undangan. Penerima masuk sebagai pemantau; admin bisa menjadikannya admin.
 
 Lainnya (semua dari tab *Keluarga*, khusus admin):
@@ -30,7 +29,7 @@ Lainnya (semua dari tab *Keluarga*, khusus admin):
 - **Membuka dashboard di perangkat lain**: masuk dengan kode undangan (sebagai pemantau), lalu admin menekan *Jadikan admin*.
 - **Mengeluarkan anggota**: *Keluarkan*. Perangkatnya langsung tidak bisa membuka dashboard. Keluarga selalu menyisakan minimal satu admin.
 
-**Juri / uji cepat**: buka `/demo`. Satu browser masuk sebagai admin "Keluarga Demo" sekaligus sebagai HP Oma Siti, ditampilkan berdampingan. Tombol *Simulasikan kejang/jatuh* memicu peringatan otomatis tanpa mengguncang HP. `/demo?reset=1` mengembalikan data demo.
+**Juri / uji cepat**: buka `/demo`. Satu browser masuk sebagai admin "Keluarga Demo" sekaligus sebagai HP Oma Siti, ditampilkan berdampingan. `/demo?reset=1` mengembalikan data demo.
 
 ## Menjalankan
 
@@ -53,7 +52,6 @@ Mencoba dari HP di jaringan yang sama: buka `http://<IP-laptop>:3000`. Mikrofon,
 | `npm run db:push` | sinkronkan `prisma/schema.prisma` ke database |
 | `npm run db:seed` | isi ulang Keluarga Demo (hanya data keluarga demo yang direset) |
 | `npm run db:studio` | lihat data di browser |
-| `npm run test:deteksi` | uji detektor kejang/jatuh dengan data sensor buatan |
 
 ## Deploy (Vercel)
 
@@ -86,7 +84,7 @@ Key anon/service_role Supabase tidak dipakai: semua akses database lewat Prisma 
 households (keluarga)
  ├─ 1:n members        id, household_id, nama, role (ADMIN | PEMANTAU)
  └─ 1:n lansia         id, household_id, nama, kode_pairing (unik), device_version, terhubung_at
-          └─ 1:n daily_records   id, lansia_id, tipe_input (TOMBOL_AMAN | TOMBOL_DARURAT | VOICE_NOTE | KELUHAN | DETEKSI_OTOMATIS),
+          └─ 1:n daily_records   id, lansia_id, tipe_input (TOMBOL_AMAN | TOMBOL_DARURAT | VOICE_NOTE | KELUHAN),
                                  status_bahaya, ai_analysis (jsonb),
                                  latitude, longitude, akurasi_meter, created_at
 households: id, nama, kode_undangan (unik), created_at
@@ -121,7 +119,7 @@ households: id, nama, kode_undangan (unik), created_at
 | POST | `/api/lansia/:id/putus` | admin | putuskan HP, buat kode baru |
 | PATCH | `/api/anggota/:id` | admin | ubah peran (ADMIN/PEMANTAU) |
 | DELETE | `/api/anggota/:id` | admin, atau diri sendiri | keluarkan anggota |
-| POST | `/api/record` | lansia | kirim Saya Aman, Darurat, keluhan pilihan (`keluhan: [..]`), atau deteksi otomatis (`sebab: KEJANG/JATUH`); status ditentukan server (+ lokasi) |
+| POST | `/api/record` | lansia | kirim Saya Aman, Darurat, atau keluhan pilihan (`keluhan: [..]`); status ditentukan server (+ lokasi) |
 | POST | `/api/ai` | lansia | kirim pesan suara (WAV) untuk triase AI (+ lokasi) |
 | GET | `/api/saya`, `/api/saya/sapa` | lansia | keadaan HP lansia dan pesan maskot |
 

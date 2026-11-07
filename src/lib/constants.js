@@ -3,7 +3,7 @@ export const TIPE_INPUT = {
   DARURAT: 'TOMBOL_DARURAT',
   VOICE: 'VOICE_NOTE',
   KELUHAN: 'KELUHAN', // dipilih lewat gambar, tanpa suara
-  OTOMATIS: 'DETEKSI_OTOMATIS', // sensor HP mendeteksi kejang/jatuh, tidak dibatalkan dalam 30 detik
+  OTOMATIS: 'DETEKSI_OTOMATIS', // fitur lama (sudah dihapus); dipertahankan agar riwayat lama tetap tampil
 };
 
 export const STATUS = {

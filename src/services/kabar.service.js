@@ -1,9 +1,10 @@
 import { STATUS, TIPE_INPUT } from '@/lib/constants';
-import { KELUHAN_BY_ID, SEBAB_OTOMATIS } from '@/lib/keluhan';
+import { KELUHAN_BY_ID } from '@/lib/keluhan';
 import { ValidationError } from './record.service';
 
-// Menafsirkan kabar non-suara dari HP lansia menjadi status + ringkasan. Status selalu ditentukan server.
-export function tafsirkanKabar({ tipeInput, keluhan, sebab, nama }) {
+// Menafsirkan kabar non-suara dari HP lansia (tombol atau keluhan pilihan gambar) menjadi status + ringkasan.
+// Status selalu ditentukan server.
+export function tafsirkanKabar({ tipeInput, keluhan, nama }) {
   switch (tipeInput) {
     case TIPE_INPUT.AMAN:
       return { statusBahaya: STATUS.HIJAU };
@@ -24,19 +25,6 @@ export function tafsirkanKabar({ tipeInput, keluhan, sebab, nama }) {
           ringkasan: gawat.length
             ? `${nama} melaporkan ${daftar}. Ini tanda gawat: segera hubungi ${nama}.`
             : `${nama} melaporkan ${daftar} lewat pilihan gambar.`,
-        },
-      };
-    }
-
-    case TIPE_INPUT.OTOMATIS: {
-      if (!SEBAB_OTOMATIS[sebab]) throw new ValidationError('sebab harus KEJANG atau JATUH.');
-      return {
-        statusBahaya: STATUS.MERAH,
-        aiAnalysis: {
-          otomatis: true,
-          sebab,
-          gejala: [sebab === 'KEJANG' ? 'Kemungkinan kejang' : 'Kemungkinan jatuh'],
-          ringkasan: `Sensor HP mendeteksi ${SEBAB_OTOMATIS[sebab]}, dan ${nama} tidak menekan "Saya baik-baik saja" dalam 30 detik. Segera hubungi atau datangi ${nama}.`,
         },
       };
     }

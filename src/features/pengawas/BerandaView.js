@@ -5,6 +5,7 @@ import { PiArrowRightBold } from 'react-icons/pi';
 import AiLiveWidget from './AiLiveWidget';
 import LansiaSwitcher from './LansiaSwitcher';
 import LokasiCard from './LokasiCard';
+import MulaiCard from './MulaiCard';
 import PertolonganCard from './PertolonganCard';
 import Skeleton from './Skeleton';
 import StatusCard from './StatusCard';
@@ -42,7 +43,7 @@ export default function BerandaView() {
         <LansiaSwitcher />
       </div>
 
-      {dipilih && !dipilih.terhubungAt && (
+      {dipilih && !dipilih.terhubungAt && records?.length > 0 && (
         <div className={styles.notice}>
           <p>
             <strong>HP {dipilih.nama} belum terhubung</strong>
@@ -54,13 +55,23 @@ export default function BerandaView() {
 
       {records === null ? (
         <Skeleton />
+      ) : records.length === 0 ? (
+        dipilih && <MulaiCard lansia={dipilih} isAdmin={isAdmin} />
       ) : (
         <div className={styles.dash}>
           <div className={styles.main}>
-            <StatusCard latest={records[0]} now={now} />
-            {records[0]?.statusBahaya === 'MERAH' && <PertolonganCard record={records[0]} nama={dipilih?.nama} lokasi={lokasiTerakhir} />}
-            <TodayStats records={records} />
-            <section aria-labelledby="terbaru">
+            <div className={styles.o1}>
+              <StatusCard latest={records[0]} now={now} />
+            </div>
+            {records[0]?.statusBahaya === 'MERAH' && (
+              <div className={styles.o2}>
+                <PertolonganCard record={records[0]} nama={dipilih?.nama} lokasi={lokasiTerakhir} />
+              </div>
+            )}
+            <div className={styles.o5}>
+              <TodayStats records={records} />
+            </div>
+            <section className={styles.o6} aria-labelledby="terbaru">
               <div className={styles.row}>
                 <h2 id="terbaru" className={styles.h2}>
                   Kabar terbaru
@@ -75,9 +86,15 @@ export default function BerandaView() {
           </div>
 
           <aside className={styles.side}>
-            <AiLiveWidget />
-            <LokasiCard />
-            <WeekChart records={records} now={now} />
+            <div className={styles.o3}>
+              <AiLiveWidget />
+            </div>
+            <div className={styles.o4}>
+              <LokasiCard />
+            </div>
+            <div className={styles.o7}>
+              <WeekChart records={records} now={now} />
+            </div>
           </aside>
         </div>
       )}

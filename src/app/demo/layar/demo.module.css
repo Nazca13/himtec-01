@@ -30,21 +30,6 @@
   gap: 8px 16px;
 }
 
-.sim {
-  display: flex;
-  gap: 8px;
-}
-
-.sim button {
-  min-height: 36px;
-  padding: 0 12px;
-  border-radius: 10px;
-  background: #fde4e7;
-  color: var(--merah);
-  font-weight: 600;
-  font-size: 0.9375rem;
-}
-
 .head a,
 .small a {
   color: var(--sky-deep);
