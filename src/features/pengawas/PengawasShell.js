@@ -100,7 +100,13 @@ export default function PengawasShell({ children }) {
         </header>
 
         {alarmActive && (
-          <div className={styles.alarmBanner} role="alert">
+          <div
+            className={styles.alarmBanner}
+            role="alert"
+            onClick={() => {
+              if (alarmBlocked) playAlarmAgain();
+            }}
+          >
             <div className={styles.alarmBannerLeft}>
               <PiSirenFill className={styles.alarmIcon} aria-hidden="true" />
               <span>

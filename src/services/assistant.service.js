@@ -1,3 +1,4 @@
+import { tanpaMarkdown } from '@/lib/format';
 import { getOrca, ORCA_TEXT_MODEL } from '@/lib/orca';
 import { STATUS_LABEL, TIPE_LABEL } from '@/lib/constants';
 import { formatWaktu } from '@/lib/format';
@@ -34,5 +35,5 @@ export async function askAssistant({ question, lansia }) {
       { role: 'user', content: prompt },
     ],
   });
-  return res.choices[0].message.content;
+  return tanpaMarkdown(res.choices[0].message.content);
 }

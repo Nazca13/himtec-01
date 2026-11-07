@@ -18,8 +18,10 @@ const nextConfig = {
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' }, // iframe hanya dari situs sendiri (mode demo)
           { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          // Mikrofon (pesan suara) dan lokasi (lokasi terakhir) hanya untuk situs sendiri; kamera tidak dipakai.
-          { key: 'Permissions-Policy', value: 'microphone=(self), geolocation=(self), camera=()' },
+          // HTTPS wajib selama 2 tahun (Vercel selalu HTTPS; header diabaikan di http://localhost).
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+          // Mikrofon (pesan suara), lokasi (lokasi terakhir), dan autoplay sirine ambulans darurat.
+          { key: 'Permissions-Policy', value: 'microphone=(self), geolocation=(self), camera=(), autoplay=(self)' },
         ],
       },
       {

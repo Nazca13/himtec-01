@@ -1,139 +1,141 @@
-# 🏛️ Arsitektur Teknis — SAPA (Sistem Asisten Pantau Aktif)
+# Arsitektur
 
-Dokumen ini menjelaskan rancangan sistem, model data, alur pemrosesan AI, dan strategi keamanan pada aplikasi **SAPA**.
+## Gambaran
 
----
-
-## 1. Diagram Alur Sistem (System Flowchart)
+Satu aplikasi Next.js (App Router) melayani tiga hal: halaman web, aplikasi orang tua (PWA), dan API. Data disimpan di PostgreSQL (Supabase) lewat Prisma. AI dipanggil dari server lewat OrcaRouter (API kompatibel OpenAI).
 
 ```mermaid
-flowchart TD
-    subgraph Klien_Lansia ["📱 Aplikasi PWA Lansia (HP Senior)"]
-        L1["Tombol Saya Aman (Hijau)"]
-        L2["Perekam Suara WAV + useRecorder"]
-        L3["Pilihan 9 Gambar Keluhan"]
-        L4["Tombol Darurat Kejang & Sensor Getar"]
-        L5["Absensi Laporan Harian & Obat"]
+flowchart LR
+    subgraph Klien
+        HP["HP orang tua<br/>PWA /lansia"]
+        WEB["Browser keluarga<br/>/pengawas"]
     end
-
-    subgraph API_Gateway ["⚡ Next.js 16 API Routes (bom1 Mumbai)"]
-        A1["/api/ai (Multimodal Voice Triage)"]
-        A2["/api/record (Pencatatan Status Harian)"]
-        A3["/api/audio/[id] (Audio Streaming Provider)"]
-        A4["/api/dashboard (Polling Data Realtime)"]
-        A5["/api/assistant (Konsultasi Chat AI)"]
+    subgraph Vercel["Vercel (wilayah bom1)"]
+        PROXY["proxy.js<br/>gerbang halaman"]
+        API["Route handler<br/>/api/*"]
+        SVC["Service<br/>aturan bisnis"]
     end
+    DB[("Supabase PostgreSQL<br/>RLS aktif")]
+    AI["OrcaRouter<br/>Gemini 2.5"]
 
-    subgraph Layanan_AI ["🧠 OrcaRouter (Gemini 2.5 Flash)"]
-        AI1["Audio Speech-to-Text & Clinical Triage"]
-        AI2["Analisis Bahaya (HIJAU/KUNING/MERAH)"]
-        AI3["Ekstraksi Gejala Medis & Ringkasan"]
-    end
-
-    subgraph Penyimpanan ["🗄️ Database PostgreSQL (Supabase ap-south-1)"]
-        DB1["Households (Keluarga)"]
-        DB2["Members (Admin & Pemantau)"]
-        DB3["Lansia (Perangkat Terhubung)"]
-        DB4["DailyRecords (Log Status & Audio Base64)"]
-    end
-
-    subgraph Dashboard_Pengawas ["🖥️ Dashboard Keluarga / Petugas"]
-        D1["Kartu Status Real-Time + Sirine Alarm"]
-        D2["Pemutar Suara Nenek (AudioPlayer)"]
-        D3["Panduan Pertolongan Pertama (119/112)"]
-        D4["Peta Lokasi GPS Terakhir"]
-        D5["Ekspor Laporan CSV & Pengaturan"]
-    end
-
-    L1 & L3 & L4 & L5 -->|Kirim Status| A2
-    L2 -->|Kirim Audio WAV + Geo| A1
-    A1 -->|Audio Prompt| Layanan_AI
-    Layanan_AI -->|Hasil JSON Triage| A1
-    A1 -->|Simpan Record + Raw Audio| DB4
-    A2 -->|Simpan Status| DB4
-    D4 & D1 & D3 & D5 <-->|Polling 3-5s| A4
-    A4 <--> DB4 & DB3 & DB2 & DB1
-    D2 -->|Stream Audio WAV| A3
-    A3 <--> DB4
+    HP -->|cookie sapa-lansia| API
+    WEB -->|cookie sapa-pengawas| API
+    HP & WEB --> PROXY
+    API --> SVC
+    SVC --> DB
+    SVC -->|suara, teks| AI
 ```
 
----
+Wilayah fungsi (`bom1`, Mumbai) disamakan dengan wilayah database agar setiap query hanya puluhan milidetik. Dari wilayah yang jauh, satu query bisa mencapai 2 detik.
 
-## 2. Struktur Model Database (Entity Relationship)
+## Lapisan dan aturan dependensi
 
-Aplikasi menggunakan **Prisma 6** dengan target **PostgreSQL (Supabase)**. Seluruh relasi menerapkan `onDelete: Cascade` agar penghapusan data bersih tanpa *orphaned records*.
+```
+src/app/            Halaman dan route handler. Tipis: validasi input, panggil service, bentuk respons.
+src/features/       Antarmuka per fitur (lansia, pengawas, masuk). Komponen React.
+src/components/     Komponen bersama (Mascot, RolePill, StatusBadge, ...).
+src/hooks/          Hook bersama (useRecorder, useDeteksiGerak).
+src/services/       Aturan bisnis dan akses data. Tidak mengenal HTTP.
+src/lib/            Utilitas murni dan infrastruktur (auth, sesi, db, kode, validasi).
+prisma/             Skema dan migrasi SQL.
+```
+
+Arah dependensi satu arah: `app` dan `features` boleh memakai `services` dan `lib`; `services` boleh memakai `lib`; `lib` tidak memakai lapisan di atasnya. Kode `features/` tidak pernah mengimpor `services/` atau `db`: ia hanya bicara dengan API lewat `fetch`.
+
+Aturan praktis:
+
+- Route handler tidak berisi aturan bisnis. Contoh: `app/api/record/route.js` memanggil `tafsirkanKabar` (service) lalu `createRecord`.
+- Galat yang disebabkan input klien dilempar sebagai `ValidationError` (`lib/errors.js`) dan dipetakan ke HTTP 400. Galat tak terduga dicatat dan dikembalikan sebagai 500 dengan pesan umum.
+- Status bahaya tidak pernah datang dari klien. Server menentukannya dari jenis kabar dan daftar keluhan.
+
+## Struktur folder
+
+```
+src/
+  app/
+    api/                 Route handler (lihat API.md)
+    daftar/ gabung/ hubungkan/ lansia/ pengawas/ demo/ panduan/   Halaman
+    global-error.js      Batas galat terakhir (layout akar)
+    error.js not-found.js layout.js globals.css
+  features/
+    lansia/              LansiaApp.js merangkai hooks/ dan components/; teks.js berisi bagian murni
+    pengawas/            Shell, RecordsProvider (polling), tampilan dashboard
+    masuk/               Gateway dan formulir masuk
+  components/ui/         Mascot, RolePill, StatusBadge, ShareCode, AudioPlayer, Wordmark
+  hooks/                 useRecorder, useDeteksiGerak
+  services/
+    household.service.js   Keluarga, anggota, orang tua, kode
+    record.service.js      Simpan dan baca kabar
+    kabar.service.js       Aturan status untuk kabar non-suara
+    triage.service.js      Suara -> transkrip + status (AI)
+    mascot.service.js      Sapaan harian (AI + teks cadangan)
+    assistant.service.js   Tanya jawab keluarga (AI)
+    demo.service.js        Data keluarga demo
+  lib/                   auth, session, codes, rate-limit, validate, lokasi, geo, format,
+                         orca, errors, constants, keluhan, deteksi, siren, http, env, flags, db
+  instrumentation.js     Validasi env saat server mulai
+  proxy.js               Gerbang halaman (pengganti middleware di Next.js 16)
+prisma/                  schema.prisma, setup.sql, seed.js, sql/ (migrasi)
+tests/                   Tes unit (node:test)
+```
+
+## Alur request terautentikasi
 
 ```mermaid
-erDiagram
-    Household ||--o{ Member : "memiliki anggota"
-    Household ||--o{ Lansia : "memantau orang tua"
-    Lansia ||--o{ DailyRecord : "mencatat aktivitas"
+sequenceDiagram
+    participant C as Klien
+    participant R as Route handler
+    participant A as lib/auth
+    participant S as Service
+    participant D as Database
 
-    Household {
-        uuid id PK
-        varchar nama "Nama keluarga mis. Keluarga Budi"
-        varchar kodeUndangan UK "Kode 8 huruf untuk pemantau"
-        timestamptz createdAt
-    }
-
-    Member {
-        uuid id PK
-        uuid householdId FK
-        varchar nama "Nama anggota"
-        varchar role "ADMIN atau PEMANTAU"
-        timestamptz createdAt
-    }
-
-    Lansia {
-        uuid id PK
-        uuid householdId FK
-        varchar nama "Nama orang tua"
-        varchar kodePairing UK "Kode 6 huruf untuk HP lansia"
-        int deviceVersion "Versi sesi (naik saat diputus)"
-        timestamptz terhubungAt
-        timestamptz createdAt
-    }
-
-    DailyRecord {
-        uuid id PK
-        uuid lansiaId FK
-        varchar tipeInput "TOMBOL_AMAN | VOICE_NOTE | KELUHAN | DETEKSI_OTOMATIS"
-        varchar statusBahaya "HIJAU | KUNING | MERAH"
-        text rawData "Audio WAV rekaman suara (Base64)"
-        jsonb aiAnalysis "transkrip, gejala, ringkasan, dll"
-        float latitude "Koordinat GPS"
-        float longitude "Koordinat GPS"
-        real akurasiMeter
-        timestamptz createdAt
-    }
+    C->>R: POST /api/record (cookie sapa-lansia)
+    R->>A: requireLansia(request)
+    A->>A: verifikasi tanda tangan + masa berlaku
+    A->>D: ambil lansia, bandingkan deviceVersion
+    A-->>R: lansia, atau galat 401
+    R->>S: tafsirkanKabar(...) lalu createRecord(...)
+    S->>D: INSERT daily_records
+    R-->>C: 201 { record }
 ```
 
----
+Peran tidak dipercaya dari cookie. Cookie hanya berisi id; peran dan keanggotaan dibaca dari database pada setiap request, sehingga perubahan peran atau pemutusan HP berlaku seketika.
 
-## 3. Alur Pemrosesan Suara & Voice Triage (`/api/ai`)
+## Pemrosesan suara
 
-1. **Perekaman di Klien (`useRecorder.js`)**:
-   - Merekam suara melalui `MediaRecorder` API.
-   - Menggunakan `OfflineAudioContext` untuk mengonversi format browser (WebM/MP4) menjadi **WAV Mono 16 kHz** standar (~32 KB/detik).
-2. **Pengiriman & Penyimpanan**:
-   - Audio dikirim ke server dalam bentuk Base64 string via `POST /api/ai`.
-   - String Base64 audio disimpan di kolom `DailyRecord.rawData` sehingga keluarga dapat memutar ulang suara asli nenek kapan saja.
-3. **Analisis AI Multimodal (`triage.service.js`)**:
-   - Dikirim ke model `gemini-2.5-flash` lewat OrcaRouter.
-   - Prompt sistem bertindak sebagai perawat triase geriatri:
-     - **MERAH**: Gejala serangan jantung, sesak, jatuh, pingsan, bicara pelo, kejang.
-     - **KUNING**: Nyeri, demam, mual, obat habis, susah tidur, kesepian.
-     - **HIJAU**: Konfirmasi kondisi sehat/aman.
-   - Menghasilkan respon JSON: `transkrip`, `gejala`, `statusBahaya`, `ringkasan`.
-4. **Fallback Resilience**:
-   - Jika OrcaRouter tidak merespons atau terjadi batas kuota/timeout, sistem secara otomatis mengembalikan status aman cadangan (**KUNING**) dengan pesan agar keluarga segera menelepon langsung. Tidak ada pesan lansia yang hilang.
+1. `hooks/useRecorder.js` merekam lewat `MediaRecorder`, lalu mengubahnya ke WAV mono 16 kHz dengan `OfflineAudioContext` (sekitar 32 KB per detik, maksimum 30 detik).
+2. Klien mengirim base64 ke `POST /api/ai` (batas `MAX_AUDIO_BASE64_LENGTH`, sekitar 4,5 MB audio).
+3. `triage.service.js` mengirim audio ke model `google/gemini-2.5-flash` dengan instruksi triase geriatri dan meminta JSON: `transkrip`, `gejala`, `statusBahaya`, `ringkasan`.
+4. Rekaman asli disimpan di `daily_records.raw_data` supaya keluarga dapat memutarnya (`GET /api/audio/[id]`, mendukung HTTP Range untuk Safari).
+5. Bila AI gagal atau melewati batas waktu, kabar tetap tersimpan dengan status KUNING dan pesan agar keluarga segera menelepon. Pesan orang tua tidak pernah hilang karena AI mati.
 
----
+Teks (sapaan maskot, asisten, ringkasan) memakai `google/gemini-2.5-flash-lite`. Setiap pemanggilan AI punya teks cadangan non-AI.
 
-## 4. Keamanan & Autentikasi Tanpa Kata Sandi
+## Rendering dan caching (Next.js 16)
 
-- Menggunakan **Signed Session Cookies** (`sapa-pengawas` dan `sapa-lansia`) berbasis **HMAC-SHA256 (Web Crypto API)**.
-- `httpOnly: true`, `sameSite: 'lax'`, `secure: true` pada HTTPS.
-- Masa berlaku sesi 1 tahun untuk memastikan HP orang tua tetap terhubung tanpa perlu berulang kali login.
-- **In-flight Device Versioning**: Jika admin menekan "Putuskan HP", kolom `deviceVersion` pada baris Lansia dinaikkan (+1). Sesi cookie lama pada HP yang hilang/diganti otomatis ditolak seketika pada request berikutnya.
-- **Row-Level Security (RLS)** diaktifkan pada semua tabel database Supabase untuk memblokir akses langsung di luar Prisma ORM server.
+- `cacheComponents` aktif: akses data dinamis harus lewat `Suspense` atau `use cache`.
+- Route handler yang membaca cookie memanggil `await connection()` agar ditandai dinamis.
+- Halaman yang membaca `searchParams` dibungkus `Suspense`.
+- `/demo` dan tautan keluar yang mengubah state memakai `<a>` biasa, bukan `<Link>`, supaya tidak ikut di-prefetch.
+- Nilai `demoAktif()` yang dibaca saat build menentukan tautan demo di beranda; variabel `ENABLE_DEMO` harus sudah ada saat build (di Vercel otomatis).
+
+## Pembaruan data di dashboard
+
+`features/pengawas/RecordsProvider.js` memuat `/api/dashboard` berkala. Tiga pengaman mencegah penumpukan request ke database:
+
+- tidak memuat saat tab tersembunyi,
+- tidak memulai pemuatan baru selama satu pemuatan masih berjalan,
+- urutan permintaan: respons lama yang terlambat dibuang.
+
+## Keputusan desain
+
+| Keputusan | Alasan | Konsekuensi |
+|---|---|---|
+| Tanpa kata sandi; kode pendek | Orang tua tidak perlu mengingat kredensial | Keamanan bergantung pada kerahasiaan kode dan pembatasan laju |
+| Cookie bertanda tangan HMAC, bukan JWT/Auth0 | Sederhana, tanpa dependensi, dapat dicabut lewat `deviceVersion` | Rotasi `SESSION_SECRET` mengeluarkan semua pengguna |
+| Peran dibaca dari DB tiap request | Pencabutan seketika | Satu query tambahan per request |
+| Status ditentukan server | Klien tidak bisa memalsukan status | Daftar keluhan dipakai bersama di `lib/keluhan.js` |
+| Polling, bukan WebSocket/push | Cukup untuk skala keluarga, sederhana di serverless | Kabar muncul dalam hitungan detik, bukan seketika |
+| Audio disimpan di kolom DB | Tanpa layanan penyimpanan tambahan | Baris besar; pindah ke object storage bila volume naik |
+| Pembatas laju dalam memori | Tanpa infrastruktur tambahan | Tidak akurat lintas instance; lihat [KEAMANAN.md](KEAMANAN.md) |
+| Migrasi SQL manual di `prisma/sql/` | Kontrol penuh atas constraint dan RLS | Harus dijalankan berurutan di SQL Editor |

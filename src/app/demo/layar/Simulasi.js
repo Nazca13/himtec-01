@@ -1,13 +1,23 @@
 'use client';
 
+import { useEffect } from 'react';
 import { PiArrowFatLinesDownFill, PiLightningFill, PiSirenFill } from 'react-icons/pi';
+import { initAudioUnlocker, playSiren } from '@/lib/siren';
 import styles from './demo.module.css';
 
 // Tombol simulasi demo: memicu laporan kejang/jatuh di HP lansia (iframe kiri) secara instan atau dengan hitung mundur.
 export default function Simulasi({ className }) {
+  useEffect(() => {
+    initAudioUnlocker();
+  }, []);
+
   const kirim = (sebab, instan = false) => {
     const hp = document.querySelector('iframe[data-hp-lansia]');
     hp?.contentWindow?.postMessage({ sapa: 'simulasi', sebab, instan }, window.location.origin);
+    if (instan) {
+      // Langsung bunyikan sirine darurat di window utama demo
+      playSiren();
+    }
   };
 
   return (

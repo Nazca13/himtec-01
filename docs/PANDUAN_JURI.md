@@ -8,10 +8,11 @@ Dokumen ini disusun khusus bagi dewan juri untuk menguji dan mengevaluasi seluru
 
 Untuk menguji seluruh ekosistem tanpa perlu mendaftar atau menghubungkan dua perangkat fisik:
 
-1. Jalankan aplikasi atau buka link produksi:
+1. Jalankan aplikasi (`npm run dev`) atau buka alamat produksi, lalu buka jalur `/demo`:
    ```
    http://localhost:3000/demo
    ```
+   Di produksi, mode demo mati secara default. Pemilik harus menyetel `ENABLE_DEMO=true` dan men-deploy ulang (lihat [PRODUKSI.md](PRODUKSI.md)); tanpa itu `/demo` menampilkan 404.
 2. Anda otomatis masuk sebagai:
    - **Kiri**: Layar HP Lansia (**Oma Siti**) dalam simulasi ponsel ramah lansia.
    - **Kanan**: Layar Dashboard Keluarga / Petugas Pengawas (**Tamu Demo**) secara *real-time*.
@@ -20,7 +21,7 @@ Untuk menguji seluruh ekosistem tanpa perlu mendaftar atau menghubungkan dua per
 
 ---
 
-## 🎯 6 Skenario Pengujian Fitur Unggulan
+## 🎯 7 Skenario Pengujian Fitur Unggulan
 
 ### 1. 🔊 Pemutar Suara Nenek Asli (*Voice Memo Player*)
 - **Tujuan**: Membuktikan bahwa suara ucapan lansia tersimpan dan dapat didengarkan oleh keluarga/petugas, lengkap dengan analisis AI.

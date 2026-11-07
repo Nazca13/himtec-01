@@ -1,0 +1,36 @@
+// Nada contoh 1,5 detik (WAV mono 16 kHz) untuk rekaman demo yang tidak punya audio asli. Hanya dipakai saat mode demo aktif.
+export function generateDemoWav(durationSec = 1.5, sampleRate = 16000) {
+  const numSamples = Math.floor(durationSec * sampleRate);
+  const dataSize = numSamples * 2;
+  const buffer = Buffer.alloc(44 + dataSize);
+
+  // WAV header
+  buffer.write('RIFF', 0);
+  buffer.writeUInt32LE(36 + dataSize, 4);
+  buffer.write('WAVE', 8);
+  buffer.write('fmt ', 12);
+  buffer.writeUInt32LE(16, 16); // Subchunk1Size (16 for PCM)
+  buffer.writeUInt16LE(1, 20); // AudioFormat (1 = PCM)
+  buffer.writeUInt16LE(1, 22); // NumChannels (1 = mono)
+  buffer.writeUInt32LE(sampleRate, 24); // SampleRate
+  buffer.writeUInt32LE(sampleRate * 2, 28); // ByteRate
+  buffer.writeUInt16LE(2, 32); // BlockAlign
+  buffer.writeUInt16LE(16, 34); // BitsPerSample
+  buffer.write('data', 36);
+  buffer.writeUInt32LE(dataSize, 40);
+
+  // Generate pleasant harmonized vocal tones (440Hz A4 + 554.37Hz C#5 + 659.25Hz E5) with smooth envelope
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const env = Math.sin((Math.PI * i) / numSamples); // smooth bell curve envelope
+    const s1 = Math.sin(2 * Math.PI * 330 * t);
+    const s2 = Math.sin(2 * Math.PI * 440 * t) * 0.7;
+    const s3 = Math.sin(2 * Math.PI * 660 * t) * 0.5;
+    const sample = Math.max(-1, Math.min(1, (s1 + s2 + s3) * env * 0.45));
+    buffer.writeInt16LE(Math.floor(sample * 32767), 44 + i * 2);
+  }
+
+  return buffer;
+}
+
+// Mengambil audio WAV dari rekaman suara lansia. Hanya anggota keluarga yang berhak mendengar.

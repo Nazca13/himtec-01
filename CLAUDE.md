@@ -9,6 +9,7 @@ npm run dev     # dev server at http://localhost:3000
 npm run build   # production build
 npm run start   # serve production build
 npm run lint    # eslint (flat config, eslint.config.mjs)
+npm test        # unit tests (node:test, tests/*.test.mjs; no database needed)
 ```
 
 No test framework is configured. Prisma has no npm script; run `npx prisma generate`, `npx prisma migrate dev` or `npx prisma studio` directly.
@@ -24,7 +25,8 @@ No test framework is configured. Prisma has no npm script; run `npx prisma gener
 
 - `src/app/` pages, layouts and route handlers (`src/app/api/*/route.js`).
 - `src/lib/` shared server utilities (e.g. `db.js`).
-- `prisma/` database schema.
+- `src/features/` UI per feature (`lansia/` is split into `hooks/`, `components/`, `teks.js`), `src/services/` business rules, `src/instrumentation.js` env validation at server start.
+- `prisma/` database schema. `docs/` full documentation (start at `docs/README.md`).
 
 The project is SAPA (see `README.md` for the full role/flow/API reference). Three roles: **ADMIN** and **PEMANTAU** are `Member` rows of a `Household` (family) and use the web dashboard (`/pengawas/*`: Pemantauan, Riwayat, Asisten AI, Keluarga, Pengaturan); **LANSIA** is an elder (`Lansia` row) whose phone is paired once via `/hubungkan?kode=` and runs the PWA (`/lansia`; only that page and `/hubungkan` link `/app.webmanifest`). Admin registers at `/daftar` (creates household + admin + first elder), viewers join at `/gabung` with the invite code, the guide is `/panduan`, `/demo` logs one browser into the seeded demo family as admin + elder side by side.
 

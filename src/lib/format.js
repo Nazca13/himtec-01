@@ -29,3 +29,11 @@ export const formatLalu = (value) => formatDistanceToNow(new Date(value), { addS
 export const wib = (d) => new Intl.DateTimeFormat('id-ID', { timeZone: TZ, dateStyle: 'medium', timeStyle: 'short' }).format(d);
 
 export const namaHari = (d) => new Intl.DateTimeFormat('id-ID', { timeZone: TZ, weekday: 'short' }).format(d);
+
+// Jawaban AI kadang berisi markdown (**tebal**, "* butir") padahal UI menampilkan teks biasa.
+export const tanpaMarkdown = (teks) =>
+  String(teks ?? '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/^\s*[*-]\s+/gm, '- ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
