@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   PiChatCircleDotsFill,
   PiClockCounterClockwiseFill,
   PiHouseFill,
+  PiSignOutBold,
   PiUsersThreeFill,
   PiWifiSlashBold,
 } from 'react-icons/pi';
@@ -21,8 +22,17 @@ const NAV = [
 ];
 
 export default function PengawasShell({ children }) {
+  const router = useRouter();
   const pathname = usePathname();
   const { error, household, me, dipilih } = useRecords();
+
+  const keluarPengawas = async () => {
+    if (window.confirm('Keluar dari akun pengawas? Nanti tinggal masukkan kode untuk masuk lagi.')) {
+      await fetch('/api/auth/keluar?role=pengawas', { method: 'POST' });
+      router.replace('/');
+      router.refresh();
+    }
+  };
 
   return (
     <div className={styles.shell}>
@@ -43,23 +53,41 @@ export default function PengawasShell({ children }) {
           })}
         </nav>
         {household && (
-          <p className={styles.who}>
+          <div className={styles.who}>
             <strong>{me?.nama}</strong>
             <span>{me?.role === 'ADMIN' ? 'Admin' : 'Pemantau'}</span>
             <span>{household.nama}</span>
             {dipilih && <span>Melihat {dipilih.nama}</span>}
-          </p>
+            <button
+              type="button"
+              className={styles.sideLogoutBtn}
+              onClick={keluarPengawas}
+            >
+              <PiSignOutBold aria-hidden="true" />
+              Keluar
+            </button>
+          </div>
         )}
       </aside>
 
       <div className={styles.main}>
         <header className={styles.top}>
           <Wordmark />
-          <span className={`${styles.live} ${error ? styles.off : ''}`} role="status">
-            {error ? <PiWifiSlashBold aria-hidden="true" /> : <span className={styles.pulse} aria-hidden="true" />}
-            {error ? 'Terputus' : 'Langsung'}
-          </span>
-
+          <div className={styles.topRight}>
+            <span className={`${styles.live} ${error ? styles.off : ''}`} role="status">
+              {error ? <PiWifiSlashBold aria-hidden="true" /> : <span className={styles.pulse} aria-hidden="true" />}
+              {error ? 'Terputus' : 'Langsung'}
+            </span>
+            <button
+              type="button"
+              className={styles.topLogoutBtn}
+              onClick={keluarPengawas}
+              title="Keluar dari akun pengawas"
+            >
+              <PiSignOutBold aria-hidden="true" />
+              <span>Keluar</span>
+            </button>
+          </div>
         </header>
 
         {error && (

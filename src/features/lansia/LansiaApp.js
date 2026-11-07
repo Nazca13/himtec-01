@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'motion/react';
 import * as m from 'motion/react-m';
 import {
@@ -13,6 +14,7 @@ import {
   PiPhoneCallFill,
   PiPillFill,
   PiShieldCheckFill,
+  PiSignOutBold,
   PiSirenFill,
   PiSmileyNervousFill,
   PiSpiralBold,
@@ -59,6 +61,7 @@ function balasan(kabar, nama, record) {
 
 // Layar orang tua: sapaan + tanggal, maskot, dan tiga tombol. Tidak ada pengaturan atau menu.
 export default function LansiaApp() {
+  const router = useRouter();
   // idle | keluhan | recording | sending | sent | error
   const [phase, setPhase] = useState('idle');
   const [errorText, setErrorText] = useState('');
@@ -176,6 +179,14 @@ export default function LansiaApp() {
     }
   };
 
+  const keluarLansia = async () => {
+    if (window.confirm('Keluar dari HP ini? Nanti tinggal masukkan kode baru tanpa perlu install ulang aplikasi.')) {
+      await fetch('/api/auth/keluar?role=lansia', { method: 'POST' });
+      router.replace('/hubungkan');
+      router.refresh();
+    }
+  };
+
   const teksMaskot = pesan ?? info.sapaan;
 
   return (
@@ -221,6 +232,17 @@ export default function LansiaApp() {
           </span>
         </m.button>
       </div>
+
+      <footer className={styles.foot}>
+        <button
+          type="button"
+          className={styles.logoutBtn}
+          onClick={keluarLansia}
+        >
+          <PiSignOutBold aria-hidden="true" />
+          Keluar / Ganti Kode
+        </button>
+      </footer>
 
       <AnimatePresence>
         {phase !== 'idle' && (
