@@ -57,18 +57,12 @@ export default function PengaturanView() {
 
   const tesBunyiAlarm = () => {
     try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      const ctx = new Ctx();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(880, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.35);
-      gain.gain.value = 0.25;
-      osc.connect(gain).connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.4);
-      osc.onended = () => ctx.close();
+      const audio = new Audio('/alert/ambulance-2.mp3');
+      audio.play().catch(() => {});
+      setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0;
+      }, 3500);
     } catch {}
   };
 

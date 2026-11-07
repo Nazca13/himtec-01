@@ -44,6 +44,35 @@
   color: #fff;
 }
 
+.stopAlarmBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  background: #a1000f;
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(161, 0, 15, 0.35);
+  animation: pulseStopBtn 1.2s infinite ease-in-out;
+}
+
+@keyframes pulseStopBtn {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+.stopAlarmBtn:hover {
+  opacity: 0.9;
+}
+
 .secondary {
   background: var(--paper);
   color: var(--merah);

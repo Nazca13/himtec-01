@@ -246,3 +246,65 @@
     padding: 36px 40px 0;
   }
 }
+
+.alarmBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: #d70015;
+  color: #ffffff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(215, 0, 21, 0.35);
+  animation: alarmBarFlash 1.4s infinite alternate ease-in-out;
+  z-index: 50;
+}
+
+@keyframes alarmBarFlash {
+  from {
+    background-color: #d70015;
+  }
+  to {
+    background-color: #a80010;
+  }
+}
+
+.alarmBannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alarmIcon {
+  font-size: 1.5rem;
+  animation: alarmRing 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes alarmRing {
+  from { transform: rotate(-10deg) scale(1); }
+  to { transform: rotate(10deg) scale(1.15); }
+}
+
+.stopAlarmBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #d70015;
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.stopAlarmBtn:hover {
+  opacity: 0.92;
+  transform: scale(1.03);
+}

@@ -8,6 +8,8 @@ import {
   PiGearFill,
   PiHouseFill,
   PiSignOutBold,
+  PiSirenFill,
+  PiSpeakerSimpleSlashFill,
   PiUsersThreeFill,
   PiWifiSlashBold,
 } from 'react-icons/pi';
@@ -26,7 +28,7 @@ const NAV = [
 export default function PengawasShell({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { error, household, me, dipilih } = useRecords();
+  const { error, household, me, dipilih, alarmActive, stopAlarm } = useRecords();
 
   const keluarPengawas = async () => {
     if (window.confirm('Keluar dari akun pengawas? Nanti tinggal masukkan kode untuk masuk lagi.')) {
@@ -91,6 +93,21 @@ export default function PengawasShell({ children }) {
             </button>
           </div>
         </header>
+
+        {alarmActive && (
+          <div className={styles.alarmBanner} role="alert">
+            <div className={styles.alarmBannerLeft}>
+              <PiSirenFill className={styles.alarmIcon} aria-hidden="true" />
+              <span>
+                <strong>Sinyal Darurat:</strong> {dipilih ? `Kondisi ${dipilih.nama} berstatus MERAH!` : 'Ada kondisi lansia berstatus MERAH!'}
+              </span>
+            </div>
+            <button type="button" className={styles.stopAlarmBtn} onClick={stopAlarm}>
+              <PiSpeakerSimpleSlashFill aria-hidden="true" />
+              <span>Hentikan Sirine</span>
+            </button>
+          </div>
+        )}
 
         {error && (
           <p className={styles.banner} role="alert">

@@ -1,4 +1,5 @@
-import { PiFirstAidKitFill, PiMapPinFill, PiPhoneFill } from 'react-icons/pi';
+import { PiFirstAidKitFill, PiMapPinFill, PiPhoneFill, PiSpeakerSimpleSlashFill } from 'react-icons/pi';
+import { useRecords } from './RecordsProvider';
 import styles from './PertolonganCard.module.css';
 
 // Langkah pertolongan pertama umum untuk keluarga saat kabar terakhir berstatus MERAH.
@@ -33,6 +34,7 @@ const JUDUL = { KEJANG: 'Kemungkinan kejang', JATUH: 'Kemungkinan jatuh', UMUM: 
 
 export default function PertolonganCard({ record, nama, lokasi }) {
   const sebab = sebabDari(record);
+  const { alarmActive, stopAlarm } = useRecords();
   return (
     <section className={styles.card} aria-labelledby="pertolongan">
       <h2 id="pertolongan">
@@ -45,6 +47,12 @@ export default function PertolonganCard({ record, nama, lokasi }) {
         ))}
       </ol>
       <div className={styles.actions}>
+        {alarmActive && (
+          <button type="button" className={styles.stopAlarmBtn} onClick={stopAlarm}>
+            <PiSpeakerSimpleSlashFill aria-hidden="true" />
+            Hentikan Sirine
+          </button>
+        )}
         <a href="tel:119" className={styles.primary}>
           <PiPhoneFill aria-hidden="true" />
           Ambulans 119
