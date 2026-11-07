@@ -52,6 +52,19 @@ Mencoba dari HP di jaringan yang sama: buka `http://<IP-laptop>:3000`. Mikrofon,
 | `npm run db:seed` | isi ulang Keluarga Demo (hanya data keluarga demo yang direset) |
 | `npm run db:studio` | lihat data di browser |
 
+## Deploy (Vercel)
+
+`vercel.json` menaruh server di Mumbai (`bom1`), sama dengan region database Supabase (`ap-south-1`), supaya setiap query tidak menyeberang benua.
+
+```bash
+npx vercel login                      # sekali, lewat browser
+npx vercel link                       # hubungkan folder ini ke project Vercel
+npx vercel env add DATABASE_URL production   # ulangi untuk DIRECT_URL, ORCA_API_KEY, SESSION_SECRET
+npx vercel deploy --prod
+```
+
+Atau lewat dashboard: *Add New Project*, import repo GitHub ini, isi Environment Variables, lalu *Deploy*. Setiap push ke `main` akan di-deploy otomatis.
+
 ## Variabel lingkungan
 
 | Nama | Isi |
